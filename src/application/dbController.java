@@ -39,6 +39,7 @@ public class dbController {
 		loadGamesDatabase();
 		createRomDatabase();
 		loadRomDirectory(mainWindowController.getRomPath());
+		loadRoms();
 		checkRemoveEntry();
 		System.out.println("<==========finished loading sql==========>"); 
 	}
@@ -57,7 +58,7 @@ public class dbController {
 			// if the error message is "out of memory", it probably means no database file is found
 			System.err.println(e.getMessage());
 		}
-		System.out.println("rom database loaded to driver manager");
+		System.out.println("rom database loaded successfull");
 	}
 	
 	/**

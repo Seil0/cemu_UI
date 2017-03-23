@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Properties;
@@ -71,6 +73,12 @@ public class MainWindowController {
     private JFXButton playBtn;
     
     @FXML
+    private JFXButton timePlayedBtn;
+    
+    @FXML
+    private JFXButton lastTimePlayedBtn;
+    
+    @FXML
     private JFXHamburger menuHam;
     
     @FXML
@@ -109,6 +117,7 @@ public class MainWindowController {
     private String romPath;
     private String gameExecutePath;
     private String selectedGameTitleID;
+    private String selectedGameTitle;
     private String color;
     private int xPos = -200;
     private int yPos = 17;
@@ -152,12 +161,13 @@ public class MainWindowController {
 	}
 	
 	void initActions() {
-		System.out.println("initializing Actions ...");
+		System.out.print("initializing Actions... ");
 		
 		HamburgerBackArrowBasicTransition burgerTask = new HamburgerBackArrowBasicTransition(menuHam);
 		menuHam.addEventHandler(MouseEvent.MOUSE_PRESSED, (e)->{
 			if(playTrue){
 	    		playBtnSlideOut();
+	    		lastTimePlayedBtnSlideOut();
 	    	}
 	    	if(menuTrue == false){
 				sideMenuSlideIn();
@@ -215,7 +225,6 @@ public class MainWindowController {
                 	alert.showAndWait();
             	}
             	else{
-            		System.out.println("remove TODO!");
             		int i = gameCover.indexOf((selectedEvent).getSource());
             		gameVBox.remove(i);
 					gameCover.remove(i);
@@ -246,7 +255,7 @@ public class MainWindowController {
             	}else{
         			Alert updateAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
         			updateAlert.setTitle("cemu_UI");
-        			updateAlert.setHeaderText("add new Game");
+        			updateAlert.setHeaderText("update "+selectedGameTitle);
         			updateAlert.setContentText("pleas select the update directory");
         			updateAlert.initOwner(main.primaryStage);
 
@@ -269,7 +278,11 @@ public class MainWindowController {
 
         	            try {
         	            	System.out.println("copying files...");
-							FileUtils.copyDirectory(srcDir, destDir);
+        	            	playBtn.setText("updating...");
+        	            	playBtn.setDisable(true);
+							FileUtils.copyDirectory(srcDir, destDir);	//TODO progress indicator
+							playBtn.setText("play");
+							playBtn.setDisable(false);
 							System.out.println("done!");
 						} catch (IOException e) {
 							e.printStackTrace();
@@ -293,6 +306,7 @@ public class MainWindowController {
 		     public void handle(MouseEvent event) {
 		    	 if (playTrue) {
 			    	 playBtnSlideOut();
+			    	 lastTimePlayedBtnSlideOut();
 				}
 		     }
 		});
@@ -302,6 +316,7 @@ public class MainWindowController {
 		     public void handle(MouseEvent event) {
 		    	 if (playTrue) {
 			    	 playBtnSlideOut();
+			    	 lastTimePlayedBtnSlideOut();
 				}
 		     }
 		});
@@ -327,6 +342,16 @@ public class MainWindowController {
 		e.printStackTrace();
 	}
     }
+    
+    @FXML
+    void timePlayedBtnAction(ActionEvent event){
+    	
+    }
+    
+    @FXML
+    void lastTimePlayedBtnAction(ActionEvent event){
+    	
+    }
 
     @FXML
     void settingsBtnAction(ActionEvent event) {
@@ -346,7 +371,7 @@ public class MainWindowController {
     	Alert alert = new Alert(AlertType.INFORMATION);
     	alert.setTitle("about");
     	alert.setHeaderText("cemu_UI");
-    	alert.setContentText("cemu_UI by @Seil0 \npre release 0.0.1 \nwww.kellerkinder.xyz");
+    	alert.setContentText("cemu_UI by @Seil0 \npre release 0.1.0 \nwww.kellerkinder.xyz");
     	alert.initOwner(main.primaryStage);
     	alert.showAndWait();
     }
@@ -526,57 +551,68 @@ public class MainWindowController {
     
     void addGame(String title, String coverPath, String romPath, String titleID){
     	ImageView imageView = new ImageView();	//TODO abgerundete Kanten,
-    	Label gameTitle = new Label(title);
-    	File file = new File(coverPath);
+    	Label gameTitleLabel = new Label(title);
+    	File coverFile = new File(coverPath);
     	VBox VBox = new VBox();
     	JFXButton gameBtn = new JFXButton();
-    	Image image = new Image(file.toURI().toString());
+    	Image coverImage = new Image(coverFile.toURI().toString());
     	
     	generatePosition();
 //    	System.out.println("Title: "+title+"; cover: "+coverPath+"; rom: "+romPath);
 //    	System.out.println("X: "+getxPos()+"; Y: "+getyPos());
     	gameVBox.add(VBox);
     	gameCover.add(gameBtn);
-    	gameLabel.add(gameTitle);
-    	gameTitle.setMaxWidth(200);
-    	imageView.setImage(image);
+    	gameLabel.add(gameTitleLabel);
+    	gameTitleLabel.setMaxWidth(200);
+    	imageView.setImage(coverImage);
     	imageView.setFitHeight(300);
     	imageView.setFitWidth(200);
     	gameBtn.setGraphic(imageView);
-    	gameBtn.setContextMenu(gameContextMenu);
-//    	gameBtn.setOnAction(new EventHandler<ActionEvent>() {
-//            @Override
-//            public void handle(ActionEvent event) {
-    	
+    	gameBtn.setContextMenu(gameContextMenu);	
     	gameBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 		     @Override
 		     public void handle(MouseEvent event) {
-    	
             	System.out.println("selected: "+title+"; ID: "+titleID);
+            	
             	gameExecutePath = romPath;
             	selectedGameTitleID = titleID;
+            	selectedGameTitle = title;
             	selectedEvent = event;
             	
             	lastGameLabel.setStyle("-fx-underline: false;");
             	gameLabel.get(gameCover.indexOf(event.getSource())).setStyle("-fx-underline: true;");
             	lastGameLabel = gameLabel.get(gameCover.indexOf(event.getSource()));
-            	System.out.println(dbController.getLastPlayed(titleID));
+            	
+            	if(dbController.getLastPlayed(titleID).equals("") || dbController.getLastPlayed(titleID).equals(null)){
+            		lastTimePlayedBtn.setText("Last played, never");
+            	}else{
+                	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                	
+                	int localInt = Integer.parseInt(dtf.format(LocalDate.now()).replaceAll("-", ""));
+                	int lastInt = Integer.parseInt(dbController.getLastPlayed(titleID).replaceAll("-", ""));
+                	
+                	if(localInt == lastInt){
+                		lastTimePlayedBtn.setText("Last played, today");
+                	}else if(localInt-1 == lastInt){
+                		lastTimePlayedBtn.setText("Last played, yesterday");
+                	}else{
+                    	lastTimePlayedBtn.setText("Last played, "+dbController.getLastPlayed(titleID));
+                	}
+            	}
 
             	if(playTrue == false){
-            		playBtnSlideIn();	//TODO anderes design(mehr details spielzeit, zuletzt gespielt, etc.)
+            		playBtnSlideIn();	//TODO anderes design(mehr details spielzeit, etc.)
+            		lastTimePlayedBtnSlideIn();
             	}
             }	
         });
     	
-    	gameTitle.setFont(Font.font("System", FontWeight.BOLD, 14));
-    	VBox.getChildren().addAll(gameTitle,gameBtn);
+    	gameTitleLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
+    	VBox.getChildren().addAll(gameTitleLabel,gameBtn);
     	VBox.setLayoutX(getxPos());
     	VBox.setLayoutY(getyPos());
-//    	gameVBox.setMouseTransparent(false);
     	
     	gamesAnchorPane.getChildren().add(VBox);
-    	
-//    	gamesAnchorPane.getChildren().add(gameBtn);
     }
 
     
@@ -595,6 +631,7 @@ public class MainWindowController {
     private void applyColor(){
 		String style = "-fx-background-color: #"+getColor()+";";
 		String btnStyleBlack = "-fx-button-type: RAISED; -fx-background-color: #"+getColor()+"; -fx-text-fill: BLACK;";
+		String timeBtnStyle = "-fx-button-type: RAISED; -fx-background-color: #ffffff; -fx-text-fill: BLACK;";
 		getColor();
 		
 		sideMenuVBox.setStyle(style);
@@ -609,10 +646,13 @@ public class MainWindowController {
 		romTFBtn.setStyle(btnStyleBlack);
 		aboutBtn.setStyle(btnStyleBlack);
 		playBtn.setStyle(btnStyleBlack);
+		
+		lastTimePlayedBtn.setStyle(timeBtnStyle);
+		timePlayedBtn.setStyle(timeBtnStyle);
     }
 		
     void saveSettings(){
-    	System.out.println("saving Settings ...");
+    	System.out.print("saving Settings... ");
     		OutputStream outputStream;	//new output-stream
     		try {
     			props.setProperty("cemuPath", getCemuPath());
@@ -636,7 +676,7 @@ public class MainWindowController {
     }
     
     void loadSettings(){
-    	System.out.print("loading settings ...");
+    	System.out.print("loading settings... ");
 		InputStream inputStream;
 		try {
 			if(System.getProperty("os.name").equals("Linux")){
@@ -704,6 +744,38 @@ public class MainWindowController {
 	private void playBtnSlideOut(){
 		playTrue = false;
 		TranslateTransition translateTransition = new TranslateTransition(Duration.millis(300), playBtn);
+		translateTransition.setFromY(0);
+		translateTransition.setToY(56);
+		translateTransition.play();
+	}
+	
+	@SuppressWarnings("unused")
+	private void timePlayedBtnSlideIn(){
+		timePlayedBtn.setVisible(true);
+		TranslateTransition translateTransition = new TranslateTransition(Duration.millis(300), timePlayedBtn);
+		translateTransition.setFromY(55);
+		translateTransition.setToY(0);
+		translateTransition.play();
+	}
+	
+	@SuppressWarnings("unused")
+	private void timePlayedBtnSlideOut(){
+		TranslateTransition translateTransition = new TranslateTransition(Duration.millis(300), timePlayedBtn);
+		translateTransition.setFromY(0);
+		translateTransition.setToY(56);
+		translateTransition.play();
+	}
+	
+	private void lastTimePlayedBtnSlideIn(){
+		lastTimePlayedBtn.setVisible(true);
+		TranslateTransition translateTransition = new TranslateTransition(Duration.millis(300), lastTimePlayedBtn);
+		translateTransition.setFromY(55);
+		translateTransition.setToY(0);
+		translateTransition.play();
+	}
+	
+	private void lastTimePlayedBtnSlideOut(){
+		TranslateTransition translateTransition = new TranslateTransition(Duration.millis(300), lastTimePlayedBtn);
 		translateTransition.setFromY(0);
 		translateTransition.setToY(56);
 		translateTransition.play();

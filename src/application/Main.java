@@ -1,13 +1,16 @@
 package application;
 	
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
 import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
@@ -20,12 +23,16 @@ public class Main extends Application {
 	
 	Stage primaryStage;
 	private MainWindowController mainWindowController;
-	private File dirWin = new File(System.getProperty("user.home") + "/Documents/cemu_UI");	//Windows: C:/Users/"User"/Documents/HomeFlix
-	private File dirLinux = new File(System.getProperty("user.home") + "/cemu_UI");	//Linux: /home/"User"/HomeFlix
-	private File fileWin = new File(dirWin + "/config.xml");	//Windows: C:/Users/"User"/Documents/HomeFlix/config.xml
-	private File fileLinux = new File(dirLinux + "/config.xml");	//Linux: /home/"User"/HomeFlix/config.xml
-	private File pictureCacheWin = new File(dirWin+"/picture_cache");
-	private File pictureCacheLinux = new File(dirLinux+"/picture_cache");
+	private String dirWin = System.getProperty("user.home") + "/Documents/cemu_UI";	//Windows: C:/Users/"User"/Documents/HomeFlix
+	private String dirLinux = System.getProperty("user.home") + "/cemu_UI";	//Linux: /home/"User"/HomeFlix
+	private String gamesDBdownloadURL = "https://github.com/Seil0/cemu_UI/raw/master/downloadContent/games.db";
+	private File directory;
+	private File configFile;
+	private File gamesDBFile;
+	@SuppressWarnings("unused")
+	private File localDB;
+	private File pictureCache;
+
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -37,8 +44,6 @@ public class Main extends Application {
 		try {
 			FXMLLoader loader = new FXMLLoader(Main.class.getResource("MainWindow.fxml"));
 			AnchorPane pane = loader.load();
-			primaryStage.setMinHeight(600.00);
-			primaryStage.setMinWidth(900.00);
 			primaryStage.setResizable(false);
 			primaryStage.setTitle("cemu_UI");
 //			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/recources/Homeflix_Icon_64x64.png"))); //adds application icon
@@ -46,46 +51,61 @@ public class Main extends Application {
 			mainWindowController = loader.getController();	//Link of FXMLController and controller class
 			mainWindowController.setMain(this);	//call setMain
 			
-			//Linux					if directory exists -> check config.xml
+			//get os and the right paths
 			if(System.getProperty("os.name").equals("Linux")){
-				if(dirLinux.exists() != true){
-					dirLinux.mkdir();
-					pictureCacheLinux.mkdir();
-				}else if(fileLinux.exists() != true){
-					firstStart();
-					mainWindowController.setColor("00a8cc");
-					mainWindowController.setxPosHelper(0);
-					mainWindowController.saveSettings();
-					Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
-					System.exit(0);	//finishes itself
-				}
-				if(pictureCacheLinux.exists() != true){
-					pictureCacheLinux.mkdir();
-				}
-			//windows
+				directory = new File(dirLinux);
+				configFile = new File(dirLinux + "/config.xml");
+				gamesDBFile = new File(dirLinux + "/games.db");
+				localDB = new File(dirLinux+"/localRoms.db");
+				pictureCache= new File(dirLinux+"/picture_cache");
 			}else{
-				if(dirWin.exists() != true){
-					dirWin.mkdir();
-					pictureCacheWin.mkdir();
-				}else if(fileWin.exists() != true){
-					firstStart();
-					mainWindowController.setColor("00a8cc");
-					mainWindowController.setxPosHelper(0);
-					mainWindowController.saveSettings();
-					Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
-					System.exit(0);	//finishes itself
-				}
-				if(pictureCacheWin.exists() != true){
-					pictureCacheWin.mkdir();
+				directory = new File(dirWin);	
+				configFile = new File(dirWin + "/config.xml");
+				gamesDBFile = new File(dirWin + "/games.db");
+				localDB = new File(dirWin+"/localRoms.db");
+				pictureCache= new File(dirWin+"/picture_cache");
+			}
+			
+			//startup checks
+			System.out.println(directory.exists());
+			System.out.println(configFile.exists());
+			if(directory.exists() != true){
+				System.out.println("mkdir all");
+				directory.mkdir();
+				pictureCache.mkdir();
+			}
+			
+			if(configFile.exists() != true){
+				System.out.println("firststart");
+				firstStart();
+				mainWindowController.setColor("00a8cc");
+				mainWindowController.setxPosHelper(0);
+				mainWindowController.saveSettings();
+				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
+				System.exit(0);	//finishes itself
+			}
+			
+			if(pictureCache.exists() != true){
+				pictureCache.mkdir();
+			}
+			
+			if(gamesDBFile.exists() != true){
+				try {
+					System.out.print("downloading games.db... ");
+					URL website = new URL(gamesDBdownloadURL);
+					ReadableByteChannel rbc = Channels.newChannel(website.openStream());
+					FileOutputStream fos = new FileOutputStream(gamesDBFile);
+					fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
+					fos.close();
+					System.out.println("done!");
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 			}
 			
-			//TODO download games.db
+			//loading settings and initialize UI
 			mainWindowController.loadSettings();
-			
 			mainWindowController.dbController.main();
-			mainWindowController.dbController.loadRoms();
-			
 			mainWindowController.initActions();
 			mainWindowController.initUI();
 			
