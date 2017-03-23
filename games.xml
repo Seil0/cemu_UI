@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>cemu_UI_games</comment>
+<entry key="yPos">10</entry>
+<entry key="coverAction0">aD:\Sonstiges\ROM's\wii u\Mario Kart 8\code\Turbo.rpx</entry>
+<entry key="color">ee3523</entry>
+<entry key="xPos">-200</entry>
+<entry key="cemuPath">C:\Users\Jannik\Documents\cemu_1.7.2\Cemu.exe</entry>
+<entry key="romPath">D:\Sonstiges\ROM's\wii u</entry>
+<entry key="xPosHelper">0</entry>
+<entry key="coverPath0">C:\Users\Jannik\Desktop\AMKE01.png</entry>
+<entry key="size">1</entry>
+</properties>
