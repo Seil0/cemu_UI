@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -28,6 +29,7 @@ public class dbController {
 	}
 	
 	private MainWindowController mainWindowController;
+	private ArrayList<String> entries = new ArrayList<>();
 	private String DB_PATH;
 	private String DB_PATH_games;
 	private Connection connection = null;
@@ -38,7 +40,6 @@ public class dbController {
 		loadRomDatabase();
 		loadGamesDatabase();
 		createRomDatabase();
-		loadRomDirectory(mainWindowController.getRomPath());
 		loadRoms();
 		checkRemoveEntry();
 		System.out.println("<==========finished loading sql==========>"); 
@@ -82,6 +83,7 @@ public class dbController {
 		System.out.println("games database loaded successfull");
 	}
 	
+	//creating database, if db has 0 entries search for all .rpx files in the roms directory and add them
 	void createRomDatabase() { 
 		try {
 			Statement stmt = connection.createStatement();
@@ -90,6 +92,22 @@ public class dbController {
 			connection.commit();
 		} catch (SQLException e1) {
 			e1.printStackTrace();
+		}
+		
+		try { 
+			Statement stmt = connection.createStatement(); 
+			ResultSet rs = stmt.executeQuery("SELECT * FROM local_roms"); 
+			while (rs.next()) { 
+				entries.add(rs.getString(2));
+			}
+			stmt.close();
+			rs.close();
+		}catch (SQLException ea){
+			System.err.println("Ups! an error occured!"); 
+			ea.printStackTrace();
+		}
+		if(entries.size() == 0){
+			loadRomDirectory(mainWindowController.getRomPath());
 		}
 	}
 
@@ -181,7 +199,7 @@ public class dbController {
 					    ImageIO.write(resizeImagePNG, "png", new File(pictureCache+"\\"+rs.getString(3)+".png")); //change path where you want it saved
 					    coverPath = pictureCache+"\\"+rs.getString(3)+".png";
 						
-						addRom(rs.getString(2), coverPath, file.getCanonicalPath(), rs.getString(1), rs.getString(3), rs.getString(5),"","");
+						addRom(rs.getString(2), coverPath, file.getCanonicalPath(), rs.getString(1), rs.getString(3), rs.getString(5),"","0");
 					}
 				}
 				System.out.println("");
@@ -244,7 +262,7 @@ public class dbController {
 	void setTimePlayed(String timePlayed, String titleID){
 		try{
 			Statement stmt = connection.createStatement(); 
-			stmt.executeUpdate("UPDATE local_roms SET timePlayed='' WHERE titleID = '"+titleID+"';");
+			stmt.executeUpdate("UPDATE local_roms SET timePlayed='"+timePlayed+"' WHERE titleID = '"+titleID+"';");
 			connection.commit();
 			stmt.close();
 		}catch(SQLException e){
@@ -257,7 +275,7 @@ public class dbController {
 		try{
 			Statement stmt = connection.createStatement(); 
 			ResultSet rs = stmt.executeQuery("SELECT timePlayed FROM local_roms WHERE titleID = '"+titleID+"';" );
-			timePlayed = rs.getString(4);
+			timePlayed = rs.getString(1);
 			stmt.close();
 			rs.close();
 		}catch(SQLException e){
@@ -265,5 +283,6 @@ public class dbController {
 		}
 		return timePlayed;
 	}
+	
 
 }

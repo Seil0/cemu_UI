@@ -43,6 +43,11 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </JFXButton>
+            <JFXButton fx:id="reloadRomsBtn" onAction="#reloadRomsBtnAction" prefHeight="38.0" prefWidth="150.0" text="reload roms">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXButton>
          </children>
       </VBox>
       <AnchorPane fx:id="settingsAnchorPane" layoutX="38.0" layoutY="27.0" prefHeight="573.0" prefWidth="862.0" style="-fx-background-color: white;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0">
@@ -60,9 +65,6 @@
          </font>
       </JFXButton>
       <JFXButton fx:id="timePlayedBtn" buttonType="RAISED" layoutX="341.0" layoutY="588.0" onAction="#timePlayedBtnAction" prefHeight="32.0" prefWidth="100.0" visible="false" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="516.5" AnchorPane.topAnchor="558.0">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font>
       </JFXButton>
       <JFXButton fx:id="lastTimePlayedBtn" buttonType="RAISED" maxHeight="32.0" onAction="#lastTimePlayedBtnAction" visible="false" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="516.5" AnchorPane.topAnchor="558.0" />
    </children>
