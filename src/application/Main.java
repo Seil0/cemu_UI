@@ -7,7 +7,6 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Optional;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.DirectoryChooser;

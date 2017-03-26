@@ -6,6 +6,7 @@
 <?import com.jfoenix.controls.JFXTextField?>
 <?import com.jfoenix.controls.JFXToggleButton?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -52,13 +53,27 @@
       </VBox>
       <AnchorPane fx:id="settingsAnchorPane" layoutX="38.0" layoutY="27.0" prefHeight="573.0" prefWidth="862.0" style="-fx-background-color: white;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="150.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0">
          <children>
-            <JFXTextField fx:id="cemuTextField" layoutX="14.0" layoutY="14.0" maxWidth="305.0" minWidth="305.0" onAction="#cemuTextFieldAction" prefHeight="31.0" prefWidth="305.0" promptText="cemu directory" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0" />
-            <JFXTextField fx:id="romTextField" layoutX="14.0" layoutY="50.0" maxWidth="305.0" minWidth="305.0" onAction="#romTextFieldAction" prefHeight="31.0" prefWidth="305.0" promptText="rom directory" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="50.0" />
-            <JFXButton fx:id="romTFBtn" layoutX="333.0" layoutY="50.0" onAction="#romTFBtnAction" prefHeight="31.0" prefWidth="108.0" text="choose directory" AnchorPane.leftAnchor="333.0" AnchorPane.topAnchor="50.0" />
-            <JFXButton fx:id="cemuTFBtn" layoutX="333.0" layoutY="14.0" onAction="#cemuTFBtnAction" prefHeight="31.0" prefWidth="108.0" text="choose directory" AnchorPane.leftAnchor="333.0" AnchorPane.topAnchor="14.0" />
-            <JFXColorPicker fx:id="colorPicker" layoutX="14.0" layoutY="89.0" onAction="#colorPickerAction" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="89.0" />
-            <JFXToggleButton fx:id="fullscreenToggleBtn" layoutX="14.0" layoutY="125.0" onAction="#fullscreenToggleBtnAction" text="start game in fullscreen" />
-         </children></AnchorPane>
+            <Label layoutX="22.0" layoutY="59.0" text="Cemu Directory" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="59.0" />
+            <JFXTextField fx:id="cemuTextField" layoutX="18.0" layoutY="83.0" maxWidth="305.0" minWidth="305.0" onAction="#cemuTextFieldAction" prefHeight="32.0" prefWidth="305.0" promptText="cemu directory" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="83.0" />
+            <JFXTextField fx:id="romTextField" layoutX="18.0" layoutY="159.0" maxWidth="305.0" minWidth="305.0" onAction="#romTextFieldAction" prefHeight="32.0" prefWidth="305.0" promptText="rom directory" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="159.0" />
+            <JFXButton fx:id="romTFBtn" layoutX="337.0" layoutY="159.0" onAction="#romTFBtnAction" prefHeight="32.0" prefWidth="108.0" text="choose directory" AnchorPane.leftAnchor="333.0" AnchorPane.topAnchor="159.0" />
+            <JFXButton fx:id="cemuTFBtn" layoutX="337.0" layoutY="90.0" onAction="#cemuTFBtnAction" prefHeight="32.0" prefWidth="108.0" text="choose directory" AnchorPane.leftAnchor="333.0" AnchorPane.topAnchor="90.0" />
+            <JFXColorPicker fx:id="colorPicker" layoutX="22.0" layoutY="235.0" onAction="#colorPickerAction" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="235.0" />
+            <JFXToggleButton fx:id="fullscreenToggleBtn" layoutX="18.0" layoutY="316.0" onAction="#fullscreenToggleBtnAction" text="start game in fullscreen" AnchorPane.leftAnchor="18.0" AnchorPane.topAnchor="317.0" />
+            <Label layoutX="22.0" layoutY="135.0" text="Rom Directory" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="135.0" />
+            <Label layoutX="22.0" layoutY="211.0" text="main color" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="211.0" />
+            <Label layoutX="18.0" layoutY="281.0" text="Cemu Settings" AnchorPane.leftAnchor="18.0" AnchorPane.topAnchor="290.0">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+            <Label layoutX="22.0" layoutY="14.0" text="cemu_UI Settings" AnchorPane.leftAnchor="18.0" AnchorPane.topAnchor="14.0">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </Label>
+         </children>
+      </AnchorPane>
       <JFXButton fx:id="playBtn" buttonType="RAISED" maxHeight="38.0" maxWidth="100.0" onAction="#playBtnAction" ripplerFill="#c92a2a" text="play" visible="false" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="396.0" AnchorPane.rightAnchor="396.0" AnchorPane.topAnchor="555.0">
          <font>
             <Font name="System Bold" size="14.0" />

@@ -14,7 +14,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Properties;
-
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
@@ -25,20 +24,22 @@ import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
 import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -46,6 +47,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.DirectoryChooser;
@@ -159,7 +161,6 @@ public class MainWindowController {
 		romTextField.setText(romPath);
 		colorPicker.setValue(Color.valueOf(getColor()));
 		fullscreenToggleBtn.setSelected(isFullscreen());
-		addDLC.setDisable(true);
 		edit.setDisable(true);
 		applyColor();
 	}
@@ -320,7 +321,57 @@ public class MainWindowController {
 		addDLC.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-            	System.out.println("add DLC");
+             	String titleID = selectedGameTitleID;
+            	String dlcPath;
+            	
+            	System.out.println("add DLC: "+selectedGameTitleID);
+            	if(selectedGameTitleID == null){
+            		System.out.println("trying to add a dlc to null! null is not valid!");
+	            	Alert alert = new Alert(AlertType.WARNING);
+	            	alert.setTitle("add DLC");
+	            	alert.setHeaderText("cemu_UI");
+	            	alert.setContentText("please select a game, \""+selectedGameTitleID+"\" is not a valid type");
+	            	alert.initOwner(main.primaryStage);
+	            	alert.showAndWait();
+            	}else{
+        			Alert updateAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
+        			updateAlert.setTitle("cemu_UI");
+        			updateAlert.setHeaderText("add a DLC to "+selectedGameTitle);
+        			updateAlert.setContentText("pleas select the DLC root directory");
+        			updateAlert.initOwner(main.primaryStage);
+
+        			Optional<ButtonType> result = updateAlert.showAndWait();
+        			if (result.get() == ButtonType.OK){
+        				DirectoryChooser directoryChooser = new DirectoryChooser();
+        	            File selectedDirecroty =  directoryChooser.showDialog(main.primaryStage);
+        	            dlcPath = selectedDirecroty.getAbsolutePath();
+            			String[] parts = titleID.split("-");	//split string into 2 parts at "-"
+            			
+            			File srcDir = new File(dlcPath);
+            			File destDir = new File(cemuPath+"\\mlc01\\usr\\title\\"+parts[0]+"\\"+parts[1]+"\\aoc");
+            			
+            			System.out.println(dlcPath);
+            			System.out.println(destDir.toString());
+
+            			if(destDir.exists() != true){
+            				destDir.mkdir();
+            			}
+
+        	            try {
+        	            	System.out.println("copying files...");
+        	            	playBtn.setText("copying files...");
+        	            	playBtn.setDisable(true);
+							FileUtils.copyDirectory(srcDir, destDir);	//TODO progress indicator
+							playBtn.setText("play");
+							playBtn.setDisable(false);
+							System.out.println("done!");
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+        			} else {
+        				dlcPath = null;
+        			}
+            	}
 		     }
 		});
             
@@ -369,12 +420,12 @@ public class MainWindowController {
     		saveSettings();
     		settingsTrue = false;
     	}
-
     }
     
     @FXML
     void reloadRomsBtnAction() throws IOException{
-    	dbController.loadRomDirectory(getRomPath());
+    	reloadRomsBtn.setText("reloading...");
+    	dbController.loadRomDirectory(getRomPath()); //TODO own thread
     	Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
 		System.exit(0);	//finishes itself
     }
@@ -384,7 +435,7 @@ public class MainWindowController {
     	dbController.setLastPlayed(selectedGameTitleID);
     	long startTime;
     	long endTime;
-    	int playedTime;
+    	int timePlayedNow;
     	int timePlayed;
     	Process p;
     	
@@ -400,12 +451,8 @@ public class MainWindowController {
     		
     		p.waitFor();
     		endTime = System.currentTimeMillis();
-    		playedTime = (int)  Math.floor(((endTime - startTime)/1000/60));
-    		System.out.println((endTime - startTime)/1000+"; "+(endTime - startTime)/1000/60+"; "+playedTime);
-    		
-    		
-    		timePlayed = Integer.parseInt(dbController.getTimePlayed(selectedGameTitleID))+playedTime;
-    		System.out.println(timePlayed);
+    		timePlayedNow = (int)  Math.floor(((endTime - startTime)/1000/60));   			
+    		timePlayed = Integer.parseInt(dbController.getTimePlayed(selectedGameTitleID))+timePlayedNow;
     		
     		dbController.setTimePlayed(Integer.toString(timePlayed), selectedGameTitleID);
     		timePlayedBtn.setText(dbController.getTimePlayed(selectedGameTitleID)+ " min");
@@ -494,13 +541,13 @@ public class MainWindowController {
     
     @FXML
     void addBtnAction(ActionEvent event){
+    	boolean exit = false;
     	String romPath = null;
     	String coverPath = null;
     	String coverName = null;
     	String title = null;
     	String titleID = null;
     	File pictureCache;
-    	boolean exit = false;
     	   	
     	TextInputDialog titleDialog = new TextInputDialog();
     	titleDialog.setTitle("cemu_UI");
@@ -515,19 +562,20 @@ public class MainWindowController {
     		exit = true;
     	}
     	
-    	TextInputDialog titleIDDialog = new TextInputDialog();
-    	titleIDDialog.setTitle("cemu_UI");
-    	titleIDDialog.setHeaderText("add new Game");
-    	titleIDDialog.setContentText("Please enter the title-ID (12345678-12345678) \nof the game you want to add:");
-    	titleIDDialog.initOwner(main.primaryStage);
-    	
-    	Optional<String> titleIDResult = titleIDDialog.showAndWait();
-    	if (titleIDResult.isPresent()){
-    		titleID = titleIDResult.get();
-    	}else{
-    		exit = true;
+    	if(exit == false){
+        	TextInputDialog titleIDDialog = new TextInputDialog();
+        	titleIDDialog.setTitle("cemu_UI");
+        	titleIDDialog.setHeaderText("add new Game");
+        	titleIDDialog.setContentText("Please enter the title-ID (12345678-12345678) \nof the game you want to add:");
+        	titleIDDialog.initOwner(main.primaryStage);
+        	
+        	Optional<String> titleIDResult = titleIDDialog.showAndWait();
+        	if (titleIDResult.isPresent()){
+        		titleID = titleIDResult.get();
+        	}else{
+        		exit = true;
+        	}
     	}
-    	
 
 		if(exit == false){
 			Alert romAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
@@ -577,20 +625,19 @@ public class MainWindowController {
 					pictureCache = pictureCacheLinux;
 				}else{
 					pictureCache = pictureCacheWin;
-				} 
-
-			        BufferedImage originalImage = ImageIO.read(new File(coverPath));//change path to where file is located
-			        int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
-			        BufferedImage resizeImagePNG = resizeImage(originalImage, type, 400, 600);
-			        ImageIO.write(resizeImagePNG, "png", new File(pictureCache+"\\"+coverName)); //change path where you want it saved
-			        coverPath = pictureCache+"\\"+coverName;
+				}
+				
+			    BufferedImage originalImage = ImageIO.read(new File(coverPath));//load cover
+			    int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
+			    BufferedImage resizeImagePNG = resizeImage(originalImage, type, 400, 600);
+			    ImageIO.write(resizeImagePNG, "png", new File(pictureCache+"\\"+coverName)); //save image to pictureCache
+			    coverPath = pictureCache+"\\"+coverName;
 			} catch (IOException e) {
 			    System.out.println("Ops something went wrong!");
 			}
 			
-			try {
-				
-				dbController.addRom(title, coverPath, romPath, titleID, "", "", "", "");
+			try {	
+				dbController.addRom(title, coverPath, romPath, titleID, "", "", "", "0");
 				dbController.loadSingleRom(titleID);
 			} catch (SQLException e) {
 				// Auto-generated catch block
@@ -600,7 +647,7 @@ public class MainWindowController {
     }
     
     void addGame(String title, String coverPath, String romPath, String titleID){
-    	ImageView imageView = new ImageView();	//TODO abgerundete Kanten,
+    	ImageView imageView = new ImageView();
     	Label gameTitleLabel = new Label(title);
     	File coverFile = new File(coverPath);
     	VBox VBox = new VBox();
@@ -608,17 +655,17 @@ public class MainWindowController {
     	Image coverImage = new Image(coverFile.toURI().toString());
     	
     	generatePosition();
-//    	System.out.println("Title: "+title+"; cover: "+coverPath+"; rom: "+romPath);
-//    	System.out.println("X: "+getxPos()+"; Y: "+getyPos());
     	gameVBox.add(VBox);
     	gameCover.add(gameBtn);
     	gameLabel.add(gameTitleLabel);
     	gameTitleLabel.setMaxWidth(200);
+    	gameTitleLabel.setPadding(new Insets(0,0,0,8));
     	imageView.setImage(coverImage);
     	imageView.setFitHeight(300);
     	imageView.setFitWidth(200);
     	gameBtn.setGraphic(imageView);
-    	gameBtn.setContextMenu(gameContextMenu);	
+    	gameBtn.setContextMenu(gameContextMenu);
+    	gameBtn.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 3); ");
     	gameBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 		     @Override
 		     public void handle(MouseEvent event) {
@@ -649,7 +696,6 @@ public class MainWindowController {
                 	}else{
                     	lastTimePlayedBtn.setText("Last played, "+dbController.getLastPlayed(titleID));
                 	}
-                	
                 	timePlayedBtn.setText(dbController.getTimePlayed(titleID)+ " min");
             	}
 
@@ -663,13 +709,11 @@ public class MainWindowController {
     	VBox.getChildren().addAll(gameTitleLabel,gameBtn);
     	VBox.setLayoutX(getxPos());
     	VBox.setLayoutY(getyPos());
-    	
     	gamesAnchorPane.getChildren().add(VBox);
     }
 
     
     private void generatePosition(){
-    	
     	if(xPosHelper == 4){
     		xPos = 17;
     		yPos = yPos + 345;		
@@ -700,6 +744,11 @@ public class MainWindowController {
 		romTFBtn.setStyle(btnStyleBlack);
 		playBtn.setStyle(btnStyleBlack);
 		
+		
+		for(int i=0; i<gameCover.size(); i++){
+			gameCover.get(i).setRipplerFill(Paint.valueOf(getColor()));
+		}
+		
 		lastTimePlayedBtn.setStyle(timeBtnStyle);
 		timePlayedBtn.setStyle(timeBtnStyle);
     }
@@ -717,14 +766,11 @@ public class MainWindowController {
     			}else{
     				outputStream = new FileOutputStream(fileWin);
     			}
-    			props.storeToXML(outputStream, "cemu_UI settings");	//writes new .xml
+    			props.storeToXML(outputStream, "cemu_UI settings");	//write new .xml
     			outputStream.close();
     			System.out.println("done!");
     		} catch (IOException e) {
-//    			if(firststart == false){
-//    				showErrorMsg(errorLoad, e);
-    				e.printStackTrace();
-//    			}
+    			e.printStackTrace();
     		}
     }
     
@@ -745,11 +791,7 @@ public class MainWindowController {
 			inputStream.close();
 			System.out.println("done!");
 		} catch (IOException e) {
-//			if(firststart == false){
-//				showErrorMsg(errorSave, e);
-				e.printStackTrace();
-//			}
-
+			e.printStackTrace();
 		}
     }
     
@@ -807,7 +849,7 @@ public class MainWindowController {
 		timePlayedBtnTransition.play();
 	}
 	
-	private void playBtnSlideOut(){
+	void playBtnSlideOut(){
 		playTrue = false;
 		TranslateTransition playBtnTransition = new TranslateTransition(Duration.millis(300), playBtn);
 		playBtnTransition.setFromY(0);
@@ -832,10 +874,10 @@ public class MainWindowController {
 		saveSettings();
 	}
 	
-	private static BufferedImage resizeImage(BufferedImage originalImage, int type, int IMG_WIDTH, int IMG_HEIGHT) {
-	    BufferedImage resizedImage = new BufferedImage(IMG_WIDTH, IMG_HEIGHT, type);
+	private static BufferedImage resizeImage(BufferedImage originalImage, int type, int imgWidth, int imgHeigth) {
+	    BufferedImage resizedImage = new BufferedImage(imgWidth, imgHeigth, type);
 	    Graphics2D g = resizedImage.createGraphics();
-	    g.drawImage(originalImage, 0, 0, IMG_WIDTH, IMG_HEIGHT, null);
+	    g.drawImage(originalImage, 0, 0, imgWidth, imgHeigth, null);
 	    g.dispose();
 
 	    return resizedImage;
