@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.math.BigInteger;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -24,7 +25,6 @@ import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
 import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
-
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
@@ -78,7 +78,7 @@ public class MainWindowController {
     private JFXButton playBtn;
     
     @FXML
-    private JFXButton timePlayedBtn;
+    JFXButton timePlayedBtn;
     
     @FXML
     private JFXButton lastTimePlayedBtn;
@@ -113,7 +113,9 @@ public class MainWindowController {
     @FXML
     private HBox topHBox;
     
-    private Main main;
+    Main main;
+    dbController dbController;
+    playGame playGame;
     private boolean menuTrue = false;
     private boolean settingsTrue = false;
     private boolean playTrue = false;
@@ -146,22 +148,29 @@ public class MainWindowController {
     private MenuItem addDLC = new MenuItem("add DLC");
 	private ContextMenu gameContextMenu = new ContextMenu(edit, remove, update, addDLC);
 	private MouseEvent selectedEvent;
-	
 	private Label lastGameLabel = new Label();
 	
-    dbController dbController;
+	private ImageView add_circle_black = new ImageView(new Image("recources/icons/ic_add_circle_black_24dp_1x.png"));
+	private ImageView info_black = new ImageView(new Image("recources/icons/ic_info_black_24dp_1x.png"));
+	private ImageView settings_black = new ImageView(new Image("recources/icons/ic_settings_black_24dp_1x.png"));
+	private ImageView cached_black = new ImageView(new Image("recources/icons/ic_cached_black_24dp_1x.png"));
+	
+	private ImageView add_circle_white = new ImageView(new Image("recources/icons/ic_add_circle_white_24dp_1x.png"));
+	private ImageView info_white = new ImageView(new Image("recources/icons/ic_info_white_24dp_1x.png"));
+	private ImageView settings_white = new ImageView(new Image("recources/icons/ic_settings_white_24dp_1x.png"));
+	private ImageView cached_white = new ImageView(new Image("recources/icons/ic_cached_white_24dp_1x.png"));
     
 	public void setMain(Main main) {
 		this.main = main;
 		dbController = new dbController(this);
 	}
 	
-	void initUI(){
+	void initUI(){		
 		cemuTextField.setText(cemuPath);
 		romTextField.setText(romPath);
 		colorPicker.setValue(Color.valueOf(getColor()));
 		fullscreenToggleBtn.setSelected(isFullscreen());
-		edit.setDisable(true);
+		edit.setDisable(true);		
 		applyColor();
 	}
 	
@@ -220,6 +229,7 @@ public class MainWindowController {
                 	alert.setTitle("remove");
                 	alert.setHeaderText("cemu_UI");
                 	alert.setContentText("please select a game, \""+selectedGameTitleID+"\" is not a valid type");
+                	
                 	alert.initOwner(main.primaryStage);
                 	alert.showAndWait();
             	}
@@ -433,34 +443,9 @@ public class MainWindowController {
     @FXML
     void playBtnAction(ActionEvent event) throws InterruptedException, IOException{
     	dbController.setLastPlayed(selectedGameTitleID);
-    	long startTime;
-    	long endTime;
-    	int timePlayedNow;
-    	int timePlayed;
-    	Process p;
+    	playGame = new playGame(this,dbController);
     	
-    	main.primaryStage.setIconified(true);
-    	startTime = System.currentTimeMillis();
-    	try{
-    		
-    		if(fullscreen){
-    			p = Runtime.getRuntime().exec(getCemuPath()+"\\Cemu.exe -f -g \""+gameExecutePath+"\"");
-    		}else{
-    			p = Runtime.getRuntime().exec(getCemuPath()+"\\Cemu.exe -g \""+gameExecutePath+"\"");
-    		}
-    		
-    		p.waitFor();
-    		endTime = System.currentTimeMillis();
-    		timePlayedNow = (int)  Math.floor(((endTime - startTime)/1000/60));   			
-    		timePlayed = Integer.parseInt(dbController.getTimePlayed(selectedGameTitleID))+timePlayedNow;
-    		
-    		dbController.setTimePlayed(Integer.toString(timePlayed), selectedGameTitleID);
-    		timePlayedBtn.setText(dbController.getTimePlayed(selectedGameTitleID)+ " min");
-    		main.primaryStage.setIconified(false);
-    		
-    	} catch (IOException e) {
-    		e.printStackTrace();
-    	}
+    	playGame.start();
     }
     
     @FXML
@@ -696,7 +681,13 @@ public class MainWindowController {
                 	}else{
                     	lastTimePlayedBtn.setText("Last played, "+dbController.getLastPlayed(titleID));
                 	}
+                	if(Integer.parseInt(dbController.getTimePlayed(titleID)) > 60){
+                		int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTimePlayed(titleID))/60);
+                		int minutesPlayed = Integer.parseInt(dbController.getTimePlayed(titleID))-60*hoursPlayed;
+                		timePlayedBtn.setText(hoursPlayed+"h "+minutesPlayed+"min");
+                	}else{
                 	timePlayedBtn.setText(dbController.getTimePlayed(titleID)+ " min");
+                	}
             	}
 
             	if(playTrue == false){
@@ -725,32 +716,51 @@ public class MainWindowController {
     }
     
     private void applyColor(){
-		String style = "-fx-background-color: #"+getColor()+";";
+		String boxStyle = "-fx-background-color: #"+getColor()+";";
 		String btnStyleBlack = "-fx-button-type: RAISED; -fx-background-color: #"+getColor()+"; -fx-text-fill: BLACK;";
-		String timeBtnStyle = "-fx-button-type: RAISED; -fx-background-color: #ffffff; -fx-text-fill: BLACK;";
+		String btnStyleWhite = "-fx-button-type: RAISED; -fx-background-color: #"+getColor()+"; -fx-text-fill: WHITE;";
+		BigInteger icolor = new BigInteger(getColor(),16);
+		BigInteger ccolor = new BigInteger("78909cff",16);
 		getColor();
 		
-		sideMenuVBox.setStyle(style);
-		topHBox.setStyle(style);
+		sideMenuVBox.setStyle(boxStyle);
+		topHBox.setStyle(boxStyle);
 		cemuTextField.setFocusColor(Color.valueOf(getColor()));
 		romTextField.setFocusColor(Color.valueOf(getColor()));
 		
-		aboutBtn.setStyle("-fx-text-fill: BLACK;");
-		settingsBtn.setStyle("-fx-text-fill: BLACK;");
-		addBtn.setStyle("-fx-text-fill: BLACK;");
-		reloadRomsBtn.setStyle("-fx-text-fill: BLACK;");
-		playBtn.setStyle("-fx-text-fill: BLACK;");
-		cemuTFBtn.setStyle(btnStyleBlack);
-		romTFBtn.setStyle(btnStyleBlack);
-		playBtn.setStyle(btnStyleBlack);
-		
-		
+		if(icolor.compareTo(ccolor) == -1){
+			aboutBtn.setStyle("-fx-text-fill: WHITE;");
+			settingsBtn.setStyle("-fx-text-fill: WHITE;");
+			addBtn.setStyle("-fx-text-fill: WHITE;");
+			reloadRomsBtn.setStyle("-fx-text-fill: WHITE;");
+			playBtn.setStyle("-fx-text-fill: WHITE; -fx-font-family: Roboto Medium;");
+			cemuTFBtn.setStyle(btnStyleWhite);
+			romTFBtn.setStyle(btnStyleWhite);
+			playBtn.setStyle(btnStyleWhite);
+			
+			aboutBtn.setGraphic(info_white);
+			settingsBtn.setGraphic(settings_white);
+			addBtn.setGraphic(add_circle_white);
+			reloadRomsBtn.setGraphic(cached_white);
+		}else{
+			aboutBtn.setStyle("-fx-text-fill: BLACK;");
+			settingsBtn.setStyle("-fx-text-fill: BLACK;");
+			addBtn.setStyle("-fx-text-fill: BLACK;");
+			reloadRomsBtn.setStyle("-fx-text-fill: BLACK;");
+			playBtn.setStyle("-fx-text-fill: BLACK; -fx-font-family: Roboto Medium;");
+			cemuTFBtn.setStyle(btnStyleBlack);
+			romTFBtn.setStyle(btnStyleBlack);
+			playBtn.setStyle(btnStyleBlack);
+			
+			aboutBtn.setGraphic(info_black);
+			settingsBtn.setGraphic(settings_black);
+			addBtn.setGraphic(add_circle_black);
+			reloadRomsBtn.setGraphic(cached_black);
+		}
+
 		for(int i=0; i<gameCover.size(); i++){
 			gameCover.get(i).setRipplerFill(Paint.valueOf(getColor()));
 		}
-		
-		lastTimePlayedBtn.setStyle(timeBtnStyle);
-		timePlayedBtn.setStyle(timeBtnStyle);
     }
 		
     void saveSettings(){
@@ -937,6 +947,22 @@ public class MainWindowController {
 
 	public void setFullscreen(boolean fullscreen) {
 		this.fullscreen = fullscreen;
+	}
+
+	public String getGameExecutePath() {
+		return gameExecutePath;
+	}
+
+	public void setGameExecutePath(String gameExecutePath) {
+		this.gameExecutePath = gameExecutePath;
+	}
+
+	public String getSelectedGameTitleID() {
+		return selectedGameTitleID;
+	}
+
+	public void setSelectedGameTitleID(String selectedGameTitleID) {
+		this.selectedGameTitleID = selectedGameTitleID;
 	}
 
 }
