@@ -109,7 +109,7 @@ public class Main extends Application {
 			mainWindowController.initUI();
 			
 			Scene scene = new Scene(pane);	//create new scene, append pane to scene
-			
+			scene.getStylesheets().add(Main.class.getResource("MainWindows.css").toExternalForm());
 			primaryStage.setScene(scene);	//append scene to stage
 			primaryStage.show();	//show stage
 			} catch (IOException e) {

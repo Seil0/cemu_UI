@@ -126,6 +126,10 @@ public class MainWindowController {
     private String selectedGameTitleID;
     private String selectedGameTitle;
     private String color;
+    private String version = "0.1.2";
+    private String buildNumber = "001";
+	@SuppressWarnings("unused")
+	private String versionName = "";
     private int xPos = -200;
     private int yPos = 17;
     private int xPosHelper;
@@ -153,8 +157,7 @@ public class MainWindowController {
 	private ImageView add_circle_black = new ImageView(new Image("recources/icons/ic_add_circle_black_24dp_1x.png"));
 	private ImageView info_black = new ImageView(new Image("recources/icons/ic_info_black_24dp_1x.png"));
 	private ImageView settings_black = new ImageView(new Image("recources/icons/ic_settings_black_24dp_1x.png"));
-	private ImageView cached_black = new ImageView(new Image("recources/icons/ic_cached_black_24dp_1x.png"));
-	
+	private ImageView cached_black = new ImageView(new Image("recources/icons/ic_cached_black_24dp_1x.png"));	
 	private ImageView add_circle_white = new ImageView(new Image("recources/icons/ic_add_circle_white_24dp_1x.png"));
 	private ImageView info_white = new ImageView(new Image("recources/icons/ic_info_white_24dp_1x.png"));
 	private ImageView settings_white = new ImageView(new Image("recources/icons/ic_settings_white_24dp_1x.png"));
@@ -415,7 +418,7 @@ public class MainWindowController {
     	Alert alert = new Alert(AlertType.INFORMATION);
     	alert.setTitle("about");
     	alert.setHeaderText("cemu_UI");
-    	alert.setContentText("cemu_UI by @Seil0 \npre release 0.1.1 \nwww.kellerkinder.xyz");
+    	alert.setContentText("cemu_UI by @Seil0 \npre release "+version+" ("+buildNumber+") \nwww.kellerkinder.xyz");
     	alert.initOwner(main.primaryStage);
     	alert.showAndWait();
     }
@@ -742,6 +745,8 @@ public class MainWindowController {
 			settingsBtn.setGraphic(settings_white);
 			addBtn.setGraphic(add_circle_white);
 			reloadRomsBtn.setGraphic(cached_white);
+			
+			menuHam.getStyleClass().add("jfx-hamburgerW");
 		}else{
 			aboutBtn.setStyle("-fx-text-fill: BLACK;");
 			settingsBtn.setStyle("-fx-text-fill: BLACK;");
@@ -756,6 +761,8 @@ public class MainWindowController {
 			settingsBtn.setGraphic(settings_black);
 			addBtn.setGraphic(add_circle_black);
 			reloadRomsBtn.setGraphic(cached_black);
+			
+			menuHam.getStyleClass().add("jfx-hamburgerB");
 		}
 
 		for(int i=0; i<gameCover.size(); i++){
@@ -813,7 +820,7 @@ public class MainWindowController {
 		fadeTransition.setToValue(1.0);
 		//slide in in 400ms
 		TranslateTransition translateTransition = new TranslateTransition(Duration.millis(400), sideMenuVBox);
-		translateTransition.setFromX(-150);
+		translateTransition.setFromX(-175);
 		translateTransition.setToX(0);
 		//in case both animations are used (add (fadeTransition, translateTransition) in the second line under this command)    
 		ParallelTransition parallelTransition = new ParallelTransition();
@@ -830,7 +837,7 @@ public class MainWindowController {
 		//slide out in 400ms
 		TranslateTransition translateTransition = new TranslateTransition(Duration.millis(400), sideMenuVBox);
 		translateTransition.setFromX(0);
-		translateTransition.setToX(-150);
+		translateTransition.setToX(-175);
 		//in case both animations are used (add (fadeTransition, translateTransition) in the second line under this command)	    
 		ParallelTransition parallelTransition = new ParallelTransition();
 		parallelTransition.getChildren().addAll(translateTransition);//(fadeTransition, translateTransition);
