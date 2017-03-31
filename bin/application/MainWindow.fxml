@@ -53,7 +53,7 @@
          </children>
       </VBox>
      		<!-- space between settings sections  35px, between sections elements (label + element) 20px, between label and element 3px(or more) -->
-      <AnchorPane fx:id="settingsAnchorPane" layoutX="38.0" layoutY="27.0" prefHeight="573.0" prefWidth="862.0" style="-fx-background-color: white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="175.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0">
+      <AnchorPane fx:id="settingsAnchorPane" layoutX="38.0" layoutY="27.0" prefHeight="573.0" prefWidth="862.0" style="-fx-background-color: white;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="175.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0">
          <children>
             <Label layoutX="22.0" layoutY="59.0" text="Cemu Directory" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="59.0" />
             <JFXTextField fx:id="cemuTextField" layoutX="18.0" layoutY="83.0" maxWidth="305.0" minWidth="305.0" onAction="#cemuTextFieldAction" prefHeight="32.0" prefWidth="305.0" promptText="cemu directory" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="79.0" />
