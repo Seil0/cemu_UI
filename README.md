@@ -18,9 +18,10 @@ cemu_UI is a simple graphical frontend for [cemu](http://cemu.info/), a Wii U em
 * Controller support
 * more UI improvements
 * support more rom file formats in automatic detection
+
 ## FAQ
 
 * My game is not detected automaticaly   
-  * You need to add it to the [games.db](https://github.com/Seil0/cemu_UI/blob/master/downloadContent/games.db) database or you add it to the [games.cvs](https://github.com/Seil0/cemu_UI/blob/master/downloadContent/games.cvs) table so everyone can use it.
+  * You need to add it to the [games.db](https://github.com/Seil0/cemu_UI/blob/master/downloadContent/games.db) database or you add it to the [games.csv](https://github.com/Seil0/cemu_UI/blob/master/downloadContent/games.csv) table so everyone can use it.
 * How can I update the games.db?
   * Delete the games.db file in "C:\Users\USERNAME\Documents\cemu_UI" it will be downloaded again at the next start of cemu_UI.
