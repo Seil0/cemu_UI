@@ -16,6 +16,5 @@ cemu_UI is a simple graphical frontend for cemu, a Wii U emulator.
 ## planed Features (no ETA)
 
 * Controller support
-* cloud savegames
 * more UI improvements
 * support more rom file formats in automatic detection
