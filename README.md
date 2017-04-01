@@ -10,7 +10,7 @@ cemu_UI is a simple graphical frontend for cemu, a Wii U emulator.
 * time played in total
 * last time played
 * easyer way to add updates & DLCs (only adding not downloading!)
-* automatic rom detection
+* automatic rom detection (only .rpx files with a app.xml)
 * customisable UI
 
 ## planed Features (no ETA)
@@ -18,3 +18,4 @@ cemu_UI is a simple graphical frontend for cemu, a Wii U emulator.
 * Controller support
 * cloud savegames
 * more UI improvements
+* support more rom file formats in automatic detection
