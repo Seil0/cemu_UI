@@ -40,7 +40,13 @@ public class playGame extends Thread{
     		
     		dbController.setTimePlayed(Integer.toString(timePlayed), selectedGameTitleID);
     		Platform.runLater(() -> {
-        		mainWindowController.timePlayedBtn.setText(dbController.getTimePlayed(selectedGameTitleID)+ " min");
+    			if(Integer.parseInt(dbController.getTimePlayed(selectedGameTitleID)) > 60){
+            		int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTimePlayed(selectedGameTitleID))/60);
+            		int minutesPlayed = Integer.parseInt(dbController.getTimePlayed(selectedGameTitleID))-60*hoursPlayed;
+            		mainWindowController.timePlayedBtn.setText(hoursPlayed+"h "+minutesPlayed+"min");
+            	}else{
+            		mainWindowController.timePlayedBtn.setText(dbController.getTimePlayed(selectedGameTitleID)+ " min");
+            	}
         		mainWindowController.main.primaryStage.setIconified(false);
              });
 		}catch (IOException | InterruptedException e){

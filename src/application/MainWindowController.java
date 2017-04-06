@@ -1,3 +1,24 @@
+/**
+ * cemu_UI
+ * 
+ * Copyright 2017  <@Seil0>
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301, USA.
+ * 
+ */
 package application;
 
 import java.awt.Graphics2D;
@@ -12,7 +33,6 @@ import java.math.BigInteger;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Properties;
 import javax.imageio.ImageIO;
@@ -28,6 +48,8 @@ import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -133,6 +155,7 @@ public class MainWindowController {
     private int xPos = -200;
     private int yPos = 17;
     private int xPosHelper;
+    private int selectedUIDataIndex;
 	private FileChooser fileChooser = new FileChooser();
 	private DirectoryChooser directoryChooser = new DirectoryChooser();
 	private File dirWin = new File(System.getProperty("user.home") + "/Documents/cemu_UI");
@@ -141,9 +164,7 @@ public class MainWindowController {
 	private File fileLinux = new File(dirLinux + "/config.xml");
 	File pictureCacheWin = new File(dirWin+"/picture_cache");
 	File pictureCacheLinux = new File(dirLinux+"/picture_cache");
-	private ArrayList<JFXButton> gameCover = new ArrayList<JFXButton>();
-	private ArrayList<Label> gameLabel = new ArrayList<Label>();
-	private ArrayList<VBox> gameVBox = new ArrayList<VBox>();
+	private ObservableList<uiDataType> games = FXCollections.observableArrayList();
     Properties props = new Properties();
     Properties gameProps = new Properties();
     private MenuItem edit = new MenuItem("edit");
@@ -151,7 +172,6 @@ public class MainWindowController {
     private MenuItem update = new MenuItem("update");
     private MenuItem addDLC = new MenuItem("add DLC");
 	private ContextMenu gameContextMenu = new ContextMenu(edit, remove, update, addDLC);
-	private MouseEvent selectedEvent;
 	private Label lastGameLabel = new Label();
 	
 	private ImageView add_circle_black = new ImageView(new Image("recources/icons/ic_add_circle_black_24dp_1x.png"));
@@ -237,8 +257,6 @@ public class MainWindowController {
                 	alert.showAndWait();
             	}
             	else{
-            		int i = gameCover.indexOf((selectedEvent).getSource());
-            		
             		Alert alert = new Alert(AlertType.CONFIRMATION);
                 	alert.setTitle("remove");
                 	alert.setHeaderText("cemu_UI");
@@ -248,29 +266,29 @@ public class MainWindowController {
                 	Optional<ButtonType> result = alert.showAndWait();
         			if (result.get() == ButtonType.OK){
     					try {
-    						gameVBox.remove(i);
-        					gameCover.remove(i);
-        					gameLabel.remove(i);
+    						//remove all elements from gamesAnchorPane
+	    					for(int i=0; i< games.size(); i++){
+	    						gamesAnchorPane.getChildren().remove(games.get(i).getVBox());
+	    					}
+	    					//remove game from database
+    						games.remove(selectedUIDataIndex);
 							dbController.removeRom(selectedGameTitleID);
-	    					gamesAnchorPane.getChildren().remove(i);
-	    					
-	    					//TODO remove if animations are done
-	    					Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
-	    					System.exit(0);	//finishes itself
-	    					
-						} catch (SQLException | IOException e) {
+	    					gamesAnchorPane.getChildren().removeAll(games);
+	    					//reset position
+	    				    xPos = -200;
+	    				    yPos = 17;
+	    				    xPosHelper = 0;
+	    					//add all games to gamesAnchorPane
+	    					for(int i=0; i< games.size(); i++){
+	    				    	generatePosition();
+	    				    	games.get(i).getVBox().setLayoutX(getxPos());
+	    				    	games.get(i).getVBox().setLayoutY(getyPos());
+	    						gamesAnchorPane.getChildren().add(games.get(i).getVBox());
+	    					}
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
         			}
-            		
-					//TODO nachrück animation
-//					platz(i)/4 -> aufrunden = Reihe; plath(i)-(platz(i)/4 -> abrunden*4)
-//					jetzt haben wir den platz des gelöschten elements und lönnen alle nachfolgenden nachrücken
-//        			double a = 13;
-//            		double b = 4;
-//            		a = a/b;
-//            		System.out.println(Math.ceil(a)); //aufrunden
-//            		System.out.println(Math.floor(a));	//abrunden
             	}
             }
 		});
@@ -643,11 +661,13 @@ public class MainWindowController {
     	Image coverImage = new Image(coverFile.toURI().toString());
     	
     	generatePosition();
-    	gameVBox.add(VBox);
-    	gameCover.add(gameBtn);
-    	gameLabel.add(gameTitleLabel);
+
+    	VBox.setLayoutX(getxPos());
+    	VBox.setLayoutY(getyPos());
+    	VBox.getChildren().addAll(gameTitleLabel,gameBtn);	
     	gameTitleLabel.setMaxWidth(200);
     	gameTitleLabel.setPadding(new Insets(0,0,0,8));
+    	gameTitleLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
     	imageView.setImage(coverImage);
     	imageView.setFitHeight(300);
     	imageView.setFitWidth(200);
@@ -659,27 +679,33 @@ public class MainWindowController {
 		     public void handle(MouseEvent event) {
             	System.out.println("selected: "+title+"; ID: "+titleID);
             	
+            	for(int i=0; i<games.size(); i++){
+            		if(games.get(i).getButton() == event.getSource()){
+            			selectedUIDataIndex = i;
+            		}
+            	}
+            	
             	gameExecutePath = romPath;
             	selectedGameTitleID = titleID;
             	selectedGameTitle = title;
-            	selectedEvent = event;
             	
             	lastGameLabel.setStyle("-fx-underline: false;");
-            	gameLabel.get(gameCover.indexOf(event.getSource())).setStyle("-fx-underline: true;");
-            	lastGameLabel = gameLabel.get(gameCover.indexOf(event.getSource()));
-            	
+            	games.get(selectedUIDataIndex).getLabel().setStyle("-fx-underline: true;");
+            	lastGameLabel = games.get(selectedUIDataIndex).getLabel();
+
             	if(dbController.getLastPlayed(titleID).equals("") || dbController.getLastPlayed(titleID).equals(null)){
             		lastTimePlayedBtn.setText("Last played, never");
             		timePlayedBtn.setText(dbController.getTimePlayed(titleID)+ " min");
             	}else{
                 	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                 	
-                	int localInt = Integer.parseInt(dtf.format(LocalDate.now()).replaceAll("-", ""));
-                	int lastInt = Integer.parseInt(dbController.getLastPlayed(titleID).replaceAll("-", ""));
+                	int today = Integer.parseInt(dtf.format(LocalDate.now()).replaceAll("-", ""));
+                	int yesterday  = Integer.parseInt(dtf.format(LocalDate.now().minusDays(1)).replaceAll("-", ""));
+                	int lastday = Integer.parseInt(dbController.getLastPlayed(titleID).replaceAll("-", ""));
                 	
-                	if(localInt == lastInt){
+                	if(today == lastday){
                 		lastTimePlayedBtn.setText("Last played, today");
-                	}else if(localInt-1 == lastInt){
+                	}else if(yesterday == lastday){
                 		lastTimePlayedBtn.setText("Last played, yesterday");
                 	}else{
                     	lastTimePlayedBtn.setText("Last played, "+dbController.getLastPlayed(titleID));
@@ -698,12 +724,14 @@ public class MainWindowController {
             	}
             }	
         });
-    	
-    	gameTitleLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
-    	VBox.getChildren().addAll(gameTitleLabel,gameBtn);
-    	VBox.setLayoutX(getxPos());
-    	VBox.setLayoutY(getyPos());
-    	gamesAnchorPane.getChildren().add(VBox);
+
+    	games.add(new uiDataType(VBox, gameTitleLabel, gameBtn, titleID, romPath));
+    }
+    
+    void addUIData(){
+    	for(int i=0; i<games.size(); i++){
+    		gamesAnchorPane.getChildren().add(games.get(i).getVBox());
+    	}
     }
 
     
@@ -765,8 +793,8 @@ public class MainWindowController {
 			menuHam.getStyleClass().add("jfx-hamburgerB");
 		}
 
-		for(int i=0; i<gameCover.size(); i++){
-			gameCover.get(i).setRipplerFill(Paint.valueOf(getColor()));
+		for(int i=0; i<games.size(); i++){
+			games.get(i).getButton().setRipplerFill(Paint.valueOf(getColor()));
 		}
     }
 		
