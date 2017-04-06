@@ -148,8 +148,8 @@ public class MainWindowController {
     private String selectedGameTitleID;
     private String selectedGameTitle;
     private String color;
-    private String version = "0.1.2";
-    private String buildNumber = "001";
+    private String version = "0.1.3";
+    private String buildNumber = "002";
 	@SuppressWarnings("unused")
 	private String versionName = "";
     private int xPos = -200;
@@ -489,7 +489,7 @@ public class MainWindowController {
         	saveSettings();
         	cemuTextField.setText(getCemuPath());
 			try {
-				Runtime.getRuntime().exec("java -jar ProjectHomeFlix.jar");	//start again
+				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again
 				System.exit(0);	//finishes itself
 			} catch (IOException e) {
 				System.out.println("es ist ein Fehler aufgetreten");
@@ -508,7 +508,7 @@ public class MainWindowController {
         	saveSettings();
         	cemuTextField.setText(getCemuPath());
 			try {
-				Runtime.getRuntime().exec("java -jar ProjectHomeFlix.jar");	//start again
+				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again
 				System.exit(0);	//finishes itself
 			} catch (IOException e) {
 				System.out.println("es ist ein Fehler aufgetreten");

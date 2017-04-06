@@ -143,7 +143,7 @@ public class Main extends Application {
 		Alert alert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
 		alert.setTitle("cemu_UI");
 		alert.setHeaderText("cemu installation");
-		alert.setContentText("pleas select your cemu installation");
+		alert.setContentText("please select your cemu installation");
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
@@ -158,7 +158,7 @@ public class Main extends Application {
 		Alert alert2 = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
 		alert2.setTitle("cemu_UI");
 		alert2.setHeaderText("rom directory");
-		alert2.setContentText("pleas select your rom directory");
+		alert2.setContentText("please select your rom directory");
 
 		Optional<ButtonType> result2 = alert2.showAndWait();
 		if (result2.get() == ButtonType.OK){
