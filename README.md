@@ -1,6 +1,6 @@
 # cemu_UI
 
-cemu_UI is a simple graphical frontend for [cemu](http://cemu.info/), a Wii U emulator.
+cemu_UI is a simple, material design graphical frontend for [cemu](http://cemu.info/), a Wii U emulator.
 
 ![Screenshot](/downloadContent/cemu_UI4.png)
 
