@@ -68,7 +68,7 @@ public class dbController {
 	
 	private void loadRomDatabase(){
 		if (System.getProperty("os.name").equals("Linux")) {
-			DB_PATH = System.getProperty("user.home") + "/localRoms.db";
+			DB_PATH = System.getProperty("user.home") + "/cemu_UI/localRoms.db";
 		}else{
 			DB_PATH = System.getProperty("user.home") + "\\Documents\\cemu_UI" + "\\" + "localRoms.db";
 		}
@@ -89,7 +89,7 @@ public class dbController {
 	 */
 	private void loadGamesDatabase(){
 		if (System.getProperty("os.name").equals("Linux")) {
-			DB_PATH_games = System.getProperty("user.home") + "/games.db";
+			DB_PATH_games = System.getProperty("user.home") + "/cemu_UI/games.db";
 		}else{
 			DB_PATH_games = System.getProperty("user.home") + "\\Documents\\cemu_UI" + "\\" + "games.db";
 		}
@@ -183,6 +183,7 @@ public class dbController {
 	//get all files with .rpx TODO add other formats
 	void loadRomDirectory(String directory){
 		File dir = new File(directory);
+		File appFile;
 		String[] extensions = new String[] { "rpx", "jsp" };
 		File pictureCache;
 		String coverPath;
@@ -198,7 +199,11 @@ public class dbController {
 			System.out.println("Getting all .rpx files in " + dir.getCanonicalPath()+" including those in subdirectories \n");
 			List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, true);
 			for (File file : files) {
-				File appFile = new File(file.getParent()+"\\app.xml");
+				if(System.getProperty("os.name").equals("Linux")){
+					appFile = new File(file.getParent()+"/app.xml");
+				} else {
+					appFile = new File(file.getParent()+"\\app.xml");
+				}
 				DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 				DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 				Document document = documentBuilder.parse(appFile);
