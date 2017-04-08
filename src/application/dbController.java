@@ -222,9 +222,14 @@ public class dbController {
 						BufferedImage originalImage = ImageIO.read(new URL(rs.getString(6)));//change path to where file is located
 					    int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
 					    BufferedImage resizeImagePNG = resizeImage(originalImage, type, 400, 600);
-					    ImageIO.write(resizeImagePNG, "png", new File(pictureCache+"\\"+rs.getString(3)+".png")); //change path where you want it saved
-					    coverPath = pictureCache+"\\"+rs.getString(3)+".png";
-						
+					    if(System.getProperty("os.name").equals("Linux")) {
+						    ImageIO.write(resizeImagePNG, "png", new File(pictureCache+"/"+rs.getString(3)+".png")); //change path where you want it saved
+						    coverPath = pictureCache+"/"+rs.getString(3)+".png";
+					    } else {
+						    ImageIO.write(resizeImagePNG, "png", new File(pictureCache+"\\"+rs.getString(3)+".png")); //change path where you want it saved
+						    coverPath = pictureCache+"\\"+rs.getString(3)+".png";
+					    }
+
 						addRom(rs.getString(2), coverPath, file.getCanonicalPath(), rs.getString(1), rs.getString(3), rs.getString(5),"","0");
 					}
 				}

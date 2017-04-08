@@ -16,6 +16,7 @@ public class playGame extends Thread{
 	
 	public void run(){
 		String selectedGameTitleID = mainWindowController.getSelectedGameTitleID();
+		String executeComand;
 		long startTime;
     	long endTime;
     	int timePlayedNow;
@@ -28,11 +29,21 @@ public class playGame extends Thread{
     	startTime = System.currentTimeMillis();
 		try{
 			if(mainWindowController.isFullscreen()){
-				p = Runtime.getRuntime().exec(mainWindowController.getCemuPath()+"\\Cemu.exe -f -g \""+mainWindowController.getGameExecutePath()+"\"");
+				if(System.getProperty("os.name").equals("Linux")){
+					executeComand = "wine "+mainWindowController.getCemuPath()+"/Cemu.exe -f -g \""+mainWindowController.getGameExecutePath()+"\"";
+				} else {
+					executeComand = mainWindowController.getCemuPath()+"\\Cemu.exe -f -g \""+mainWindowController.getGameExecutePath()+"\"";
+				}
 			}else{
-				p = Runtime.getRuntime().exec(mainWindowController.getCemuPath()+"\\Cemu.exe -g \""+mainWindowController.getGameExecutePath()+"\"");
+				if(System.getProperty("os.name").equals("Linux")){
+					executeComand = "wine "+mainWindowController.getCemuPath()+"/Cemu.exe -g \""+mainWindowController.getGameExecutePath()+"\"";
+				} else {
+					executeComand = mainWindowController.getCemuPath()+"\\Cemu.exe -g \""+mainWindowController.getGameExecutePath()+"\"";
+				}
 			}
+			System.out.println(executeComand);
 			
+			p = Runtime.getRuntime().exec(executeComand);
 			p.waitFor();
 			endTime = System.currentTimeMillis();
     		timePlayedNow = (int)  Math.floor(((endTime - startTime)/1000/60));   			

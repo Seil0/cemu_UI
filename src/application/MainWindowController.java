@@ -148,8 +148,8 @@ public class MainWindowController {
     private String selectedGameTitleID;
     private String selectedGameTitle;
     private String color;
-    private String version = "0.1.3";
-    private String buildNumber = "002";
+    private String version = "0.1.4";
+    private String buildNumber = "007";
 	@SuppressWarnings("unused")
 	private String versionName = "";
     private int xPos = -200;
@@ -193,7 +193,7 @@ public class MainWindowController {
 		romTextField.setText(romPath);
 		colorPicker.setValue(Color.valueOf(getColor()));
 		fullscreenToggleBtn.setSelected(isFullscreen());
-		edit.setDisable(true);		
+		edit.setDisable(true);
 		applyColor();
 	}
 	
