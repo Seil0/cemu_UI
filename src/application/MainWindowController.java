@@ -156,7 +156,6 @@ public class MainWindowController {
     private int yPos = 17;
     private int xPosHelper;
     private int selectedUIDataIndex;
-	private FileChooser fileChooser = new FileChooser();
 	private DirectoryChooser directoryChooser = new DirectoryChooser();
 	private File dirWin = new File(System.getProperty("user.home") + "/Documents/cemu_UI");
 	private File dirLinux = new File(System.getProperty("user.home") + "/cemu_UI");
@@ -481,7 +480,7 @@ public class MainWindowController {
     
     @FXML
     void cemuTFBtnAction(ActionEvent event) {
-    	File cemuDirectory = fileChooser.showOpenDialog(main.primaryStage);
+    	File cemuDirectory = directoryChooser.showDialog(main.primaryStage);
         if(cemuDirectory == null){
             System.out.println("No Directory selected");
         }else{
