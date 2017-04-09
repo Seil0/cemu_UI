@@ -2,7 +2,13 @@
 
 cemu_UI is a simple, material design graphical frontend for [cemu](http://cemu.info/), a Wii U emulator. Downloads can be found [here](https://github.com/Seil0/cemu_UI/releases).
 
-![Screenshot](/downloadContent/cemu_UI4.png)
+## installation
+Simply download the cemu_UI.jar from [releases](https://github.com/Seil0/cemu_UI/releases), make sure you have the latest version of java 8 oracle jre/jdk installed, open the file. cemu_UI creats a new directory "C:\Users\USERNAME\Documents\cemu_UI", where the database, settings and covers are stored.
+
+## building from source
+1. download/clone the git repository
+2. make sure you have the latest versionj of java 8 oracle jdk installed
+3. place the unzip repository into your workspace and start eclipse, project should now be there **or** import the project to your workspace
 
 ## Features
 
@@ -21,14 +27,6 @@ cemu_UI is a simple, material design graphical frontend for [cemu](http://cemu.i
 
 ### If you have another idea, make a "new issue" with the ![#f03c15](https://placehold.it/15/fbca04/000000?text=+)`idea` lable
 
-## installation
-Simply download the cemu_UI.jar from [releases](https://github.com/Seil0/cemu_UI/releases), make sure you have the latest version of java 8 oracle jre/jdk installed, open the file. cemu_UI creats a new directory "C:\Users\USERNAME\Documents\cemu_UI", where the database, settings and covers are stored.
-
-## building from source
-1. download/clone the git repository
-2. make sure you have the latest versionj of java 8 oracle jdk installed
-3. place the unzip repository into your workspace and start eclipse, project should now be there **or** import the project to your workspace
-
 ## FAQ
 
 * My game is not detected automaticaly   
@@ -37,4 +35,9 @@ Simply download the cemu_UI.jar from [releases](https://github.com/Seil0/cemu_UI
   * Delete the games.db file in "C:\Users\USERNAME\Documents\cemu_UI" it will be downloaded again at the next start of cemu_UI.
 * I have another question
   * make a new issue and let me know
+  
+## screenshots
+  
+![Screenshot](/downloadContent/cemu_UI4.png)
+  
   
