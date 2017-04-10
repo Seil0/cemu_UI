@@ -24,6 +24,7 @@ Simply download the cemu_UI.jar from [releases](https://github.com/Seil0/cemu_UI
 * Controller support
 * more UI improvements
 * support more rom file formats in automatic detection
+* [smmdb api](http://smmdb.ddns.net/api) integration
 
 ### If you have another idea, make a "new issue" with the ![#f03c15](https://placehold.it/15/fbca04/000000?text=+)`idea` lable
 
