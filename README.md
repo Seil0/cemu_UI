@@ -3,7 +3,7 @@
 cemu_UI is a simple, material design graphical frontend for [cemu](http://cemu.info/), a Wii U emulator. Downloads can be found [here](https://github.com/Seil0/cemu_UI/releases).
 
 ## installation
-Simply download the cemu_UI.jar from [releases](https://github.com/Seil0/cemu_UI/releases), make sure you have the latest version of java 8 oracle jre/jdk installed, open the file. cemu_UI creats a new directory "C:\Users\USERNAME\Documents\cemu_UI", where the database, settings and covers are stored.
+Simply download the cemu_UI.jar from [releases](https://github.com/Seil0/cemu_UI/releases), make sure you have the latest version of java 8 oracle jre/jdk installed, open the file. cemu_UI creats a new directory "C:\Users\USERNAME\Documents\cemu_UI", where the database, settings and covers are stored. **first start can take while!**
 
 ## building from source
 1. download/clone the git repository
