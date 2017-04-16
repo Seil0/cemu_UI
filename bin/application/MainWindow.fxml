@@ -61,10 +61,10 @@
             <JFXButton fx:id="romTFBtn" layoutX="337.0" layoutY="159.0" onAction="#romTFBtnAction" prefHeight="32.0" prefWidth="108.0" text="choose directory" AnchorPane.leftAnchor="333.0" AnchorPane.topAnchor="151.0" />
             <JFXButton fx:id="cemuTFBtn" layoutX="333.0" layoutY="79.0" onAction="#cemuTFBtnAction" prefHeight="32.0" prefWidth="108.0" text="choose directory" AnchorPane.leftAnchor="333.0" AnchorPane.topAnchor="79.0" />
             <JFXColorPicker fx:id="colorPicker" layoutX="22.0" layoutY="235.0" onAction="#colorPickerAction" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="227.0" />
-            <JFXToggleButton fx:id="fullscreenToggleBtn" layoutX="18.0" layoutY="316.0" onAction="#fullscreenToggleBtnAction" text="start game in fullscreen" AnchorPane.leftAnchor="18.0" AnchorPane.topAnchor="314.0" />
+            <JFXToggleButton fx:id="fullscreenToggleBtn" layoutX="14.0" layoutY="391.0" onAction="#fullscreenToggleBtnAction" text="start game in fullscreen" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="390.0" />
             <Label layoutX="22.0" layoutY="135.0" text="Rom Directory" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="131.0" />
             <Label layoutX="22.0" layoutY="211.0" text="main Color" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="203.0" />
-            <Label layoutX="18.0" layoutY="281.0" text="Cemu Settings" AnchorPane.leftAnchor="18.0" AnchorPane.topAnchor="287.0">
+            <Label layoutX="14.0" layoutY="371.0" text="Cemu Settings" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="350.0">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
@@ -74,6 +74,7 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Label>
+            <JFXToggleButton fx:id="cloudSyncToggleBtn" layoutX="14.0" layoutY="264.0" onAction="#cloudSyncToggleBtnAction" text="cloud savegames (Google Drive)" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="267.0" />
          </children>
       </AnchorPane>
       <JFXButton fx:id="playBtn" buttonType="RAISED" maxHeight="38.0" maxWidth="100.0" onAction="#playBtnAction" ripplerFill="#c92a2a" text="play" visible="false" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="396.0" AnchorPane.rightAnchor="396.0" AnchorPane.topAnchor="555.0">

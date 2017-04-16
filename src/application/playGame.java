@@ -60,6 +60,13 @@ public class playGame extends Thread{
             	}
         		mainWindowController.main.primaryStage.setIconified(false);
              });
+    		
+//    		System.out.println(mainWindowController.getCemuPath()+"/mlc01/emulatorSave/"+);
+    		//sync savegame with cloud service
+    		if(mainWindowController.isCloudSync()) {
+    			mainWindowController.main.cloudController.sync(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
+    		}
+    		
 		}catch (IOException | InterruptedException e){
 			e.printStackTrace();
 		}

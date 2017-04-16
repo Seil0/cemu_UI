@@ -119,6 +119,9 @@ public class MainWindowController {
     
     @FXML
     private JFXToggleButton fullscreenToggleBtn;
+    
+    @FXML
+    private JFXToggleButton cloudSyncToggleBtn;
 
     @FXML
     private AnchorPane settingsAnchorPane;
@@ -142,6 +145,8 @@ public class MainWindowController {
     private boolean settingsTrue = false;
     private boolean playTrue = false;
     private boolean fullscreen;
+    private boolean cloudSync;
+    private String cloudService = "GoogleDrive"; //set cloud provider (at the moment only GoogleDrive, Dropbox is planed)
     private String cemuPath;
     private String romPath;
     private String gameExecutePath;
@@ -519,13 +524,13 @@ public class MainWindowController {
     @FXML
     void cemuTextFieldAction(ActionEvent event){
     	setCemuPath(cemuTextField.getText());
-		saveSettings();
+		saveSettings();//TODO remove (only save on exit settings)
     }
     
     @FXML
     void romTextFieldAction(ActionEvent event){
     	setRomPath(romTextField.getText());
-		saveSettings();
+		saveSettings();//TODO remove (only save on exit settings)
     }
     
     @FXML
@@ -535,7 +540,19 @@ public class MainWindowController {
     	}else{
     		fullscreen = true;
     	}
-    	saveSettings();
+    	saveSettings();//TODO remove (only save on exit settings)
+    }
+    
+    @FXML
+    void cloudSyncToggleBtnAction(ActionEvent event){
+    	if(cloudSync) {
+    		cloudSync = false;
+    	} else {
+    		cloudSync = true;
+    		main.cloudController.initializeConnection(getCloudService(), getCemuPath());
+    		main.cloudController.sync(getCloudService(), getCemuPath());
+    	}
+    	saveSettings();//TODO remove (only save on exit settings)
     }
     
     @FXML
@@ -733,8 +750,9 @@ public class MainWindowController {
     	}
     }
 
-    
+    //TODO xPosHelper based on window with
     private void generatePosition(){
+//    	System.out.println(main.primaryStage.getWidth());
     	if(xPosHelper == 4){
     		xPos = 17;
     		yPos = yPos + 345;		
@@ -805,6 +823,8 @@ public class MainWindowController {
 				props.setProperty("romPath", getRomPath());
 				props.setProperty("color", getColor());
 				props.setProperty("fullscreen", String.valueOf(isFullscreen()));
+				props.setProperty("cloudSync", String.valueOf(cloudSync));
+				props.setProperty("folderID", main.cloudController.getFolderID(getCloudService()));
     			if(System.getProperty("os.name").equals("Linux")){
     				outputStream = new FileOutputStream(fileLinux);
     			}else{
@@ -832,6 +852,8 @@ public class MainWindowController {
 			setRomPath(props.getProperty("romPath"));
 			setColor(props.getProperty("color"));
 			setFullscreen(Boolean.parseBoolean(props.getProperty("fullscreen")));
+			setCloudSync(Boolean.parseBoolean(props.getProperty("cloudSync")));
+			main.cloudController.setFolderID(props.getProperty("folderID"), getCloudService());
 			inputStream.close();
 			System.out.println("done!");
 		} catch (IOException e) {
@@ -983,6 +1005,14 @@ public class MainWindowController {
 		this.fullscreen = fullscreen;
 	}
 
+	public boolean isCloudSync() {
+		return cloudSync;
+	}
+
+	public void setCloudSync(boolean cloudSync) {
+		this.cloudSync = cloudSync;
+	}
+
 	public String getGameExecutePath() {
 		return gameExecutePath;
 	}
@@ -997,6 +1027,14 @@ public class MainWindowController {
 
 	public void setSelectedGameTitleID(String selectedGameTitleID) {
 		this.selectedGameTitleID = selectedGameTitleID;
+	}
+
+	public String getCloudService() {
+		return cloudService;
+	}
+
+	public void setCloudService(String cloudService) {
+		this.cloudService = cloudService;
 	}
 
 }
