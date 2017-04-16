@@ -71,8 +71,7 @@
  			mainWindowController = loader.getController();	//Link of FXMLController and controller class
  			mainWindowController.setMain(this);	//call setMain
  			
--			//get os and the right paths
-+			//get OS and the right paths
+			//get OS and the right paths
  			if(System.getProperty("os.name").equals("Linux")){
  				directory = new File(dirLinux);
  				configFile = new File(dirLinux + "/config.xml");
