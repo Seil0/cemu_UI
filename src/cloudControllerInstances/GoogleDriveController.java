@@ -1,54 +1,40 @@
 package cloudControllerInstances;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import org.apache.commons.io.FileUtils;
+
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
 import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
-import com.google.api.client.googleapis.media.MediaHttpUploader.UploadState;
 import com.google.api.client.http.FileContent;
 import com.google.api.client.http.HttpTransport;
-import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 import com.google.api.client.util.store.FileDataStoreFactory;
-
-import com.google.api.services.drive.DriveScopes;
-import com.google.api.services.drive.model.*;
-
-import javafx.print.Collation;
-
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.Drive.Files;
-import com.google.api.services.drive.Drive.Files.Get;
-
-import java.io.ByteArrayOutputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.TimeZone;
-
-import javax.servlet.ServletInputStream;
-
-import org.apache.commons.io.FileUtils;
+import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.File;
+import com.google.api.services.drive.model.FileList;
 
 public class GoogleDriveController {
 	
 	Drive service;
-	private String uploadFilePath = "C:/Users/Jannik/Documents/cemu_1.7.4/mlc01/emulatorSave/019be15c/userdata.dat";
 	private String cemuDirectory;
 	private String folderID;
-	private java.io.File uploadFile = new java.io.File(uploadFilePath);
-	private File uploadedFile;
 	private ArrayList<java.io.File> localSavegames = new ArrayList<>();
 	private ArrayList<File> cloudSavegames = new ArrayList<>();
 	private ArrayList<String> localSavegamesName = new ArrayList<>();
@@ -150,7 +136,7 @@ public class GoogleDriveController {
 //					 System.out.println(localSavegamesName.get(i)+"; "+cloudSavegames.get(i).getName());
 //					 System.out.println(localSavegames.get(a).getName()+"; "+cloudSavegames.get(i).getName().substring(9, cloudSavegames.get(i).getName().length()));
 					
-//					 String localSavegameName = localSavegames.get(a).getParentFile().getName()+"_"+localSavegames.get(a).getName();
+//					 if the file exists locally check which one is newer
 					 if(localSavegamesName.contains(cloudSavegames.get(i).getName())) {
 						
 						 int localSavegamesNumber = localSavegamesName.indexOf(cloudSavegames.get(i).getName());
@@ -164,14 +150,15 @@ public class GoogleDriveController {
 							 System.out.println("both files are the same, nothing to do \n");
 						 } else if(localModified >= cloudModified) {
 							 System.out.println("local is newer, going to upload local file \n");
-//							 updateFile(localSavegames.get(localSavegamesNumber));
+							 updateFile(cloudSavegames.get(i), localSavegames.get(localSavegamesNumber));
 						 } else {
 							 System.out.println("cloud is newer, going to download cloud file \n");
-//							 downloadFile(cloudSavegames.get(i));
+							 downloadFile(cloudSavegames.get(i));
 						 }
 					 } else {
+						 System.out.println("file doesn't exist locally");
 						 System.out.println("download "+cloudSavegames.get(i).getName()+" from the cloud");
-//						 downloadFile(cloudSavegames.get(i));
+						 downloadFile(cloudSavegames.get(i));
 					 }
 				 }
 				 
@@ -179,7 +166,7 @@ public class GoogleDriveController {
 				 for(int j = 0; j < localSavegames.size(); j++) {
 					 if(!cloudSavegamesName.contains(localSavegamesName.get(j))) {
 						 System.out.println("upload "+localSavegames.get(j).getName()+" to the cloud");
-//						 uploadFile(localSavegames.get(j));
+						 uploadFile(localSavegames.get(j));
 					 }
 				 }
 			 
@@ -258,7 +245,7 @@ public class GoogleDriveController {
 	    
 	    FileContent mediaContent = new FileContent("", uploadFile);
 	    File file = service.files().create(fileMetadata, mediaContent).setFields("id, parents").execute();
-	    uploadedFile = file;
+//	    uploadedFile = file;
 	    System.out.println("File ID: " + file.getId());
 	    }
 	    
@@ -280,8 +267,20 @@ public class GoogleDriveController {
 	    System.out.println("done");     
 	 }
 	 
-	 private void updateFile(java.io.File uploadFile) {
+	 private void updateFile(File oldFile, java.io.File newFile) throws IOException {
+		 //deleting old file
+		 service.files().delete(oldFile.getId()).execute();
 		 
+		 //uploading new file
+		 File fileMetadata = new File();
+		 fileMetadata.setName(newFile.getParentFile().getName()+"_"+newFile.getName());
+		 fileMetadata.setParents(Collections.singletonList(folderID));
+		 fileMetadata.setModifiedTime(new DateTime(newFile.lastModified()));
+		    
+		 FileContent mediaContent = new FileContent("", newFile);
+		 File file = service.files().create(fileMetadata, mediaContent).setFields("id, parents").execute();
+//		 uploadedFile = file;
+		 System.out.println("File ID: " + file.getId());
 	 }
 
 	public String getFolderID() {
