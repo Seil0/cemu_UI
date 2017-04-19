@@ -6,9 +6,10 @@ cemu_UI is a simple, material design graphical frontend for [cemu](http://cemu.i
 Simply download the cemu_UI.jar from [releases](https://github.com/Seil0/cemu_UI/releases), make sure you have the latest version of java 8 oracle jre/jdk installed, open the file. cemu_UI creats a new directory "C:\Users\USERNAME\Documents\cemu_UI", where the database, settings and covers are stored. **first start can take while!**
 
 ## building from source
-1. download/clone the git repository
-2. make sure you have the latest versionj of java 8 oracle jdk installed
-3. place the unzip repository into your workspace and start eclipse, project should now be there **or** import the project to your workspace
+1. read the [license](https://github.com/Seil0/cemu_UI/blob/master/LICENSE)
+2. download/clone the git repository
+3. make sure you have the latest versionj of java 8 oracle jdk installed
+4. place the unzip repository into your workspace and start eclipse, project should now be there **or** import the project to your workspace
 
 ## Features
 
