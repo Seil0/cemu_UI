@@ -1,17 +1,3 @@
-/**
- * cemu_UI
- * 
- * Copyright 2017  <@Seil0>
- * 
- * "THE CHOCOLATE-WARE LICENSE" (Revision 1):
- * As long as you retain this notice this software is licensed under the GNU GENERAL PUBLIC LICENSE Version 3,
- * with the following additions:
- * If we meet some day, and you think this stuff is worth it,
- * you can buy me a chocolate in return. - @Seil0
- * (license based in Beer-ware, see https://fedoraproject.org/wiki/Licensing/Beerware )   
- * 
- */
-
 package application;
 
 import java.io.IOException;
