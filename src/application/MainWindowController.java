@@ -189,6 +189,7 @@ public class MainWindowController {
 		romTextField.setText(romPath);
 		colorPicker.setValue(Color.valueOf(getColor()));
 		fullscreenToggleBtn.setSelected(isFullscreen());
+		cloudSyncToggleBtn.setSelected(isCloudSync());
 		edit.setDisable(true);
 		applyColor();
 	}
