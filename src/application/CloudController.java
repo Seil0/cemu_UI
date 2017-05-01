@@ -10,7 +10,6 @@
  * you can buy me a chocolate in return. - @Seil0
  * (license based in Beer-ware, see https://fedoraproject.org/wiki/Licensing/Beerware )   
  * 
- * TODO own thread
  */
 package application;
 
@@ -45,34 +44,52 @@ public class CloudController {
 	}
 	
 	void sync(String cloudService, String cemuDirectory) {
-		if(cloudService == "GoogleDrive") {
-			try {
-				googleDriveController.sync(cemuDirectory);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		if(cloudService == "Dropbox") {
-			
-		}
+		
+		//running sync in a new thread, instead of blocking the main thread
+		new Thread() {
+            public void run() {
+            	System.out.println("starting sync in new thread...");
+            	
+            	if(cloudService == "GoogleDrive") {
+        			try {
+        				googleDriveController.sync(cemuDirectory);
+        			} catch (IOException e) {
+        				e.printStackTrace();
+        			}
+        		}
+        		if(cloudService == "Dropbox") {
+        			
+        		}
+            }
+        }.start();
+		
 	}	
 	
 	void uploadFile(String cloudService, File file) {
-		if(cloudService == "GoogleDrive") {
-			 try {
-				googleDriveController.uploadFile(file);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		if(cloudService == "Dropbox") {
+		
+		//running uploadFile in a new thread, instead of blocking the main thread
+		new Thread() {
+            public void run() {
+            	System.out.println("starting uploadFile in new thread...");
+            	
+            	if(cloudService == "GoogleDrive") {
+       			 	try {
+       			 		googleDriveController.uploadFile(file);
+       			 	} catch (IOException e) {
+       			 		e.printStackTrace();
+       			 	}
+            	}
+            	if(cloudService == "Dropbox") {
 
-		}
+            	}
+            }
+        }.start();
+	
 	}
 	
-	void download(String cloudService) {
-		
-	}
+//	void download(String cloudService) {
+//		
+//	}
 	
 	public String getFolderID(String cloudService) {
 		String folderID = "";

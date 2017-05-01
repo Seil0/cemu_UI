@@ -20,6 +20,7 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Optional;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.DirectoryChooser;
@@ -81,8 +82,8 @@ public class Main extends Application {
 			}
 			
 			//startup checks
-			System.out.println(directory.exists());
-			System.out.println(configFile.exists());
+			System.out.println("Directory: " + directory.exists());
+			System.out.println("configfile: " + configFile.exists());
 			if(directory.exists() != true){
 				System.out.println("mkdir all");
 				directory.mkdir();

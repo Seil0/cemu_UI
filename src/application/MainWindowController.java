@@ -145,10 +145,9 @@ public class MainWindowController {
     private String selectedGameTitleID;
     private String selectedGameTitle;
     private String color;
-    private String version = "0.1.4";
-    private String buildNumber = "007";
-	@SuppressWarnings("unused")
-	private String versionName = "";
+    private String version = "0.1.5";
+    private String buildNumber = "010";
+	private String versionName = "Gusty Garden";
     private int xPos = -200;
     private int yPos = 17;
     private int xPosHelper;
@@ -433,7 +432,7 @@ public class MainWindowController {
     	Alert alert = new Alert(AlertType.INFORMATION);
     	alert.setTitle("about");
     	alert.setHeaderText("cemu_UI");
-    	alert.setContentText("cemu_UI by @Seil0 \npre release "+version+" ("+buildNumber+") \nwww.kellerkinder.xyz");
+    	alert.setContentText("cemu_UI by @Seil0 \nVersion: "+version+" ("+buildNumber+")  \""+versionName+"\" \nwww.kellerkinder.xyz");
     	alert.initOwner(main.primaryStage);
     	alert.showAndWait();
     }
