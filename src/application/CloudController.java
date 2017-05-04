@@ -45,6 +45,7 @@ public class CloudController {
 	
 	void stratupCheck(String cloudService, String cemuDirectory) {
 		if(cloudService == "GoogleDrive") {
+			System.out.println("starting startup check google drive...");
 			try {
 				if (!googleDriveController.checkFolder()) {
 					googleDriveController.creatFolder();

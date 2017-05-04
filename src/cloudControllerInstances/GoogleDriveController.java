@@ -177,6 +177,7 @@ public class GoogleDriveController {
 		// upload file to cloud which don't exist in the cloud
 		for (int j = 0; j < localSavegames.size(); j++) {
 			if (!cloudSavegamesName.contains(localSavegamesName.get(j))) {
+				System.out.print("file doesn't exist in the cloud, ");
 				uploadFile(localSavegames.get(j));
 			}
 		}
@@ -245,7 +246,7 @@ public class GoogleDriveController {
 	
 	//upload a file to the cloud from the local savegames folder
 	public void uploadFile(java.io.File uploadFile) throws IOException{
-		System.out.println("uploading ...");
+		System.out.println("uploading " + uploadFile.getName() + "...");
 	    File fileMetadata = new File();
 	    fileMetadata.setName(uploadFile.getParentFile().getName()+"_"+uploadFile.getName());
 	    fileMetadata.setParents(Collections.singletonList(folderID));
@@ -296,13 +297,13 @@ public class GoogleDriveController {
 	public void uploadAllFiles() {
 		new Thread() {
             public void run() {
-            	try {
+				try {
 					getLocalSavegames();
 					for (int i = 0; i < localSavegames.size(); i++) {
-	        			uploadFile(localSavegames.get(i));
-	        		}
+		        		uploadFile(localSavegames.get(i));
+		        	}
 				} catch (IOException e) {
-					// Auto-generated catch block
+					//Auto-generated catch block
 					e.printStackTrace();
 				}
             }
