@@ -17,5 +17,6 @@
 	<classpathentry kind="lib" path="src/libraries/google_apis/jetty-6.1.25.jar"/>
 	<classpathentry kind="lib" path="src/libraries/google_apis/jetty-util-6.1.25.jar"/>
 	<classpathentry kind="lib" path="src/libraries/google_apis/jackson-core-2.8.8.jar"/>
+	<classpathentry kind="lib" path="src/libraries/commons-codec-1.10.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -43,6 +43,27 @@ public class CloudController {
 		System.out.println("done!");
 	}
 	
+	void stratupCheck(String cloudService, String cemuDirectory) {
+		if(cloudService == "GoogleDrive") {
+			try {
+				if (!googleDriveController.checkFolder()) {
+					googleDriveController.creatFolder();
+					main.mainWindowController.saveSettings();
+					googleDriveController.uploadAllFiles();
+				} else {
+					sync(cloudService, cemuDirectory);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		if(cloudService == "Dropbox") {
+			
+		}
+	}
+	
+	
+	
 	void sync(String cloudService, String cemuDirectory) {
 		
 		//running sync in a new thread, instead of blocking the main thread
