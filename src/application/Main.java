@@ -35,7 +35,7 @@ import javafx.scene.layout.AnchorPane;
 public class Main extends Application {
 	
 	Stage primaryStage;
-	MainWindowController mainWindowController;
+	public MainWindowController mainWindowController; //TODO find a better way
 	CloudController cloudController;
 	private String dirWin = System.getProperty("user.home") + "/Documents/cemu_UI";	//Windows: C:/Users/"User"/Documents/HomeFlix
 	private String dirLinux = System.getProperty("user.home") + "/cemu_UI";	//Linux: /home/"User"/HomeFlix
@@ -120,12 +120,11 @@ public class Main extends Application {
 			
 			//loading settings and initialize UI, dbController.main() loads all databases
 			mainWindowController.loadSettings();
+			mainWindowController.dbController.main();
 			if(mainWindowController.isCloudSync()) {
 				cloudController.initializeConnection(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
 				cloudController.stratupCheck(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
-//				mainWindowController.saveSettings();//TODO find a better way
 			}
-			mainWindowController.dbController.main();
 			mainWindowController.addUIData();
 			mainWindowController.initActions();
 			mainWindowController.initUI();

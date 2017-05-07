@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 
 import cloudControllerInstances.GoogleDriveController;
+import javafx.application.Platform;
 
 public class CloudController {
 
@@ -24,12 +25,11 @@ public class CloudController {
 		main = ma;
 	}
 	
-	@SuppressWarnings("unused")//TODO
-	private Main main;
+	Main main;
 	private GoogleDriveController googleDriveController = new GoogleDriveController();
 	
 	void initializeConnection(String cloudService, String cemuDirectory) {
-		System.out.println("sartting initialisation... ");
+		System.out.println("sartting cloud initialisation... ");
 		if(cloudService == "GoogleDrive") {
 			try {
 				googleDriveController.main(cemuDirectory);
@@ -40,7 +40,7 @@ public class CloudController {
 		if(cloudService == "Dropbox") {
 			
 		}
-		System.out.println("done!");
+		System.out.println("cloud initialisation done!");
 	}
 	
 	void stratupCheck(String cloudService, String cemuDirectory) {
@@ -50,7 +50,19 @@ public class CloudController {
 				if (!googleDriveController.checkFolder()) {
 					googleDriveController.creatFolder();
 					main.mainWindowController.saveSettings();
-					googleDriveController.uploadAllFiles();
+					
+	        		Thread thread = new Thread(new Runnable() {
+	        			public void run() {
+	        				Platform.runLater(() -> {
+	    	            		main.mainWindowController.getPlayBtn().setText("syncing...");
+	    	                });
+	        				googleDriveController.uploadAllFiles();
+	        				Platform.runLater(() -> {
+	    	            		main.mainWindowController.getPlayBtn().setText("play");
+	    	                });
+	        			}
+	        		});
+	        		thread.start();
 				} else {
 					sync(cloudService, cemuDirectory);
 				}
@@ -68,8 +80,11 @@ public class CloudController {
 	void sync(String cloudService, String cemuDirectory) {
 		
 		//running sync in a new thread, instead of blocking the main thread
-		new Thread() {
-            public void run() {
+		Thread thread = new Thread(new Runnable() {
+			public void run() {
+            	Platform.runLater(() -> {
+        			main.mainWindowController.getPlayBtn().setText("syncing...");
+                 });
             	System.out.println("starting sync in new thread...");
             	
             	if(cloudService == "GoogleDrive") {
@@ -82,8 +97,13 @@ public class CloudController {
         		if(cloudService == "Dropbox") {
         			
         		}
+        		Platform.runLater(() -> {
+            		main.mainWindowController.getPlayBtn().setText("play");
+                 });
+        		System.out.println("sync finished!");
             }
-        }.start();
+        });
+		thread.start();
 		
 	}	
 	

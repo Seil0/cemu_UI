@@ -146,7 +146,7 @@ public class MainWindowController {
     private String selectedGameTitle;
     private String color;
     private String version = "0.1.5";
-    private String buildNumber = "010";
+    private String buildNumber = "011";
 	private String versionName = "Gusty Garden";
     private int xPos = -200;
     private int yPos = 17;
@@ -194,7 +194,7 @@ public class MainWindowController {
 	}
 	
 	void initActions() {
-		System.out.print("initializing Actions... ");
+		System.out.println("initializing Actions... ");
 		
 		HamburgerBackArrowBasicTransition burgerTask = new HamburgerBackArrowBasicTransition(menuHam);
 		menuHam.addEventHandler(MouseEvent.MOUSE_PRESSED, (e)->{
@@ -419,7 +419,7 @@ public class MainWindowController {
 				}
 		     }
 		});
-		System.out.println("done!");
+		System.out.println("initializing Actions done!");
 	}
     
     @FXML
@@ -540,9 +540,20 @@ public class MainWindowController {
     	if(cloudSync) {
     		cloudSync = false;
     	} else {
-    		cloudSync = true;
-    		main.cloudController.initializeConnection(getCloudService(), getCemuPath());
-    		main.cloudController.sync(getCloudService(), getCemuPath());
+    		Alert cloudWarningAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
+    		cloudWarningAlert.setTitle("cemu_UI");
+    		cloudWarningAlert.setHeaderText("activate cloud savegame sync (beta)");
+    		cloudWarningAlert.setContentText("You just activate the cloud savegame sync function of cemu_UI which is currently in beta. Are you sure you want to do this?");
+    		cloudWarningAlert.initOwner(main.primaryStage);
+    		Optional<ButtonType> coverResult = cloudWarningAlert.showAndWait();
+			if (coverResult.get() == ButtonType.OK){
+				cloudSync = true;
+	    		main.cloudController.initializeConnection(getCloudService(), getCemuPath());
+	    		main.cloudController.sync(getCloudService(), getCemuPath());
+			} else {
+				cloudSyncToggleBtn.setSelected(false);
+			}
+			
     	}
     	saveSettings();//TODO remove (only save on exit settings)
     }
@@ -1027,6 +1038,14 @@ public class MainWindowController {
 
 	public void setCloudService(String cloudService) {
 		this.cloudService = cloudService;
+	}
+
+	public JFXButton getPlayBtn() {
+		return playBtn;
+	}
+
+	public void setPlayBtn(JFXButton playBtn) {
+		this.playBtn = playBtn;
 	}
 
 }

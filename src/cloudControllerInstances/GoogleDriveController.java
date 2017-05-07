@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -112,23 +111,10 @@ public class GoogleDriveController {
 	 
 	public void sync(String cemuDirectory) throws IOException {
 		getLocalSavegames();
-//
-//		if (!checkFolder()) {
-//			creatFolder();
-//
-//			for (int i = 0; i < localSavegames.size(); i++) {
-//				uploadFile(localSavegames.get(i));
-//			}
-//		} else {
-
 		getCloudSavegames();
-//		System.out.println(cloudSavegames.size() + "; " + localSavegames.size() + "; " + localSavegamesName.size());
 
 		// download files from cloud which don't exist locally
 		for (int i = 0; i < cloudSavegames.size(); i++) {
-
-			// System.out.println(localSavegamesName.get(i)+";"+cloudSavegames.get(i).getName());
-			// System.out.println(localSavegames.get(a).getName()+";"+cloudSavegames.get(i).getName().substring(9,cloudSavegames.get(i).getName().length()));
 
 			// if the file exists locally, check which one is newer
 			if (localSavegamesName.contains(cloudSavegames.get(i).getName())) {
@@ -136,25 +122,7 @@ public class GoogleDriveController {
 				int localSavegamesNumber = localSavegamesName.indexOf(cloudSavegames.get(i).getName());
 				long localModified = new DateTime(localSavegames.get(localSavegamesNumber).lastModified()).getValue();
 				long cloudModified = cloudSavegames.get(i).getModifiedTime().getValue();
-				FileInputStream fis = new FileInputStream(localSavegames.get(localSavegamesNumber));
-
-//				// System.out.println(localSavegamesNumber);
-////			System.out.println(localSavegames.get(localSavegamesNumber).getName() + "; " + cloudSavegames.get(i).getName());
-//				System.out.println(localModified + "; " + cloudModified);
-////				System.out.println(new Date(localModified) + "; " + new Date(cloudModified));
-//				if (localModified == cloudModified) {
-//					System.out.println("both files are the same, nothing to do \n");
-//				} else if (localModified >= cloudModified) {
-//					System.out.println("\nlocal is newer, going to upload local file");
-//					System.out.println("uploading "+ localSavegames.get(localSavegamesNumber).getName()+"("+new Date(localModified)+")");
-////					updateFile(cloudSavegames.get(i), localSavegames.get(localSavegamesNumber));
-//				} else {
-//					System.out.println("\ncloud is newer, going to download cloud file");
-//					System.out.println("downloading "+ cloudSavegames.get(i).getName() + "(" + new Date(cloudModified) + ")");
-////					downloadFile(cloudSavegames.get(i));
-//				}
-				
-				
+				FileInputStream fis = new FileInputStream(localSavegames.get(localSavegamesNumber));				
 				
 				if (cloudSavegames.get(i).getMd5Checksum().equals(org.apache.commons.codec.digest.DigestUtils.md5Hex(fis))) {
 					System.out.println("both files are the same, nothing to do");
@@ -181,8 +149,6 @@ public class GoogleDriveController {
 				uploadFile(localSavegames.get(j));
 			}
 		}
-//		}
-
 	}
 	
 	//create a folder in google drive
@@ -217,16 +183,11 @@ public class GoogleDriveController {
 	private void getLocalSavegames() throws IOException {
 		java.io.File dir = new  java.io.File(cemuDirectory+"/mlc01/emulatorSave");
 		String[] extensions = new String[] { "dat" };
-
-		System.out.println("Getting all .dat files in " + dir.getCanonicalPath()+" including those in subdirectories \n");
+		System.out.println("Getting all .dat files in " + dir.getCanonicalPath()+" including those in subdirectories");
 		List<java.io.File> files = (List<java.io.File>) FileUtils.listFiles(dir, extensions, true);
 		for (java.io.File file : files) {
 			 localSavegamesName.add(file.getParentFile().getName()+"_"+file.getName());
 			 localSavegames.add(file);
-//			 System.out.println(file.getAbsolutePath());
-//			 System.out.println(file.getParentFile().getName());
-//			 System.out.println(file.lastModified());
-//			 System.out.println(file.getName()+"\n");
 		}
 	}
 	
@@ -239,8 +200,6 @@ public class GoogleDriveController {
 		for (File file : files.getFiles()) {
 			cloudSavegamesName.add(file.getName());
 			cloudSavegames.add(file);
-//			System.out.println(file.getName());
-//			System.out.println(file.getModifiedTime()+"\n");
 		}	
 	}	 
 	
@@ -250,29 +209,23 @@ public class GoogleDriveController {
 	    File fileMetadata = new File();
 	    fileMetadata.setName(uploadFile.getParentFile().getName()+"_"+uploadFile.getName());
 	    fileMetadata.setParents(Collections.singletonList(folderID));
-//	    System.out.println(new DateTime(uploadFile.lastModified())+"; "+ new DateTime(uploadFile.lastModified()).getTimeZoneShift());
 	    fileMetadata.setModifiedTime(new DateTime(uploadFile.lastModified()));
-//	    System.out.println(fileMetadata.getModifiedTime()+"; "+fileMetadata.getModifiedTime().getTimeZoneShift());
-	    
 	    FileContent mediaContent = new FileContent("", uploadFile);
 	    File file = service.files().create(fileMetadata, mediaContent).setFields("id, parents").execute();
-	    System.out.println("File ID: " + file.getId());   
+	    System.out.println("upload successfull, File ID: " + file.getId());   
 	}
 	    
 	//download a file from the cloud to the local savegames folder
 	private void downloadFile(File downloadFile) throws IOException{	    	
 	   System.out.print("downloading "+downloadFile.getName()+"... ");  
-//	   String directory = downloadFile.getName().substring(0,8);
 	   java.io.File directoryFile = new java.io.File(cemuDirectory+"/mlc01/emulatorSave/"+ downloadFile.getName().substring(0,8));
 	   String file = downloadFile.getName().substring(9,downloadFile.getName().length());
-//	   System.out.println(cemuDirectory+"/mlc01/emulatorSave/"+ directory +"/"+ file);
-//	   System.out.println("DownloadfileID: " + downloadFile.getId());
 	   if(!directoryFile.exists()) {
 		   System.out.println("dir dosent exist");
 		   directoryFile.mkdir();
 	   }
 	    
-	   OutputStream outputStream = new FileOutputStream(directoryFile +"/"+ file);	//TODO needs to be tested
+	   OutputStream outputStream = new FileOutputStream(directoryFile +"/"+ file);
 	   service.files().get(downloadFile.getId()).executeMediaAndDownloadTo(outputStream);
 	   
 	   System.out.println("done");
@@ -295,20 +248,17 @@ public class GoogleDriveController {
 	 }
 	
 	public void uploadAllFiles() {
-		new Thread() {
-            public void run() {
-				try {
-					getLocalSavegames();
-					for (int i = 0; i < localSavegames.size(); i++) {
-		        		uploadFile(localSavegames.get(i));
-		        	}
-				} catch (IOException e) {
-					//Auto-generated catch block
-					e.printStackTrace();
-				}
-            }
-        }.start();
-	}
+		try {
+			getLocalSavegames();
+			System.out.println("uploading " + localSavegames.size() + " files...");
+			for (int i = 0; i < localSavegames.size(); i++) {
+		        uploadFile(localSavegames.get(i));
+		       }
+		} catch (IOException e) {
+			//Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
 	
 
 	public String getFolderID() {
