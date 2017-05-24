@@ -25,7 +25,7 @@ public class CloudController {
 		main = ma;
 	}
 	
-	Main main;
+	private Main main;
 	private GoogleDriveController googleDriveController = new GoogleDriveController();
 	
 	void initializeConnection(String cloudService, String cemuDirectory) {
