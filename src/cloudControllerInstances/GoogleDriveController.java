@@ -183,8 +183,10 @@ public class GoogleDriveController {
 	private void getLocalSavegames() throws IOException {
 		java.io.File dir = new  java.io.File(cemuDirectory+"/mlc01/emulatorSave");
 		String[] extensions = new String[] { "dat" };
+		localSavegames.removeAll(localSavegames);
+		localSavegamesName.removeAll(localSavegamesName);
 		System.out.println("Getting all .dat files in " + dir.getCanonicalPath()+" including those in subdirectories");
-		List<java.io.File> files = (List<java.io.File>) FileUtils.listFiles(dir, extensions, true);
+		List<java.io.File> files = (List<java.io.File>) FileUtils.listFiles(dir, extensions, true);					
 		for (java.io.File file : files) {
 			 localSavegamesName.add(file.getParentFile().getName()+"_"+file.getName());
 			 localSavegames.add(file);
@@ -194,6 +196,8 @@ public class GoogleDriveController {
 	//reading all cloud savegames
 	private void getCloudSavegames() throws IOException {
 		System.out.println("getting all cloud savegames");
+		cloudSavegames.removeAll(cloudSavegames);
+		cloudSavegamesName.removeAll(cloudSavegamesName);
 		Files.List request = service.files().list().setQ("fileExtension = 'dat' and '"+folderID+"' in parents").setFields("nextPageToken, files(id, name, size, modifiedTime, createdTime, md5Checksum)");
 		FileList files = request.execute();
 		
@@ -218,16 +222,16 @@ public class GoogleDriveController {
 	//download a file from the cloud to the local savegames folder
 	private void downloadFile(File downloadFile) throws IOException{	    	
 	   System.out.print("downloading "+downloadFile.getName()+"... ");  
-	   java.io.File directoryFile = new java.io.File(cemuDirectory+"/mlc01/emulatorSave/"+ downloadFile.getName().substring(0,8));
+	   java.io.File directory = new java.io.File(cemuDirectory+"/mlc01/emulatorSave/"+ downloadFile.getName().substring(0,8));
 	   String file = downloadFile.getName().substring(9,downloadFile.getName().length());
-	   if(!directoryFile.exists()) {
-		   System.out.println("dir dosent exist");
-		   directoryFile.mkdir();
+	   if(!directory.exists()) {
+		   System.out.print("dir dosent exist... ");
+		   directory.mkdir();
 	   }
 	    
-	   OutputStream outputStream = new FileOutputStream(directoryFile +"/"+ file);
+	   OutputStream outputStream = new FileOutputStream(directory +"/"+ file);
 	   service.files().get(downloadFile.getId()).executeMediaAndDownloadTo(outputStream);
-	   
+	   outputStream.close();
 	   System.out.println("done");
 	}
 	
@@ -254,6 +258,7 @@ public class GoogleDriveController {
 			for (int i = 0; i < localSavegames.size(); i++) {
 		        uploadFile(localSavegames.get(i));
 		       }
+			System.out.println("finished uploading all files!");
 		} catch (IOException e) {
 			//Auto-generated catch block
 			e.printStackTrace();
