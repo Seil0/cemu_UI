@@ -3,9 +3,7 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
 	<classpathentry kind="con" path="org.eclipse.fx.ide.jdt.core.JAVAFX_CONTAINER"/>
-	<classpathentry kind="lib" path="src/libraries/sqlite-jdbc-3.16.1.jar"/>
 	<classpathentry kind="lib" path="src/libraries/commons-io-2.5.jar"/>
-	<classpathentry kind="lib" path="src/libraries/jfoenix-1.3.0.jar"/>
 	<classpathentry kind="lib" path="src/libraries/google_apis/google-api-client-1.22.0.jar"/>
 	<classpathentry kind="lib" path="src/libraries/google_apis/google-api-services-drive-v3-rev68-1.22.0.jar"/>
 	<classpathentry kind="lib" path="src/libraries/google_apis/google-http-client-1.22.0.jar"/>
@@ -18,5 +16,7 @@
 	<classpathentry kind="lib" path="src/libraries/google_apis/jetty-util-6.1.25.jar"/>
 	<classpathentry kind="lib" path="src/libraries/google_apis/jackson-core-2.8.8.jar"/>
 	<classpathentry kind="lib" path="src/libraries/commons-codec-1.10.jar"/>
+	<classpathentry kind="lib" path="src/libraries/jfoenix-1.4.0.jar"/>
+	<classpathentry kind="lib" path="src/libraries/sqlite-jdbc-3.18.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
