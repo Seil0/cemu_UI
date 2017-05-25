@@ -110,6 +110,10 @@ public class GoogleDriveController {
 	 }
 	 
 	public void sync(String cemuDirectory) throws IOException {
+		//in case there is no folderID saved, look it up first
+		if (getFolderID() == "" || getFolderID() == null) {
+			getSavegamesFolderID();
+		}
 		getLocalSavegames();
 		getCloudSavegames();
 
@@ -205,7 +209,21 @@ public class GoogleDriveController {
 			cloudSavegamesName.add(file.getName());
 			cloudSavegames.add(file);
 		}	
-	}	 
+	}
+	
+	private void getSavegamesFolderID() throws IOException {
+		Files.List request = service.files().list().setQ("mimeType = 'application/vnd.google-apps.folder' and name = 'cemu_savegames'");
+		FileList files = request.execute();
+
+		try {
+			System.out.println("FolderID: " + files.getFiles().get(0).getId());
+			setFolderID(files.getFiles().get(0).getId());
+		} catch (Exception e) {
+			System.out.println("Oops, something went wrong! It seems that you have more than one folder called 'cemu_savegames'!");
+			e.printStackTrace();
+		}	
+	}	
+		
 	
 	//upload a file to the cloud from the local savegames folder
 	public void uploadFile(java.io.File uploadFile) throws IOException{
@@ -261,6 +279,7 @@ public class GoogleDriveController {
 			System.out.println("finished uploading all files!");
 		} catch (IOException e) {
 			//Auto-generated catch block
+			System.out.println("Oops, there went something wrong! Error during uploading all files.");
 			e.printStackTrace();
 		}
     }

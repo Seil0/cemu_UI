@@ -27,6 +27,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.Properties;
+
 import javax.imageio.ImageIO;
 
 import org.apache.commons.io.FileUtils;
@@ -37,6 +38,7 @@ import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
 import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
+
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
@@ -83,6 +85,9 @@ public class MainWindowController {
     private JFXButton reloadRomsBtn;
     
     @FXML
+    private JFXButton smmdbBtn;
+    
+    @FXML
     private JFXButton cemuTFBtn;
     
     @FXML
@@ -119,6 +124,9 @@ public class MainWindowController {
     private AnchorPane settingsAnchorPane;
     
     @FXML
+    private AnchorPane smmdbAnchorPane;
+    
+    @FXML
     private AnchorPane gamesAnchorPane;
     
     @FXML
@@ -138,7 +146,7 @@ public class MainWindowController {
     private boolean playTrue = false;
     private boolean fullscreen;
     private boolean cloudSync;
-    private String cloudService = "GoogleDrive"; //set cloud provider (at the moment only GoogleDrive, Dropbox is planed)
+    private String cloudService; //set cloud provider (at the moment only GoogleDrive, Dropbox is planed)
     private String cemuPath;
     private String romPath;
     private String gameExecutePath;
@@ -146,7 +154,7 @@ public class MainWindowController {
     private String selectedGameTitle;
     private String color;
     private String version = "0.1.5";
-    private String buildNumber = "015";
+    private String buildNumber = "017";
 	private String versionName = "Gusty Garden";
     private int xPos = -200;
     private int yPos = 17;
@@ -173,10 +181,12 @@ public class MainWindowController {
 	private ImageView info_black = new ImageView(new Image("recources/icons/ic_info_black_24dp_1x.png"));
 	private ImageView settings_black = new ImageView(new Image("recources/icons/ic_settings_black_24dp_1x.png"));
 	private ImageView cached_black = new ImageView(new Image("recources/icons/ic_cached_black_24dp_1x.png"));	
+	private ImageView smmdb_black = new ImageView(new Image("recources/icons/ic_get_app_black_24dp_1x.png"));
 	private ImageView add_circle_white = new ImageView(new Image("recources/icons/ic_add_circle_white_24dp_1x.png"));
 	private ImageView info_white = new ImageView(new Image("recources/icons/ic_info_white_24dp_1x.png"));
 	private ImageView settings_white = new ImageView(new Image("recources/icons/ic_settings_white_24dp_1x.png"));
 	private ImageView cached_white = new ImageView(new Image("recources/icons/ic_cached_white_24dp_1x.png"));
+	private ImageView smmdb_white = new ImageView(new Image("recources/icons/ic_get_app_white_24dp_1x.png"));
     
 	public void setMain(Main main) {
 		this.main = main;
@@ -190,6 +200,7 @@ public class MainWindowController {
 		fullscreenToggleBtn.setSelected(isFullscreen());
 		cloudSyncToggleBtn.setSelected(isCloudSync());
 		edit.setDisable(true);
+		smmdbBtn.setDisable(true);
 		applyColor();
 	}
 	
@@ -458,6 +469,11 @@ public class MainWindowController {
     }
     
     @FXML
+    void smmdbBtnAction() {
+    	System.out.println("yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeehaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    }
+    
+    @FXML
     void playBtnAction(ActionEvent event) throws InterruptedException, IOException{
     	dbController.setLastPlayed(selectedGameTitleID);
     	playGame = new playGame(this,dbController);
@@ -516,13 +532,13 @@ public class MainWindowController {
     @FXML
     void cemuTextFieldAction(ActionEvent event){
     	setCemuPath(cemuTextField.getText());
-		saveSettings();//TODO remove (only save on exit settings)
+		saveSettings();
     }
     
     @FXML
     void romTextFieldAction(ActionEvent event){
     	setRomPath(romTextField.getText());
-		saveSettings();//TODO remove (only save on exit settings)
+		saveSettings();
     }
     
     @FXML
@@ -532,7 +548,7 @@ public class MainWindowController {
     	}else{
     		fullscreen = true;
     	}
-    	saveSettings();//TODO remove (only save on exit settings)
+    	saveSettings();
     }
     
     @FXML
@@ -548,6 +564,8 @@ public class MainWindowController {
     		Optional<ButtonType> coverResult = cloudWarningAlert.showAndWait();
 			if (coverResult.get() == ButtonType.OK){
 				cloudSync = true;
+				//TODO rework for other cloud services
+				cloudService = "GoogleDrive";
 	    		main.cloudController.initializeConnection(getCloudService(), getCemuPath());
 	    		main.cloudController.sync(getCloudService(), getCemuPath());
 			} else {
@@ -555,7 +573,7 @@ public class MainWindowController {
 			}
 			
     	}
-    	saveSettings();//TODO remove (only save on exit settings)
+    	saveSettings();
     }
     
     @FXML
@@ -666,11 +684,19 @@ public class MainWindowController {
 				dbController.loadSingleRom(titleID);
 			} catch (SQLException e) {
 				// Auto-generated catch block
+				System.out.println("Oops, something went wrong! Error during adding a game.");
 				e.printStackTrace();
 			}
 		}
     }
     
+    /**
+     * add game to the program and initialize all needed actions (start, time stamps, titleID)
+     * @param title : game title
+     * @param coverPath : path to cover (cache)
+     * @param romPath : path to rom file (.rpx)
+     * @param titleID : rom ID
+     */
     void addGame(String title, String coverPath, String romPath, String titleID){
     	ImageView imageView = new ImageView();
     	Label gameTitleLabel = new Label(title);
@@ -698,6 +724,7 @@ public class MainWindowController {
 		     public void handle(MouseEvent event) {
             	System.out.println("selected: "+title+"; ID: "+titleID);
             	
+            	//getting the selected game index by comparing event.getSource() with games.get(i).getButton()
             	for(int i=0; i<games.size(); i++){
             		if(games.get(i).getButton() == event.getSource()){
             			selectedUIDataIndex = i;
@@ -711,7 +738,8 @@ public class MainWindowController {
             	lastGameLabel.setStyle("-fx-underline: false;");
             	games.get(selectedUIDataIndex).getLabel().setStyle("-fx-underline: true;");
             	lastGameLabel = games.get(selectedUIDataIndex).getLabel();
-
+            	
+            	//setting last played
             	if(dbController.getLastPlayed(titleID).equals("") || dbController.getLastPlayed(titleID).equals(null)){
             		lastTimePlayedBtn.setText("Last played, never");
             		timePlayedBtn.setText(dbController.getTimePlayed(titleID)+ " min");
@@ -737,16 +765,20 @@ public class MainWindowController {
                 	timePlayedBtn.setText(dbController.getTimePlayed(titleID)+ " min");
                 	}
             	}
-
-            	if(playTrue == false){
+            	
+            	if (!playTrue) {
             		playBtnSlideIn();
             	}
+            	if (menuTrue) {
+					sideMenuSlideOut();
+				}
+            	
             }	
         });
-
     	games.add(new uiDataType(VBox, gameTitleLabel, gameBtn, titleID, romPath));
     }
     
+    //add all games to the UI (only called on startup)
     void addUIData(){
     	for(int i=0; i<games.size(); i++){
     		gamesAnchorPane.getChildren().add(games.get(i).getVBox());
@@ -784,6 +816,7 @@ public class MainWindowController {
 			settingsBtn.setStyle("-fx-text-fill: WHITE;");
 			addBtn.setStyle("-fx-text-fill: WHITE;");
 			reloadRomsBtn.setStyle("-fx-text-fill: WHITE;");
+			smmdbBtn.setStyle("-fx-text-fill: WHITE;");
 			playBtn.setStyle("-fx-text-fill: WHITE; -fx-font-family: Roboto Medium;");
 			cemuTFBtn.setStyle(btnStyleWhite);
 			romTFBtn.setStyle(btnStyleWhite);
@@ -793,6 +826,7 @@ public class MainWindowController {
 			settingsBtn.setGraphic(settings_white);
 			addBtn.setGraphic(add_circle_white);
 			reloadRomsBtn.setGraphic(cached_white);
+			smmdbBtn.setGraphic(smmdb_white);
 			
 			menuHam.getStyleClass().add("jfx-hamburgerW");
 		}else{
@@ -800,6 +834,7 @@ public class MainWindowController {
 			settingsBtn.setStyle("-fx-text-fill: BLACK;");
 			addBtn.setStyle("-fx-text-fill: BLACK;");
 			reloadRomsBtn.setStyle("-fx-text-fill: BLACK;");
+			smmdbBtn.setStyle("-fx-text-fill: BLACK;");
 			playBtn.setStyle("-fx-text-fill: BLACK; -fx-font-family: Roboto Medium;");
 			cemuTFBtn.setStyle(btnStyleBlack);
 			romTFBtn.setStyle(btnStyleBlack);
@@ -809,6 +844,7 @@ public class MainWindowController {
 			settingsBtn.setGraphic(settings_black);
 			addBtn.setGraphic(add_circle_black);
 			reloadRomsBtn.setGraphic(cached_black);
+			smmdbBtn.setGraphic(smmdb_black);
 			
 			menuHam.getStyleClass().add("jfx-hamburgerB");
 		}
@@ -827,6 +863,7 @@ public class MainWindowController {
 				props.setProperty("color", getColor());
 				props.setProperty("fullscreen", String.valueOf(isFullscreen()));
 				props.setProperty("cloudSync", String.valueOf(cloudSync));
+				props.setProperty("cloudService", getCloudService());
 				props.setProperty("folderID", main.cloudController.getFolderID(getCloudService()));
     			if(System.getProperty("os.name").equals("Linux")){
     				outputStream = new FileOutputStream(fileLinux);
@@ -856,6 +893,7 @@ public class MainWindowController {
 			setColor(props.getProperty("color"));
 			setFullscreen(Boolean.parseBoolean(props.getProperty("fullscreen")));
 			setCloudSync(Boolean.parseBoolean(props.getProperty("cloudSync")));
+			setCloudService(props.getProperty("cloudService"));
 			main.cloudController.setFolderID(props.getProperty("folderID"), getCloudService());
 			inputStream.close();
 			System.out.println("done!");

@@ -53,7 +53,7 @@ public class dbController {
 		loadRomDatabase();
 		loadGamesDatabase();
 		createRomDatabase();
-		loadRoms();
+		loadAllRoms();
 		checkRemoveEntry();
 		System.out.println("<==========finished loading sql==========>"); 
 	}
@@ -141,7 +141,7 @@ public class dbController {
 	}
 	
 	//load all rom's on startup to the UI
-	void loadRoms(){
+	void loadAllRoms(){
 		System.out.println("loading all rom's on startup to mwc ..."); 
 		try { 
 			Statement stmt = connection.createStatement(); 

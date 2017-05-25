@@ -30,21 +30,22 @@ public class CloudController {
 	
 	void initializeConnection(String cloudService, String cemuDirectory) {
 		System.out.println("sartting cloud initialisation... ");
-		if(cloudService == "GoogleDrive") {
+		if(cloudService.equals("GoogleDrive")) {
+			System.out.println("selected service is Google Drive");
 			try {
 				googleDriveController.main(cemuDirectory);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
-		if(cloudService == "Dropbox") {
-			
+		if(cloudService.equals("Dropbox")) {
+			System.out.println("selected service is Dropbox");
 		}
 		System.out.println("cloud initialisation done!");
 	}
 	
 	void stratupCheck(String cloudService, String cemuDirectory) {
-		if(cloudService == "GoogleDrive") {
+		if(cloudService.equals("GoogleDrive")) {
 			System.out.println("starting startup check google drive...");
 			try {
 				if (!googleDriveController.checkFolder()) {
@@ -70,7 +71,7 @@ public class CloudController {
 				e.printStackTrace();
 			}
 		}
-		if(cloudService == "Dropbox") {
+		if(cloudService.equals("Dropbox")) {
 			
 		}
 	}
@@ -87,19 +88,20 @@ public class CloudController {
                  });
             	System.out.println("starting sync in new thread...");
             	
-            	if(cloudService == "GoogleDrive") {
+            	if(cloudService.equals("GoogleDrive")) {
         			try {
         				googleDriveController.sync(cemuDirectory);
         			} catch (IOException e) {
         				e.printStackTrace();
         			}
         		}
-        		if(cloudService == "Dropbox") {
+        		if(cloudService.equals("Dropbox")) {
         			
         		}
         		Platform.runLater(() -> {
             		main.mainWindowController.getPlayBtn().setText("play");
                  });
+        		main.mainWindowController.saveSettings();
         		System.out.println("sync finished!");
             }
         });
@@ -114,14 +116,14 @@ public class CloudController {
             public void run() {
             	System.out.println("starting uploadFile in new thread...");
             	
-            	if(cloudService == "GoogleDrive") {
+            	if(cloudService.equals("GoogleDrive")) {
        			 	try {
        			 		googleDriveController.uploadFile(file);
        			 	} catch (IOException e) {
        			 		e.printStackTrace();
        			 	}
             	}
-            	if(cloudService == "Dropbox") {
+            	if(cloudService.equals("Dropbox")) {
 
             	}
             }
@@ -129,26 +131,22 @@ public class CloudController {
 	
 	}
 	
-//	void download(String cloudService) {
-//		
-//	}
-	
 	public String getFolderID(String cloudService) {
 		String folderID = "";
-		if(cloudService == "GoogleDrive") {
+		if(cloudService.equals("GoogleDrive")) {
 			 folderID = googleDriveController.getFolderID();
 		}
-		if(cloudService == "Dropbox") {
+		if(cloudService.equals("Dropbox")) {
 
 		}
 		return folderID;
 	}
 
 	public void setFolderID(String folderID, String cloudService) {
-		if(cloudService == "GoogleDrive") {
+		if(cloudService.equals("GoogleDrive")) {
 			googleDriveController.setFolderID(folderID);
 		}
-		if(cloudService == "Dropbox") {
+		if(cloudService.equals("Dropbox")) {
 			
 		}
 	}
