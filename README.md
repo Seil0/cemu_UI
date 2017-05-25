@@ -21,7 +21,7 @@ Simply download the cemu_UI.jar from [releases](https://github.com/Seil0/cemu_UI
 * customisable UI
 * [sync savegames via google drive](https://github.com/Seil0/cemu_UI/wiki)
 
-## planed Features (no ETA)
+## [planed Features](https://github.com/Seil0/cemu_UI/projects/1) (no ETA)
 
 * Controller support
 * more UI improvements
