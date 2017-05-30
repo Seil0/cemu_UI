@@ -186,10 +186,10 @@ public class GoogleDriveController {
 	//reading all local savegames
 	private void getLocalSavegames() throws IOException {
 		java.io.File dir = new  java.io.File(cemuDirectory+"/mlc01/emulatorSave");
-		String[] extensions = new String[] { "dat" };
+		String[] extensions = new String[] { "dat","sav","bin" };
 		localSavegames.removeAll(localSavegames);
 		localSavegamesName.removeAll(localSavegamesName);
-		System.out.println("Getting all .dat files in " + dir.getCanonicalPath()+" including those in subdirectories");
+		System.out.println("Getting all dat,sav,bin files in " + dir.getCanonicalPath()+" including those in subdirectories");
 		List<java.io.File> files = (List<java.io.File>) FileUtils.listFiles(dir, extensions, true);					
 		for (java.io.File file : files) {
 			 localSavegamesName.add(file.getParentFile().getName()+"_"+file.getName());
