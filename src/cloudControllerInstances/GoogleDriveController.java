@@ -202,7 +202,7 @@ public class GoogleDriveController {
 		System.out.println("getting all cloud savegames");
 		cloudSavegames.removeAll(cloudSavegames);
 		cloudSavegamesName.removeAll(cloudSavegamesName);
-		Files.List request = service.files().list().setQ("fileExtension = 'dat' and '"+folderID+"' in parents").setFields("nextPageToken, files(id, name, size, modifiedTime, createdTime, md5Checksum)");
+		Files.List request = service.files().list().setQ("'"+folderID+"' in parents").setFields("nextPageToken, files(id, name, size, modifiedTime, createdTime, md5Checksum)");
 		FileList files = request.execute();
 		
 		for (File file : files.getFiles()) {
