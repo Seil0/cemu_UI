@@ -154,7 +154,7 @@ public class MainWindowController {
     private String selectedGameTitle;
     private String color;
     private String version = "0.1.5";
-    private String buildNumber = "019";
+    private String buildNumber = "021";
 	private String versionName = "Gusty Garden";
     private int xPos = -200;
     private int yPos = 17;
