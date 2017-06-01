@@ -146,7 +146,7 @@ public class MainWindowController {
     private boolean playTrue = false;
     private boolean fullscreen;
     private boolean cloudSync;
-    private String cloudService; //set cloud provider (at the moment only GoogleDrive, Dropbox is planed)
+    private String cloudService = ""; //set cloud provider (at the moment only GoogleDrive, Dropbox is planed)
     private String cemuPath;
     private String romPath;
     private String gameExecutePath;
@@ -177,16 +177,16 @@ public class MainWindowController {
 	private ContextMenu gameContextMenu = new ContextMenu(edit, remove, update, addDLC);
 	private Label lastGameLabel = new Label();
 	
-	private ImageView add_circle_black = new ImageView(new Image("recources/icons/ic_add_circle_black_24dp_1x.png"));
-	private ImageView info_black = new ImageView(new Image("recources/icons/ic_info_black_24dp_1x.png"));
-	private ImageView settings_black = new ImageView(new Image("recources/icons/ic_settings_black_24dp_1x.png"));
-	private ImageView cached_black = new ImageView(new Image("recources/icons/ic_cached_black_24dp_1x.png"));	
-	private ImageView smmdb_black = new ImageView(new Image("recources/icons/ic_get_app_black_24dp_1x.png"));
-	private ImageView add_circle_white = new ImageView(new Image("recources/icons/ic_add_circle_white_24dp_1x.png"));
-	private ImageView info_white = new ImageView(new Image("recources/icons/ic_info_white_24dp_1x.png"));
-	private ImageView settings_white = new ImageView(new Image("recources/icons/ic_settings_white_24dp_1x.png"));
-	private ImageView cached_white = new ImageView(new Image("recources/icons/ic_cached_white_24dp_1x.png"));
-	private ImageView smmdb_white = new ImageView(new Image("recources/icons/ic_get_app_white_24dp_1x.png"));
+	private ImageView add_circle_black = new ImageView(new Image("resources/icons/ic_add_circle_black_24dp_1x.png"));
+	private ImageView info_black = new ImageView(new Image("resources/icons/ic_info_black_24dp_1x.png"));
+	private ImageView settings_black = new ImageView(new Image("resources/icons/ic_settings_black_24dp_1x.png"));
+	private ImageView cached_black = new ImageView(new Image("resources/icons/ic_cached_black_24dp_1x.png"));	
+	private ImageView smmdb_black = new ImageView(new Image("resources/icons/ic_get_app_black_24dp_1x.png"));
+	private ImageView add_circle_white = new ImageView(new Image("resources/icons/ic_add_circle_white_24dp_1x.png"));
+	private ImageView info_white = new ImageView(new Image("resources/icons/ic_info_white_24dp_1x.png"));
+	private ImageView settings_white = new ImageView(new Image("resources/icons/ic_settings_white_24dp_1x.png"));
+	private ImageView cached_white = new ImageView(new Image("resources/icons/ic_cached_white_24dp_1x.png"));
+	private ImageView smmdb_white = new ImageView(new Image("resources/icons/ic_get_app_white_24dp_1x.png"));
     
 	public void setMain(Main main) {
 		this.main = main;

@@ -61,7 +61,7 @@ public class Main extends Application {
 			AnchorPane pane = loader.load();
 			primaryStage.setResizable(false);
 			primaryStage.setTitle("cemu_UI");
-//			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/recources/Homeflix_Icon_64x64.png"))); //adds application icon
+//			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/resources/Homeflix_Icon_64x64.png"))); //adds application icon
 
 			mainWindowController = loader.getController();	//Link of FXMLController and controller class
 			mainWindowController.setMain(this);	//call setMain		

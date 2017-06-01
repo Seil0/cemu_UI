@@ -77,7 +77,7 @@ public class GoogleDriveController {
 	  */
 	 public Credential authorize() throws IOException {
 		 // Load client secrets.
-	     InputStream in = getClass().getClassLoader().getResourceAsStream("recources/client_secret.json");
+	     InputStream in = getClass().getClassLoader().getResourceAsStream("resources/client_secret.json");
 	     GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
 	     // Build flow and trigger user authorization request.
