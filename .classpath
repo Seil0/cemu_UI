@@ -18,5 +18,6 @@
 	<classpathentry kind="lib" path="src/libraries/commons-codec-1.10.jar"/>
 	<classpathentry kind="lib" path="src/libraries/jfoenix-1.4.0.jar"/>
 	<classpathentry kind="lib" path="src/libraries/sqlite-jdbc-3.18.0.jar"/>
+	<classpathentry kind="lib" path="src/libraries/minimal-json-0.9.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

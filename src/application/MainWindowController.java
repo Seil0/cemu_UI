@@ -25,6 +25,7 @@ import java.math.BigInteger;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -39,6 +40,7 @@ import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
 import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
+import datatypes.SmmdbApiDataType;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
@@ -140,6 +142,7 @@ public class MainWindowController {
     
     Main main;
     dbController dbController;
+    SmmdbApiQuery smmdbApiQuery;
     playGame playGame;
     private boolean menuTrue = false;
     private boolean settingsTrue = false;
@@ -191,6 +194,7 @@ public class MainWindowController {
 	public void setMain(Main main) {
 		this.main = main;
 		dbController = new dbController(this);
+		smmdbApiQuery = new SmmdbApiQuery();
 	}
 	
 	void initUI(){		
@@ -200,7 +204,7 @@ public class MainWindowController {
 		fullscreenToggleBtn.setSelected(isFullscreen());
 		cloudSyncToggleBtn.setSelected(isCloudSync());
 		edit.setDisable(true);
-		smmdbBtn.setDisable(true);
+		smmdbBtn.setDisable(true);	//TODO
 		applyColor();
 	}
 	
@@ -470,9 +474,13 @@ public class MainWindowController {
     
     @FXML
     void smmdbBtnAction() {
-    	System.out.println("yeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeehaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+    	//TODO show TODO smmdbAnchorPane
+    	
+    	//TODO start query
+    	ArrayList<SmmdbApiDataType> courses = new ArrayList<>(smmdbApiQuery.startQuery());
+    	System.out.println(courses.size());
     }
-    
+    	
     @FXML
     void playBtnAction(ActionEvent event) throws InterruptedException, IOException{
     	dbController.setLastPlayed(selectedGameTitleID);
