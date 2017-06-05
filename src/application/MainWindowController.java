@@ -204,7 +204,7 @@ public class MainWindowController {
 		fullscreenToggleBtn.setSelected(isFullscreen());
 		cloudSyncToggleBtn.setSelected(isCloudSync());
 		edit.setDisable(true);
-		smmdbBtn.setDisable(true);	//TODO
+		smmdbBtn.setDisable(false);	//TODO
 		applyColor();
 	}
 	
@@ -476,9 +476,11 @@ public class MainWindowController {
     void smmdbBtnAction() {
     	//TODO show TODO smmdbAnchorPane
     	
-    	//TODO start query
+    	//start query
     	ArrayList<SmmdbApiDataType> courses = new ArrayList<>(smmdbApiQuery.startQuery());
-    	System.out.println(courses.size());
+    	
+    	System.out.println("size: " + courses.size());
+    	System.out.println(courses.get(3).getNintendoid());
     }
     	
     @FXML

@@ -1,8 +1,6 @@
 package datatypes;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -20,25 +18,25 @@ public class SmmdbApiDataType {
 	private final IntegerProperty stars = new SimpleIntegerProperty();
 	private final IntegerProperty ispackage = new SimpleIntegerProperty();
 	private final IntegerProperty updatereq = new SimpleIntegerProperty();
-//	private final StringProperty nintendoid = new SimpleStringProperty();
+	private final StringProperty nintendoid = new SimpleStringProperty();
 	private final StringProperty title = new SimpleStringProperty();
 	
 	public SmmdbApiDataType(final int id, final int owner, final int coursetype, final int leveltype, final int difficulty, 
 							final int lastmodified, final int uploaded, final int downloads, final int stars, final int ispackage,
-							final int updatereq, final String title) {
+							final int updatereq, final String nintendoid, final String title) {
 		this.id.set(id);
 		this.owner.set(owner);
 		this.coursetype.set(coursetype);
-//		this.nintendoid.set(nintendoid);
 		this.leveltype.set(leveltype);
 		this.difficulty.set(difficulty);
 		this.lastmodified.set(lastmodified);
 		this.uploaded.set(uploaded);
 		this.downloads.set(downloads);
 		this.stars.set(stars);
-		this.title.set(title);
 		this.ispackage.set(ispackage);
 		this.updatereq.set(updatereq);
+		this.nintendoid.set(nintendoid);
+		this.title.set(title);
 	}
 	
 	public IntegerProperty idProperty(){
@@ -53,9 +51,9 @@ public class SmmdbApiDataType {
 		return coursetype;
 	}
 	
-//	public StringProperty nintendoidProperty(){
-//		return nintendoid;
-//	}
+	public StringProperty nintendoidProperty(){
+		return nintendoid;
+	}
 	
 	public IntegerProperty leveltypeProperty(){
 		return leveltype;
@@ -137,9 +135,9 @@ public class SmmdbApiDataType {
 		return updatereqProperty().get();
 	}
 	
-//	public String getNintendoid() {
-//		return nintendoidProperty().get();
-//	}
+	public String getNintendoid() {
+		return nintendoidProperty().get();
+	}
 
 	public String getTitle() {
 		return titleProperty().get();
@@ -189,9 +187,9 @@ public class SmmdbApiDataType {
 		updatereqProperty().set(updatereq);
 	}
 
-//	public final void setNintendoid(String nintendoid) {
-//		nintendoidProperty().set(nintendoid);
-//	}
+	public final void setNintendoid(String nintendoid) {
+		nintendoidProperty().set(nintendoid);
+	}
 
 	public final void setTitle(String title) {
 		titleProperty().set(title);
