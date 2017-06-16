@@ -38,12 +38,17 @@ import com.jfoenix.controls.JFXColorPicker;
 import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
+import com.jfoenix.controls.JFXTreeTableColumn;
+import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
 import datatypes.SmmdbApiDataType;
+import datatypes.courseTableDataType;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -58,6 +63,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -140,6 +146,25 @@ public class MainWindowController {
     @FXML
     private HBox topHBox;
     
+    
+    @FXML
+    private JFXTreeTableView<courseTableDataType> courseTreeTable = new JFXTreeTableView<courseTableDataType>();
+    
+    @FXML
+    TreeItem<courseTableDataType> root = new TreeItem<>(new courseTableDataType("",0,0,0));
+    
+    @FXML
+    private JFXTreeTableColumn<courseTableDataType, String> titleColumn = new JFXTreeTableColumn<>("title");
+    
+    @FXML
+    private JFXTreeTableColumn<courseTableDataType, Integer> starsColumn = new JFXTreeTableColumn<>("stars");
+    
+    @FXML
+    private JFXTreeTableColumn<courseTableDataType, Integer> downloadsColumn = new JFXTreeTableColumn<>("downloads");
+    
+    @FXML
+    private JFXTreeTableColumn<courseTableDataType, Integer> idColumn = new JFXTreeTableColumn<>("id");
+    
     Main main;
     dbController dbController;
     SmmdbApiQuery smmdbApiQuery;
@@ -147,6 +172,7 @@ public class MainWindowController {
     private boolean menuTrue = false;
     private boolean settingsTrue = false;
     private boolean playTrue = false;
+    private boolean smmdbTrue = false;
     private boolean fullscreen;
     private boolean cloudSync;
     private String cloudService = ""; //set cloud provider (at the moment only GoogleDrive, Dropbox is planed)
@@ -163,6 +189,8 @@ public class MainWindowController {
     private int yPos = 17;
     private int xPosHelper;
     private int selectedUIDataIndex;
+    private int selected;
+    private int id;
 	private DirectoryChooser directoryChooser = new DirectoryChooser();
 	private File dirWin = new File(System.getProperty("user.home") + "/Documents/cemu_UI");
 	private File dirLinux = new File(System.getProperty("user.home") + "/cemu_UI");
@@ -197,6 +225,7 @@ public class MainWindowController {
 		smmdbApiQuery = new SmmdbApiQuery();
 	}
 	
+	@SuppressWarnings("unchecked")	//FIXME SuppressWarnings
 	void initUI(){		
 		cemuTextField.setText(cemuPath);
 		romTextField.setText(romPath);
@@ -204,8 +233,24 @@ public class MainWindowController {
 		fullscreenToggleBtn.setSelected(isFullscreen());
 		cloudSyncToggleBtn.setSelected(isCloudSync());
 		edit.setDisable(true);
-		smmdbBtn.setDisable(false);	//TODO
 		applyColor();
+		
+		//initialize courseTable
+		titleColumn.setPrefWidth(150);
+		starsColumn.setPrefWidth(85);
+		downloadsColumn.setPrefWidth(115);
+		
+		courseTreeTable.setRoot(root);
+		courseTreeTable.setShowRoot(false);
+		courseTreeTable.setEditable(false);
+		
+		titleColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().title);
+		starsColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().stars.asObject());
+		downloadsColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().downloads.asObject());
+		idColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().id.asObject());
+		
+		courseTreeTable.getColumns().setAll(titleColumn, downloadsColumn, starsColumn, idColumn);
+		courseTreeTable.getColumns().get(3).setVisible(false); //hide idColumn (important)
 	}
 	
 	void initActions() {
@@ -213,26 +258,31 @@ public class MainWindowController {
 		
 		HamburgerBackArrowBasicTransition burgerTask = new HamburgerBackArrowBasicTransition(menuHam);
 		menuHam.addEventHandler(MouseEvent.MOUSE_PRESSED, (e)->{
-			if(playTrue){
+			if (playTrue) {
 	    		playBtnSlideOut();
 	    	}
-	    	if(menuTrue == false){
-				sideMenuSlideIn();
-				burgerTask.setRate(1.0);
-				burgerTask.play();
-				menuTrue = true;
-			}else{
+	    	if (menuTrue){ 
 				sideMenuSlideOut();
 				burgerTask.setRate(-1.0);
 				burgerTask.play();
 				menuTrue = false;
+			}else{
+				sideMenuSlideIn();
+				burgerTask.setRate(1.0);
+				burgerTask.play();
+				menuTrue = true;
 			}
-			if(settingsTrue == true){
+			if (settingsTrue) {
 				settingsAnchorPane.setVisible(false);
 //				setPath(tfPath.getText());
 				saveSettings();
 				settingsTrue = false;
 			}
+			if (smmdbTrue) {
+				smmdbAnchorPane.setVisible(false);
+				smmdbTrue = false;
+			}
+			
 		});
 		
 		edit.setOnAction(new EventHandler<ActionEvent>() {
@@ -248,7 +298,7 @@ public class MainWindowController {
 	            	alert.initOwner(main.primaryStage);
 	            	alert.showAndWait();
             	}else{
-            		System.out.println("show edit window TODO!"); //TODO 
+            		System.out.println("show edit window TODO!"); //TODO show edit window
             	}
             }
 		});
@@ -434,6 +484,20 @@ public class MainWindowController {
 				}
 		     }
 		});
+		
+		//Change-listener for TreeTable
+		courseTreeTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Object>() {	
+				@Override
+				public void changed(ObservableValue<?> observable, Object oldVal, Object newVal){
+					// last = selected; //for auto-play
+					selected = courseTreeTable.getSelectionModel().getSelectedIndex(); //get selected item
+					id = idColumn.getCellData(selected); //get name of selected item
+					
+					//TODO show additional information and download option
+					
+					System.out.println(id + "; " + selected);
+				}
+		 });
 		System.out.println("initializing Actions done!");
 	}
     
@@ -474,13 +538,28 @@ public class MainWindowController {
     
     @FXML
     void smmdbBtnAction() {
-    	//TODO show TODO smmdbAnchorPane
-    	
+    	//show smmdbAnchorPane
+    	if (smmdbTrue) {
+    		smmdbAnchorPane.setVisible(false);
+    		smmdbTrue = false;
+    	} else {
+    		smmdbAnchorPane.setVisible(true);
+    		smmdbTrue = true;
+    	}
+    		
     	//start query
     	ArrayList<SmmdbApiDataType> courses = new ArrayList<>(smmdbApiQuery.startQuery());
     	
     	System.out.println("size: " + courses.size());
     	System.out.println(courses.get(3).getNintendoid());
+    	
+    	//add query response to courseTreeTable
+		for(int i = 0; i < courses.size(); i++){
+			courseTableDataType helpCourse = new courseTableDataType(courses.get(i).getTitle(), courses.get(i).getDownloads(),
+																	courses.get(i).getStars(), courses.get(i).getId());
+			
+			root.getChildren().add(new TreeItem<courseTableDataType>(helpCourse));	//add data to root-node
+		}
     }
     	
     @FXML

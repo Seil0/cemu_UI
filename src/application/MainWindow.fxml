@@ -5,6 +5,7 @@
 <?import com.jfoenix.controls.JFXHamburger?>
 <?import com.jfoenix.controls.JFXTextField?>
 <?import com.jfoenix.controls.JFXToggleButton?>
+<?import com.jfoenix.controls.JFXTreeTableView?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
@@ -82,7 +83,10 @@
             <JFXToggleButton fx:id="cloudSyncToggleBtn" layoutX="14.0" layoutY="264.0" onAction="#cloudSyncToggleBtnAction" text="cloud savegames (Google Drive)" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="267.0" />
          </children>
       </AnchorPane>
-      <AnchorPane fx:id="smmdbAnchorPane" style="-fx-background-color: white;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="175.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0" />
+      <AnchorPane fx:id="smmdbAnchorPane" style="-fx-background-color: white;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="175.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0">
+         <children>
+            <JFXTreeTableView fx:id="courseTreeTable" layoutX="14.0" layoutY="14.0" prefHeight="537.0" prefWidth="350.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0" />
+         </children></AnchorPane>
       <JFXButton fx:id="playBtn" buttonType="RAISED" maxHeight="38.0" maxWidth="100.0" onAction="#playBtnAction" ripplerFill="#c92a2a" text="play" visible="false" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="396.0" AnchorPane.rightAnchor="396.0" AnchorPane.topAnchor="555.0">
          <font>
             <Font name="System Bold" size="14.0" />
