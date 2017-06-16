@@ -96,7 +96,7 @@ public class dbController {
 		System.out.println("games database loaded successfull");
 	}
 	
-	//creating database, if db has 0 entries search for all .rpx files in the roms directory and add them
+	//creating database, if database has 0 entries search for all .rpx files in the roms directory and add them
 	void createRomDatabase() { 
 		try {
 			Statement stmt = connection.createStatement();

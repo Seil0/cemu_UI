@@ -25,7 +25,6 @@ import java.math.BigInteger;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -43,7 +42,8 @@ import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
 import datatypes.SmmdbApiDataType;
-import datatypes.courseTableDataType;
+import datatypes.UIROMDataType;
+import datatypes.CourseTableDataType;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
@@ -148,22 +148,22 @@ public class MainWindowController {
     
     
     @FXML
-    private JFXTreeTableView<courseTableDataType> courseTreeTable = new JFXTreeTableView<courseTableDataType>();
+    private JFXTreeTableView<CourseTableDataType> courseTreeTable = new JFXTreeTableView<CourseTableDataType>();
     
     @FXML
-    TreeItem<courseTableDataType> root = new TreeItem<>(new courseTableDataType("",0,0,0));
+    TreeItem<CourseTableDataType> root = new TreeItem<>(new CourseTableDataType("",0,0,0));
     
     @FXML
-    private JFXTreeTableColumn<courseTableDataType, String> titleColumn = new JFXTreeTableColumn<>("title");
+    private JFXTreeTableColumn<CourseTableDataType, String> titleColumn = new JFXTreeTableColumn<>("title");
     
     @FXML
-    private JFXTreeTableColumn<courseTableDataType, Integer> starsColumn = new JFXTreeTableColumn<>("stars");
+    private JFXTreeTableColumn<CourseTableDataType, Integer> starsColumn = new JFXTreeTableColumn<>("stars");
     
     @FXML
-    private JFXTreeTableColumn<courseTableDataType, Integer> downloadsColumn = new JFXTreeTableColumn<>("downloads");
+    private JFXTreeTableColumn<CourseTableDataType, Integer> downloadsColumn = new JFXTreeTableColumn<>("downloads");
     
     @FXML
-    private JFXTreeTableColumn<courseTableDataType, Integer> idColumn = new JFXTreeTableColumn<>("id");
+    private JFXTreeTableColumn<CourseTableDataType, Integer> idColumn = new JFXTreeTableColumn<>("id");
     
     Main main;
     dbController dbController;
@@ -198,7 +198,7 @@ public class MainWindowController {
 	private File fileLinux = new File(dirLinux + "/config.xml");
 	File pictureCacheWin = new File(dirWin+"/picture_cache");
 	File pictureCacheLinux = new File(dirLinux+"/picture_cache");
-	private ObservableList<uiDataType> games = FXCollections.observableArrayList();
+	private ObservableList<UIROMDataType> games = FXCollections.observableArrayList();
 	ObservableList<SmmdbApiDataType> courses = FXCollections.observableArrayList();
     Properties props = new Properties();
     Properties gameProps = new Properties();
@@ -494,7 +494,14 @@ public class MainWindowController {
 					selected = courseTreeTable.getSelectionModel().getSelectedIndex(); //get selected item
 					id = idColumn.getCellData(selected); //get name of selected item
 					
-					//TODO show additional information and download option
+					for (int i = 0; i < courses.size(); i++) {
+						if (courses.get(i).getId() == id) {
+							
+							//TODO show additional information and download option
+							System.out.println(i);
+						}
+
+					}
 					
 					System.out.println(id + "; " + selected);
 				}
@@ -556,10 +563,10 @@ public class MainWindowController {
     	
     	//add query response to courseTreeTable
 		for(int i = 0; i < courses.size(); i++){
-			courseTableDataType helpCourse = new courseTableDataType(courses.get(i).getTitle(), courses.get(i).getDownloads(),
+			CourseTableDataType helpCourse = new CourseTableDataType(courses.get(i).getTitle(), courses.get(i).getDownloads(),
 																	courses.get(i).getStars(), courses.get(i).getId());
 			
-			root.getChildren().add(new TreeItem<courseTableDataType>(helpCourse));	//add data to root-node
+			root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse));	//add data to root-node
 		}
     }
     	
@@ -825,6 +832,7 @@ public class MainWindowController {
             	selectedGameTitleID = titleID;
             	selectedGameTitle = title;
             	
+            	//underling selected Label
             	lastGameLabel.setStyle("-fx-underline: false;");
             	games.get(selectedUIDataIndex).getLabel().setStyle("-fx-underline: true;");
             	lastGameLabel = games.get(selectedUIDataIndex).getLabel();
@@ -865,7 +873,7 @@ public class MainWindowController {
             	
             }	
         });
-    	games.add(new uiDataType(VBox, gameTitleLabel, gameBtn, titleID, romPath));
+    	games.add(new UIROMDataType(VBox, gameTitleLabel, gameBtn, titleID, romPath));
     }
     
     //add all games to the UI (only called on startup)

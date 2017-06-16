@@ -1,4 +1,7 @@
-package application;
+/**
+ * Datatype used for UI ROM elements
+ */
+package datatypes;
 
 import com.jfoenix.controls.JFXButton;
 
@@ -8,15 +11,15 @@ import javafx.beans.property.StringProperty;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
-public class uiDataType {
-	
+public class UIROMDataType {
+
 	private final SimpleObjectProperty<VBox> vBox = new SimpleObjectProperty<>();
 	private final SimpleObjectProperty<Label> label = new SimpleObjectProperty<>();
 	private final SimpleObjectProperty<JFXButton> button = new SimpleObjectProperty<>();
 	private final StringProperty titleID = new SimpleStringProperty();
 	private final StringProperty romPath = new SimpleStringProperty();
 	
-	public uiDataType (final VBox vBox, final Label label, final JFXButton button, final String titleID, final String romPath){
+	public UIROMDataType (final VBox vBox, final Label label, final JFXButton button, final String titleID, final String romPath){
 		this.vBox.set(vBox);
 		this.label.set(label);
 		this.button.set(button);

@@ -1,3 +1,6 @@
+/**
+ * Datatype used for the smmdbapi query
+ */
 package datatypes;
 
 import javafx.beans.property.IntegerProperty;
