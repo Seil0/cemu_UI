@@ -199,6 +199,7 @@ public class MainWindowController {
 	File pictureCacheWin = new File(dirWin+"/picture_cache");
 	File pictureCacheLinux = new File(dirLinux+"/picture_cache");
 	private ObservableList<uiDataType> games = FXCollections.observableArrayList();
+	ObservableList<SmmdbApiDataType> courses = FXCollections.observableArrayList();
     Properties props = new Properties();
     Properties gameProps = new Properties();
     private MenuItem edit = new MenuItem("edit");
@@ -548,7 +549,7 @@ public class MainWindowController {
     	}
     		
     	//start query
-    	ArrayList<SmmdbApiDataType> courses = new ArrayList<>(smmdbApiQuery.startQuery());
+    	courses.addAll(smmdbApiQuery.startQuery());
     	
     	System.out.println("size: " + courses.size());
     	System.out.println(courses.get(3).getNintendoid());
