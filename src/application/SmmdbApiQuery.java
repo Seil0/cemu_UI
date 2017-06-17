@@ -50,7 +50,7 @@ public class SmmdbApiQuery {
         
         //if value is 9 or "notset" the api returned NULL as value
         for (int i = 0; i < courseIDs.size(); i++) {
-        	int id, owner, coursetype, leveltype, difficulty, lastmodified, uploaded, downloads, stars, ispackage, updatereq;
+        	int id, owner, coursetype, leveltype, difficulty, lastmodified, uploaded, downloads, stars, hasimage, ispackage, updatereq;
         	String nintendoid, title;
         	JsonObject singleObject = mainObject.get(courseIDs.get(i).toString()).asObject();
 
@@ -100,6 +100,11 @@ public class SmmdbApiQuery {
 				stars = 9;
 			}
         	try {
+        		hasimage = singleObject.getInt("hasimage", 0);
+			} catch (Exception e) {
+				hasimage = 9;
+			}
+        	try {
         		ispackage = singleObject.getInt("ispackage", 0);
 			} catch (Exception e) {
 				ispackage = 9;
@@ -121,7 +126,7 @@ public class SmmdbApiQuery {
 			}
 
         	course.add(new SmmdbApiDataType(id, owner, coursetype, leveltype, difficulty, lastmodified, uploaded, downloads,
-        			 						stars, ispackage, updatereq, nintendoid, title));
+        			 						stars, hasimage, ispackage, updatereq, nintendoid, title));
 		}
         
 		return course;

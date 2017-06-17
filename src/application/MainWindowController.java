@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -41,9 +44,9 @@ import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
+import datatypes.CourseTableDataType;
 import datatypes.SmmdbApiDataType;
 import datatypes.UIROMDataType;
-import datatypes.CourseTableDataType;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
@@ -74,6 +77,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.TextFlow;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
@@ -102,13 +106,16 @@ public class MainWindowController {
     private JFXButton romTFBtn;
     
     @FXML
+    private JFXButton smmdbDownloadBtn;
+    
+    @FXML
     private JFXButton playBtn;
     
     @FXML
-    JFXButton timePlayedBtn;
+    private JFXButton lastTimePlayedBtn;
     
     @FXML
-    private JFXButton lastTimePlayedBtn;
+    JFXButton timePlayedBtn;
     
     @FXML
     private JFXHamburger menuHam;
@@ -118,6 +125,9 @@ public class MainWindowController {
     
     @FXML
     private JFXTextField romTextField;
+    
+    @FXML
+    private TextFlow smmdbTextFlow;
     
     @FXML
     private JFXColorPicker colorPicker;
@@ -141,10 +151,16 @@ public class MainWindowController {
     private ScrollPane scrollPaneMain;
     
     @FXML
+    private ScrollPane smmdbScrollPane;
+    
+    @FXML
     private VBox sideMenuVBox;
     
     @FXML
     private HBox topHBox;
+    
+    @FXML
+    private ImageView smmdbImageView;
     
     
     @FXML
@@ -237,9 +253,9 @@ public class MainWindowController {
 		applyColor();
 		
 		//initialize courseTable
-		titleColumn.setPrefWidth(150);
-		starsColumn.setPrefWidth(85);
-		downloadsColumn.setPrefWidth(115);
+		titleColumn.setPrefWidth(168);
+		downloadsColumn.setPrefWidth(130);
+		starsColumn.setPrefWidth(100);
 		
 		courseTreeTable.setRoot(root);
 		courseTreeTable.setShowRoot(false);
@@ -497,6 +513,20 @@ public class MainWindowController {
 					for (int i = 0; i < courses.size(); i++) {
 						if (courses.get(i).getId() == id) {
 							
+							if (courses.get(i).getHasimage() == 1) {	
+								try {
+									URL url = new URL("http://smmdb.ddns.net/img/courses/thumbnails/" + id + ".pic");
+									Image image = new Image(url.toURI().toString());
+									smmdbImageView.setImage(image);
+								} catch (MalformedURLException | URISyntaxException e) {
+									e.printStackTrace();
+								}
+							} else {
+								//TODO show an image if none was found
+//								Image image = new Image(url.toURI().toString());
+//								smmdbImageView.setImage(image);
+							}
+							
 							//TODO show additional information and download option
 							System.out.println(i);
 						}
@@ -624,6 +654,18 @@ public class MainWindowController {
 				e.printStackTrace();
 			}
         }
+    }
+    
+    @FXML
+    void smmdbDownloadBtnAction(ActionEvent event){
+    	//TODO implement download
+    	System.out.println("this needs to be implemented ^^");
+    	try {
+			URL url = new URL("smmdb.ddns.net/courses/" + id);
+		} catch (MalformedURLException e) {
+			System.err.println("something went wrong during downloading the course");
+			e.printStackTrace();
+		}
     }
     
     @FXML
@@ -918,6 +960,7 @@ public class MainWindowController {
 			playBtn.setStyle("-fx-text-fill: WHITE; -fx-font-family: Roboto Medium;");
 			cemuTFBtn.setStyle(btnStyleWhite);
 			romTFBtn.setStyle(btnStyleWhite);
+			smmdbDownloadBtn.setStyle(btnStyleWhite);
 			playBtn.setStyle(btnStyleWhite);
 			
 			aboutBtn.setGraphic(info_white);
@@ -936,6 +979,7 @@ public class MainWindowController {
 			playBtn.setStyle("-fx-text-fill: BLACK; -fx-font-family: Roboto Medium;");
 			cemuTFBtn.setStyle(btnStyleBlack);
 			romTFBtn.setStyle(btnStyleBlack);
+			smmdbDownloadBtn.setStyle(btnStyleBlack);
 			playBtn.setStyle(btnStyleBlack);
 			
 			aboutBtn.setGraphic(info_black);

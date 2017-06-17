@@ -19,14 +19,15 @@ public class SmmdbApiDataType {
 	private final IntegerProperty uploaded = new SimpleIntegerProperty();
 	private final IntegerProperty downloads = new SimpleIntegerProperty();
 	private final IntegerProperty stars = new SimpleIntegerProperty();
+	private final IntegerProperty hasimage = new SimpleIntegerProperty();
 	private final IntegerProperty ispackage = new SimpleIntegerProperty();
 	private final IntegerProperty updatereq = new SimpleIntegerProperty();
 	private final StringProperty nintendoid = new SimpleStringProperty();
 	private final StringProperty title = new SimpleStringProperty();
 	
 	public SmmdbApiDataType(final int id, final int owner, final int coursetype, final int leveltype, final int difficulty, 
-							final int lastmodified, final int uploaded, final int downloads, final int stars, final int ispackage,
-							final int updatereq, final String nintendoid, final String title) {
+							final int lastmodified, final int uploaded, final int downloads, final int stars, final int hasimage,
+							final int ispackage, final int updatereq, final String nintendoid, final String title) {
 		this.id.set(id);
 		this.owner.set(owner);
 		this.coursetype.set(coursetype);
@@ -36,6 +37,7 @@ public class SmmdbApiDataType {
 		this.uploaded.set(uploaded);
 		this.downloads.set(downloads);
 		this.stars.set(stars);
+		this.hasimage.set(hasimage);
 		this.ispackage.set(ispackage);
 		this.updatereq.set(updatereq);
 		this.nintendoid.set(nintendoid);
@@ -80,6 +82,10 @@ public class SmmdbApiDataType {
 	
 	public IntegerProperty starsProperty(){
 		return stars;
+	}
+	
+	public IntegerProperty hasimageProperty(){
+		return hasimage;
 	}
 	
 	public IntegerProperty ispackageProperty(){
@@ -128,6 +134,10 @@ public class SmmdbApiDataType {
 
 	public int getStars() {
 		return starsProperty().get();
+	}
+	
+	public int getHasimage() {
+		return hasimageProperty().get();
 	}
 	
 	public int getIspackage() {
@@ -182,6 +192,10 @@ public class SmmdbApiDataType {
 		starsProperty().set(stars);
 	}
 	
+	public final void setHasimage(int hasimage) {
+		hasimageProperty().set(hasimage);
+	}
+	
 	public final void setIspackage(int ispackage) {
 		ispackageProperty().set(ispackage);
 	}
@@ -197,5 +211,5 @@ public class SmmdbApiDataType {
 	public final void setTitle(String title) {
 		titleProperty().set(title);
 	}
-
+	
 }
