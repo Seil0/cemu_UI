@@ -87,7 +87,7 @@
       </AnchorPane>
       <AnchorPane fx:id="smmdbAnchorPane" style="-fx-background-color: white;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="175.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0">
          <children>
-            <JFXTreeTableView fx:id="courseTreeTable" layoutX="14.0" layoutY="14.0" prefHeight="537.0" prefWidth="400.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0" />
+            <JFXTreeTableView fx:id="courseTreeTable" layoutX="14.0" layoutY="14.0" prefHeight="537.0" prefWidth="405.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0" />
             <ImageView fx:id="smmdbImageView" fitHeight="150.0" fitWidth="267.0" layoutX="436.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="436.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
             <ScrollPane fx:id="smmdbScrollPane" layoutX="436.0" layoutY="181.0" prefHeight="314.0" prefWidth="267.0" AnchorPane.bottomAnchor="67.0" AnchorPane.leftAnchor="436.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="181.0">
                <content>

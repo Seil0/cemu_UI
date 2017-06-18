@@ -28,6 +28,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Properties;
 
@@ -77,6 +78,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
@@ -216,6 +218,8 @@ public class MainWindowController {
 	File pictureCacheLinux = new File(dirLinux+"/picture_cache");
 	private ObservableList<UIROMDataType> games = FXCollections.observableArrayList();
 	ObservableList<SmmdbApiDataType> courses = FXCollections.observableArrayList();
+	ArrayList<Text> courseText = new ArrayList<Text>();
+	ArrayList<Text> nameText = new ArrayList<Text>();
     Properties props = new Properties();
     Properties gameProps = new Properties();
     private MenuItem edit = new MenuItem("edit");
@@ -235,6 +239,7 @@ public class MainWindowController {
 	private ImageView settings_white = new ImageView(new Image("resources/icons/ic_settings_white_24dp_1x.png"));
 	private ImageView cached_white = new ImageView(new Image("resources/icons/ic_cached_white_24dp_1x.png"));
 	private ImageView smmdb_white = new ImageView(new Image("resources/icons/ic_get_app_white_24dp_1x.png"));
+	private Image close_black = new Image("resources/icons/close_black_2048x2048.png");
     
 	public void setMain(Main main) {
 		this.main = main;
@@ -253,8 +258,8 @@ public class MainWindowController {
 		applyColor();
 		
 		//initialize courseTable
-		titleColumn.setPrefWidth(168);
-		downloadsColumn.setPrefWidth(130);
+		titleColumn.setPrefWidth(160);
+		downloadsColumn.setPrefWidth(127);
 		starsColumn.setPrefWidth(100);
 		
 		courseTreeTable.setRoot(root);
@@ -522,18 +527,11 @@ public class MainWindowController {
 									e.printStackTrace();
 								}
 							} else {
-								//TODO show an image if none was found
-//								Image image = new Image(url.toURI().toString());
-//								smmdbImageView.setImage(image);
+								smmdbImageView.setImage(close_black);
 							}
-							
-							//TODO show additional information and download option
-							System.out.println(i);
+							addCourseDescription(courses.get(i));
 						}
-
-					}
-					
-					System.out.println(id + "; " + selected);
+					}	
 				}
 		 });
 		System.out.println("initializing Actions done!");
@@ -556,13 +554,17 @@ public class MainWindowController {
 
     @FXML
     void settingsBtnAction(ActionEvent event) {
-    	if(settingsTrue == false){
+    	if (smmdbTrue) {
+    		smmdbAnchorPane.setVisible(false);
+    		smmdbTrue = false;
+    	}
+    	if (settingsTrue) {
+    		settingsAnchorPane.setVisible(false);
+      		settingsTrue = false;
+    		saveSettings();
+    	} else {
     		settingsAnchorPane.setVisible(true);
     		settingsTrue = true;
-    	}else{
-    		settingsAnchorPane.setVisible(false);
-    		saveSettings();
-    		settingsTrue = false;
     	}
     }
     
@@ -924,9 +926,100 @@ public class MainWindowController {
     		gamesAnchorPane.getChildren().add(games.get(i).getVBox());
     	}
     }
+    
+    private void addCourseDescription(SmmdbApiDataType course) {
+    	String coursetype;
+    	String leveltype;
+    	String difficulty;
+    	smmdbTextFlow.getChildren().remove(0, smmdbTextFlow.getChildren().size());
+    	nameText.clear();
+    	courseText.clear();
+    	
+    	switch (course.getCoursetype()) {
+		case 0:
+			coursetype = "Creation";
+			break;
+		case 1:
+			coursetype = "Recreation";
+			break;
+		case 2:
+			coursetype = "Wii U Dump";
+			break;
+		default:
+			coursetype = "notset";
+			break;
+		}
+    	
+    	switch (course.getLeveltype()) {
+		case 0:
+			leveltype = "NSMBU";
+			break;
+		case 1:
+			leveltype = "SMW";
+			break;
+		case 2:
+			leveltype = "SMB3";
+			break;
+		case 3:
+			leveltype = "SMB";
+			break;
+		case 4:
+			leveltype = "Mixed";
+			break;
+		default:
+			leveltype = "notset";
+			break;
+		}
+
+    	switch (course.getDifficulty()) {
+		case 0:
+			difficulty = "Easy";
+			break;
+		case 1:
+			difficulty = "Normal";
+			break;
+		case 2:
+			difficulty = "Expert";
+			break;
+		case 3:
+			difficulty = "Super Expert";
+			break;
+		case 4:
+			difficulty = "Mixed";
+			break;
+		default:
+			difficulty = "notset";
+			break;
+		}
+    	
+    	nameText.add(0, new Text("title" + ": "));
+    	nameText.add(1, new Text("owner" + ": "));
+    	nameText.add(2, new Text("coursetype" + ": "));
+    	nameText.add(3, new Text("leveltype" + ": "));
+    	nameText.add(4, new Text("difficulty" + ": "));
+    	nameText.add(5, new Text("lastmodified" + ": "));
+    	nameText.add(6, new Text("uploaded" + ": "));
+    	nameText.add(7, new Text("nintendoid" + ": "));
+    	
+    	courseText.add(0, new Text(course.getTitle() + "\n"));
+    	courseText.add(1, new Text(Integer.toString(course.getOwner()) + "\n"));
+    	courseText.add(2, new Text(coursetype + "\n"));
+    	courseText.add(3, new Text(leveltype + "\n"));
+    	courseText.add(4, new Text(difficulty + "\n"));
+    	courseText.add(5, new Text(new java.util.Date((long)course.getLastmodified()*1000) + "\n"));
+    	courseText.add(6, new Text(new java.util.Date((long)course.getUploaded()*1000) + "\n"));
+    	courseText.add(7, new Text(course.getNintendoid() + "\n"));
+    	
+    	for(int i=0; i<nameText.size(); i++){
+			nameText.get(i).setFont(Font.font ("System", FontWeight.BOLD, 14));
+			courseText.get(i).setFont(Font.font ("System", 14));
+			smmdbTextFlow.getChildren().addAll(nameText.get(i),courseText.get(i));
+		}
+
+    }
 
     //TODO xPosHelper based on window with
-    private void generatePosition(){
+    private void generatePosition() {
 //    	System.out.println(main.primaryStage.getWidth());
     	if(xPosHelper == 4){
     		xPos = 17;
@@ -938,13 +1031,12 @@ public class MainWindowController {
     	}
     }
     
-    private void applyColor(){
+    private void applyColor() {
 		String boxStyle = "-fx-background-color: #"+getColor()+";";
 		String btnStyleBlack = "-fx-button-type: RAISED; -fx-background-color: #"+getColor()+"; -fx-text-fill: BLACK;";
 		String btnStyleWhite = "-fx-button-type: RAISED; -fx-background-color: #"+getColor()+"; -fx-text-fill: WHITE;";
 		BigInteger icolor = new BigInteger(getColor(),16);
 		BigInteger ccolor = new BigInteger("78909cff",16);
-		getColor();
 		
 		sideMenuVBox.setStyle(boxStyle);
 		topHBox.setStyle(boxStyle);
@@ -1121,6 +1213,18 @@ public class MainWindowController {
 		sb.delete(0, 2);
 		this.color = sb.toString();
 		saveSettings();
+	}
+	
+	@SuppressWarnings("unused")
+	private String hexToRgb() {
+		System.out.println(getColor());
+		int hex = Integer.parseInt(getColor().substring(0, 5), 16);
+		
+	    int r = (hex & 0xFF0000) >> 16;
+	    int g = (hex & 0xFF00) >> 8;
+	    int b = (hex & 0xFF);
+	    
+	    return r + ", " + g + ", " + b;
 	}
 	
 	private static BufferedImage resizeImage(BufferedImage originalImage, int type, int imgWidth, int imgHeigth) {
