@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -33,6 +34,8 @@ import java.util.Optional;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
+import javax.swing.ProgressMonitor;
+import javax.swing.ProgressMonitorInputStream;
 
 import org.apache.commons.io.FileUtils;
 
@@ -511,7 +514,6 @@ public class MainWindowController {
 		courseTreeTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Object>() {	
 				@Override
 				public void changed(ObservableValue<?> observable, Object oldVal, Object newVal){
-					// last = selected; //for auto-play
 					selected = courseTreeTable.getSelectionModel().getSelectedIndex(); //get selected item
 					id = idColumn.getCellData(selected); //get name of selected item
 					
@@ -660,11 +662,19 @@ public class MainWindowController {
     
     @FXML
     void smmdbDownloadBtnAction(ActionEvent event){
-    	//TODO implement download
-    	System.out.println("this needs to be implemented ^^");
+    	String downloadUrl = "http://smmdb.ddns.net/courses/" + id;
+    	//TODO un-rar and place to the right directory
     	try {
-			URL url = new URL("smmdb.ddns.net/courses/" + id);
-		} catch (MalformedURLException e) {
+			HttpURLConnection conn = (HttpURLConnection) new URL(downloadUrl).openConnection();
+			ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(null, "Downloading...", conn.getInputStream());
+			ProgressMonitor pm = pmis.getProgressMonitor();
+	        pm.setMillisToDecideToPopup(0);
+	        pm.setMillisToPopup(0);
+	        pm.setMinimum(0);	// tell the progress bar that we start at the beginning of the stream
+	        pm.setMaximum(conn.getContentLength());	// tell the progress bar the total number of bytes we are going to read.
+			FileUtils.copyInputStreamToFile(pmis, new File(getCemuPath() + "/" + id + ".rar"));	//download file  + "/mlc01/emulatorSave"
+			System.out.println("downloaded successfull");
+		} catch (IOException e) {
 			System.err.println("something went wrong during downloading the course");
 			e.printStackTrace();
 		}
