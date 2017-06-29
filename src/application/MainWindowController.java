@@ -329,7 +329,8 @@ public class MainWindowController {
 		});
 		
 		remove.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
+			@SuppressWarnings("unlikely-arg-type")	//FIXME SuppressWarnings("unlikely-arg-type")
+			@Override
             public void handle(ActionEvent event) {
             	System.out.println("remove "+selectedGameTitleID);
             	if(selectedGameTitleID == null){
@@ -359,12 +360,13 @@ public class MainWindowController {
 	    					//remove game from database
     						games.remove(selectedUIDataIndex);
 							dbController.removeRom(selectedGameTitleID);
+							//remove all games form gamesAnchorPane (UI)
 	    					gamesAnchorPane.getChildren().removeAll(games);
 	    					//reset position
 	    				    xPos = -200;
 	    				    yPos = 17;
 	    				    xPosHelper = 0;
-	    					//add all games to gamesAnchorPane
+	    					//add all games to gamesAnchorPane (UI)
 	    					for(int i=0; i< games.size(); i++){
 	    				    	generatePosition();
 	    				    	games.get(i).getVBox().setLayoutX(getxPos());
