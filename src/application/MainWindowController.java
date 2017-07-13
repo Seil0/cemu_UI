@@ -17,6 +17,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +39,12 @@ import javax.swing.ProgressMonitor;
 import javax.swing.ProgressMonitorInputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.vfs2.tasks.MkdirTask;
 
+import com.github.junrar.Archive;
+import com.github.junrar.exception.RarException;
+import com.github.junrar.impl.FileVolumeManager;
+import com.github.junrar.rarfile.FileHeader;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
 import com.jfoenix.controls.JFXHamburger;
@@ -203,6 +209,7 @@ public class MainWindowController {
     private String selectedGameTitleID;
     private String selectedGameTitle;
     private String color;
+    private String smmID;
     private String version = "0.1.5";
     private String buildNumber = "021";
 	private String versionName = "Gusty Garden";
@@ -665,7 +672,9 @@ public class MainWindowController {
     @FXML
     void smmdbDownloadBtnAction(ActionEvent event){
     	String downloadUrl = "http://smmdb.ddns.net/courses/" + id;
-    	//TODO un-rar and place to the right directory
+    	String downloadFile = getCemuPath() + "/" + id + ".rar";	//getCemuPath() + "/" + smmID + "/" + id + ".rar"
+    	String outputFile = getCemuPath() + "\\";
+    	
     	try {
 			HttpURLConnection conn = (HttpURLConnection) new URL(downloadUrl).openConnection();
 			ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(null, "Downloading...", conn.getInputStream());
@@ -674,8 +683,50 @@ public class MainWindowController {
 	        pm.setMillisToPopup(0);
 	        pm.setMinimum(0);	// tell the progress bar that we start at the beginning of the stream
 	        pm.setMaximum(conn.getContentLength());	// tell the progress bar the total number of bytes we are going to read.
-			FileUtils.copyInputStreamToFile(pmis, new File(getCemuPath() + "/" + id + ".rar"));	//download file  + "/mlc01/emulatorSave"
+			FileUtils.copyInputStreamToFile(pmis, new File(downloadFile));	//download file  + "/mlc01/emulatorSave"
+			System.out.println((getCemuPath() + "/" + smmID + "/" + id + ".rar"));
 			System.out.println("downloaded successfull");
+			
+	    	//TODO place file  into the right directory
+			File f = new File(downloadFile);
+			Archive a = null;
+			try {
+				a = new Archive(new FileVolumeManager(f));
+			} catch (RarException e) {
+				// Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// Auto-generated catch block
+				e.printStackTrace();
+			}
+			if (a != null) {
+				a.getMainHeader().print();
+				FileHeader fh = a.nextFileHeader();
+				File courseDirectory = new File(outputFile + fh.getFileNameString().substring(0, fh.getFileNameString().indexOf('\\')));
+				while (fh != null) {
+					try {
+						if (!courseDirectory.exists()) {
+							courseDirectory.mkdir();
+						}
+						File out = new File(outputFile + fh.getFileNameString().trim());
+						System.out.println(out.getAbsolutePath());
+						FileOutputStream os = new FileOutputStream(out);
+						a.extractFile(fh, os);
+						os.close();
+					} catch (FileNotFoundException e) {
+						// Auto-generated catch block
+						e.printStackTrace();
+					} catch (RarException e) {
+						// Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// Auto-generated catch block
+						e.printStackTrace();
+					}
+					fh = a.nextFileHeader();
+				}
+			}
+			
 		} catch (IOException e) {
 			System.err.println("something went wrong during downloading the course");
 			e.printStackTrace();
