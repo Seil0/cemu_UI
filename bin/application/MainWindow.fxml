@@ -89,16 +89,21 @@
          <children>
             <JFXTreeTableView fx:id="courseTreeTable" layoutX="14.0" layoutY="14.0" prefHeight="537.0" prefWidth="405.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0" />
             <ImageView fx:id="smmdbImageView" fitHeight="150.0" fitWidth="267.0" layoutX="436.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="436.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
-            <ScrollPane fx:id="smmdbScrollPane" layoutX="436.0" layoutY="181.0" prefHeight="314.0" prefWidth="267.0" AnchorPane.bottomAnchor="67.0" AnchorPane.leftAnchor="436.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="181.0">
+            <ScrollPane fx:id="smmdbScrollPane" layoutX="436.0" layoutY="181.0" prefHeight="290.0" prefWidth="267.0" AnchorPane.bottomAnchor="91.0" AnchorPane.leftAnchor="436.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="181.0">
                <content>
                   <TextFlow fx:id="smmdbTextFlow" maxWidth="265.0" prefWidth="265.0" />
                </content>
             </ScrollPane>
-            <JFXButton fx:id="smmdbDownloadBtn" buttonType="RAISED" layoutX="436.0" layoutY="510.0" onAction="#smmdbDownloadBtnAction" prefHeight="38.0" prefWidth="267.0" text="download" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="436.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="510.0">
+            <JFXButton fx:id="smmdbDownloadBtn" buttonType="RAISED" layoutX="436.0" layoutY="479.0" onAction="#smmdbDownloadBtnAction" prefHeight="38.0" prefWidth="267.0" text="download" AnchorPane.bottomAnchor="45.0" AnchorPane.leftAnchor="436.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="479.0">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
             </JFXButton>
+            <Label fx:id="helpLabel" layoutX="436.0" layoutY="538.0" prefHeight="17.0" prefWidth="267.0" text="please help me improving this! click me!">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
          </children></AnchorPane>
       <JFXButton fx:id="playBtn" buttonType="RAISED" maxHeight="38.0" maxWidth="100.0" onAction="#playBtnAction" ripplerFill="#c92a2a" text="play" visible="false" AnchorPane.bottomAnchor="7.0" AnchorPane.leftAnchor="396.0" AnchorPane.rightAnchor="396.0" AnchorPane.topAnchor="555.0">
          <font>

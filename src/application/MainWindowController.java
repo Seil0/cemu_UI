@@ -13,11 +13,11 @@
  */
 package application;
 
+import java.awt.Desktop;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,6 +25,7 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -39,8 +40,6 @@ import javax.swing.ProgressMonitor;
 import javax.swing.ProgressMonitorInputStream;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.vfs2.tasks.MkdirTask;
-
 import com.github.junrar.Archive;
 import com.github.junrar.exception.RarException;
 import com.github.junrar.impl.FileVolumeManager;
@@ -79,6 +78,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
@@ -173,6 +173,9 @@ public class MainWindowController {
     @FXML
     private ImageView smmdbImageView;
     
+    @FXML
+    private Label helpLabel;
+    
     
     @FXML
     private JFXTreeTableView<CourseTableDataType> courseTreeTable = new JFXTreeTableView<CourseTableDataType>();
@@ -209,10 +212,9 @@ public class MainWindowController {
     private String selectedGameTitleID;
     private String selectedGameTitle;
     private String color;
-    private String smmID;
-    private String version = "0.1.5";
-    private String buildNumber = "021";
-	private String versionName = "Gusty Garden";
+    private String version = "0.1.6";
+    private String buildNumber = "027";
+	private String versionName = "Throwback Galaxy";
     private int xPos = -200;
     private int yPos = 17;
     private int xPosHelper;
@@ -226,6 +228,7 @@ public class MainWindowController {
 	private File fileLinux = new File(dirLinux + "/config.xml");
 	File pictureCacheWin = new File(dirWin+"/picture_cache");
 	File pictureCacheLinux = new File(dirLinux+"/picture_cache");
+	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2");	//TODO add more IDs
 	private ObservableList<UIROMDataType> games = FXCollections.observableArrayList();
 	ObservableList<SmmdbApiDataType> courses = FXCollections.observableArrayList();
 	ArrayList<Text> courseText = new ArrayList<Text>();
@@ -545,6 +548,21 @@ public class MainWindowController {
 					}	
 				}
 		 });
+		
+		helpLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+		    @Override
+		    public void handle(MouseEvent mouseEvent) {
+		        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
+		            System.out.println("I'll help you");
+		            try {
+						Desktop.getDesktop().browse(new URI("https://github.com/Seil0/cemu_UI/issues/3"));
+					} catch (IOException | URISyntaxException e) {
+						e.printStackTrace();
+					}
+		        }
+		    }
+		});
+		
 		System.out.println("initializing Actions done!");
 	}
     
@@ -672,8 +690,8 @@ public class MainWindowController {
     @FXML
     void smmdbDownloadBtnAction(ActionEvent event){
     	String downloadUrl = "http://smmdb.ddns.net/courses/" + id;
-    	String downloadFile = getCemuPath() + "/" + id + ".rar";	//getCemuPath() + "/" + smmID + "/" + id + ".rar"
-    	String outputFile = getCemuPath() + "\\";
+    	String downloadFileURL = getCemuPath() + "/" + id + ".rar";	//getCemuPath() + "/" + smmID + "/" + id + ".rar"
+    	String outputFile = getCemuPath() + "/";
     	
     	try {
 			HttpURLConnection conn = (HttpURLConnection) new URL(downloadUrl).openConnection();
@@ -683,50 +701,50 @@ public class MainWindowController {
 	        pm.setMillisToPopup(0);
 	        pm.setMinimum(0);	// tell the progress bar that we start at the beginning of the stream
 	        pm.setMaximum(conn.getContentLength());	// tell the progress bar the total number of bytes we are going to read.
-			FileUtils.copyInputStreamToFile(pmis, new File(downloadFile));	//download file  + "/mlc01/emulatorSave"
-			System.out.println((getCemuPath() + "/" + smmID + "/" + id + ".rar"));
+			FileUtils.copyInputStreamToFile(pmis, new File(downloadFileURL));	//download file  + "/mlc01/emulatorSave"
+			pmis.close();
 			System.out.println("downloaded successfull");
-			
-	    	//TODO place file  into the right directory
-			File f = new File(downloadFile);
+
+			File downloadFile = new File(downloadFileURL);
 			Archive a = null;
 			try {
-				a = new Archive(new FileVolumeManager(f));
-			} catch (RarException e) {
-				// Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
+				a = new Archive(new FileVolumeManager(downloadFile));
+			} catch (RarException | IOException e) {
 				// Auto-generated catch block
 				e.printStackTrace();
 			}
 			if (a != null) {
 				a.getMainHeader().print();
 				FileHeader fh = a.nextFileHeader();
-				File courseDirectory = new File(outputFile + fh.getFileNameString().substring(0, fh.getFileNameString().indexOf('\\')));
-				while (fh != null) {
-					try {
+				
+				for (int i = 0; i < smmIDs.size(); i++) {
+					if (new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(i)).exists()) {
+						File courseDirectory = new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(0) + "/" + fh.getFileNameString().substring(0, fh.getFileNameString().indexOf('\\')));
+						System.out.println("Path: " + courseDirectory.getAbsolutePath());
 						if (!courseDirectory.exists()) {
 							courseDirectory.mkdir();
 						}
-						File out = new File(outputFile + fh.getFileNameString().trim());
-						System.out.println(out.getAbsolutePath());
-						FileOutputStream os = new FileOutputStream(out);
-						a.extractFile(fh, os);
-						os.close();
-					} catch (FileNotFoundException e) {
-						// Auto-generated catch block
-						e.printStackTrace();
-					} catch (RarException e) {
-						// Auto-generated catch block
-						e.printStackTrace();
-					} catch (IOException e) {
-						// Auto-generated catch block
-						e.printStackTrace();
+						while (fh != null) {
+							try {
+								File out = new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(0) + "/" + fh.getFileNameString().trim());
+								if (!out.getAbsolutePath().equals(courseDirectory.getAbsolutePath())) {
+									System.out.println(out.getAbsolutePath());
+									FileOutputStream os = new FileOutputStream(out);
+									a.extractFile(fh, os);
+									os.close();
+								}
+
+							} catch (RarException | IOException e) {
+								// Auto-generated catch block
+								e.printStackTrace();
+							}
+							fh = a.nextFileHeader();
+						}
 					}
-					fh = a.nextFileHeader();
 				}
 			}
-			
+			a.close();
+			downloadFile.delete();		
 		} catch (IOException e) {
 			System.err.println("something went wrong during downloading the course");
 			e.printStackTrace();
