@@ -37,6 +37,8 @@ public class Main extends Application {
 	Stage primaryStage;
 	public MainWindowController mainWindowController; //TODO find a better way
 	CloudController cloudController;
+	AnchorPane pane;
+	private Scene scene;
 	private String dirWin = System.getProperty("user.home") + "/Documents/cemu_UI";	//Windows: C:/Users/"User"/Documents/HomeFlix
 	private String dirLinux = System.getProperty("user.home") + "/cemu_UI";	//Linux: /home/"User"/HomeFlix
 	private String gamesDBdownloadURL = "https://github.com/Seil0/cemu_UI/raw/master/downloadContent/games.db";
@@ -58,7 +60,7 @@ public class Main extends Application {
 	private void mainWindow(){
 		try {
 			FXMLLoader loader = new FXMLLoader(Main.class.getResource("MainWindow.fxml"));
-			AnchorPane pane = loader.load();
+			pane = loader.load();
 			primaryStage.setResizable(false);
 			primaryStage.setTitle("cemu_UI");
 //			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/resources/Homeflix_Icon_64x64.png"))); //adds application icon
@@ -129,7 +131,7 @@ public class Main extends Application {
 			mainWindowController.initActions();
 			mainWindowController.initUI();
 			
-			Scene scene = new Scene(pane);	//create new scene, append pane to scene
+			scene = new Scene(pane);	//create new scene, append pane to scene
 			scene.getStylesheets().add(Main.class.getResource("MainWindows.css").toExternalForm());
 			primaryStage.setScene(scene);	//append scene to stage
 			primaryStage.show();	//show stage

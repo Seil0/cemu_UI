@@ -46,6 +46,8 @@ import com.github.junrar.impl.FileVolumeManager;
 import com.github.junrar.rarfile.FileHeader;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
@@ -82,6 +84,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -212,6 +215,7 @@ public class MainWindowController {
     private String selectedGameTitleID;
     private String selectedGameTitle;
     private String color;
+    private String dialogBtnStyle;
     private String version = "0.1.6";
     private String buildNumber = "027";
 	private String versionName = "Throwback Galaxy";
@@ -572,13 +576,29 @@ public class MainWindowController {
     }
     
     @FXML
-    void aboutBtnAction(){
-    	Alert alert = new Alert(AlertType.INFORMATION);
-    	alert.setTitle("about");
-    	alert.setHeaderText("cemu_UI");
-    	alert.setContentText("cemu_UI by @Seil0 \nVersion: "+version+" ("+buildNumber+")  \""+versionName+"\" \nwww.kellerkinder.xyz");
-    	alert.initOwner(main.primaryStage);
-    	alert.showAndWait();
+    void aboutBtnAction(){  	
+    	JFXDialogLayout content= new JFXDialogLayout();
+    	content.setHeading(new Text("cemu_UI"));
+    	content.setBody(new Text("cemu_UI by @Seil0 \nVersion: "+version+" ("+buildNumber+")  \""+versionName+"\" \nThis Application is made with free Software\nwww.kellerkinder.xyz"));
+    	content.setPrefSize(350, 170);
+    	StackPane stackPane = new StackPane();
+    	stackPane.autosize();
+    	JFXDialog dialog =new JFXDialog(stackPane, content, JFXDialog.DialogTransition.LEFT, true);
+    	JFXButton button=new JFXButton("Okay");
+    	button.setOnAction(new EventHandler<ActionEvent>(){
+    	    @Override
+    	    public void handle(ActionEvent event){
+    	        dialog.close();
+    	    }
+    	});
+    	button.setButtonType(com.jfoenix.controls.JFXButton.ButtonType.RAISED);
+    	button.setPrefHeight(32);
+    	button.setStyle(dialogBtnStyle);
+    	content.setActions(button);
+    	main.pane.getChildren().add(stackPane);
+    	AnchorPane.setTopAnchor(stackPane, (main.pane.getHeight()-content.getPrefHeight())/2);
+    	AnchorPane.setLeftAnchor(stackPane, (main.pane.getWidth()-content.getPrefWidth())/2);
+    	dialog.show();
     }
 
     @FXML
@@ -778,24 +798,49 @@ public class MainWindowController {
     	if(cloudSync) {
     		cloudSync = false;
     	} else {
-    		Alert cloudWarningAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
-    		cloudWarningAlert.setTitle("cemu_UI");
-    		cloudWarningAlert.setHeaderText("activate cloud savegame sync (beta)");
-    		cloudWarningAlert.setContentText("You just activate the cloud savegame sync function of cemu_UI which is currently in beta. Are you sure you want to do this?");
-    		cloudWarningAlert.initOwner(main.primaryStage);
-    		Optional<ButtonType> coverResult = cloudWarningAlert.showAndWait();
-			if (coverResult.get() == ButtonType.OK){
-				cloudSync = true;
-				//TODO rework for other cloud services
-				cloudService = "GoogleDrive";
-	    		main.cloudController.initializeConnection(getCloudService(), getCemuPath());
-	    		main.cloudController.sync(getCloudService(), getCemuPath());
-			} else {
-				cloudSyncToggleBtn.setSelected(false);
-			}
-			
+    		
+        	JFXDialogLayout content= new JFXDialogLayout();
+        	content.setHeading(new Text("activate cloud savegame sync (beta)"));
+        	content.setBody(new Text("You just activate the cloud savegame sync function of cemu_UI, \nwhich is currently in beta. Are you sure you want to do this?"));
+        	StackPane stackPane = new StackPane();
+        	stackPane.autosize();
+        	JFXDialog dialog = new JFXDialog(stackPane, content, JFXDialog.DialogTransition.LEFT, true);
+        	JFXButton okayBtn = new JFXButton("Okay");
+        	okayBtn.setOnAction(new EventHandler<ActionEvent>(){
+        	    @Override
+        	    public void handle(ActionEvent event){
+        	    	cloudSync = true;
+    				//TODO rework for other cloud services
+    				cloudService = "GoogleDrive";
+    	    		main.cloudController.initializeConnection(getCloudService(), getCemuPath());
+    	    		main.cloudController.sync(getCloudService(), getCemuPath());
+    	        	saveSettings();
+        	        dialog.close();
+        	    }
+        	});
+        	JFXButton cancelBtn = new JFXButton("Cancel");
+        	cancelBtn.setOnAction(new EventHandler<ActionEvent>(){
+        	    @Override
+        	    public void handle(ActionEvent event){
+        	    	cloudSyncToggleBtn.setSelected(false);
+        	        dialog.close();
+        	    }
+        	});
+        	Label placeholder = new Label();
+        	placeholder.setPrefSize(15, 10);
+        	okayBtn.setButtonType(com.jfoenix.controls.JFXButton.ButtonType.RAISED);
+        	cancelBtn.setButtonType(com.jfoenix.controls.JFXButton.ButtonType.RAISED);
+        	okayBtn.setPrefHeight(32);
+        	cancelBtn.setPrefHeight(32);
+        	okayBtn.setStyle(dialogBtnStyle);
+        	cancelBtn.setStyle(dialogBtnStyle);
+        	content.setActions(cancelBtn, placeholder, okayBtn);
+        	content.setPrefSize(419, 140);
+        	main.pane.getChildren().add(stackPane);
+        	AnchorPane.setTopAnchor(stackPane, (main.pane.getHeight()-content.getPrefHeight())/2);
+        	AnchorPane.setLeftAnchor(stackPane, (main.pane.getWidth()-content.getPrefWidth())/2);
+        	dialog.show();
     	}
-    	saveSettings();
     }
     
     @FXML
@@ -1125,6 +1170,8 @@ public class MainWindowController {
 		romTextField.setFocusColor(Color.valueOf(getColor()));
 		
 		if(icolor.compareTo(ccolor) == -1){
+			dialogBtnStyle = btnStyleWhite;
+			
 			aboutBtn.setStyle("-fx-text-fill: WHITE;");
 			settingsBtn.setStyle("-fx-text-fill: WHITE;");
 			addBtn.setStyle("-fx-text-fill: WHITE;");
@@ -1144,6 +1191,8 @@ public class MainWindowController {
 			
 			menuHam.getStyleClass().add("jfx-hamburgerW");
 		}else{
+			dialogBtnStyle = btnStyleBlack;
+			
 			aboutBtn.setStyle("-fx-text-fill: BLACK;");
 			settingsBtn.setStyle("-fx-text-fill: BLACK;");
 			addBtn.setStyle("-fx-text-fill: BLACK;");
