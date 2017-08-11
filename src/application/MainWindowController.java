@@ -217,7 +217,7 @@ public class MainWindowController {
     private String color;
     private String dialogBtnStyle;
     private String version = "0.1.6";
-    private String buildNumber = "027";
+    private String buildNumber = "029";
 	private String versionName = "Throwback Galaxy";
     private int xPos = -200;
     private int yPos = 17;
