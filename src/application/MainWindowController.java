@@ -973,7 +973,7 @@ public class MainWindowController {
     	Image coverImage = new Image(coverFile.toURI().toString());
     	
     	generatePosition();
-
+    	System.out.println("add " + getxPos());	//TODO debug
     	VBox.setLayoutX(getxPos());
     	VBox.setLayoutY(getyPos());
     	VBox.getChildren().addAll(gameTitleLabel,gameBtn);	
@@ -1144,10 +1144,15 @@ public class MainWindowController {
 
     }
 
-    //TODO xPosHelper based on window with
+    //TODO xPosHelper based on window with breite -24(windows, Linx = 36)
     private void generatePosition() {
-//    	System.out.println(main.primaryStage.getWidth());
-    	if(xPosHelper == 4){
+    	int xPosHelperMax;
+    	if(System.getProperty("os.name").equals("Linux")){
+    		xPosHelperMax = (int) Math.floor((main.pane.getPrefWidth() - 36) / 217);
+    	} else {
+    		xPosHelperMax = (int) Math.floor((main.pane.getPrefWidth() - 24) / 217);
+    	}
+    	if(xPosHelper == xPosHelperMax){
     		xPos = 17;
     		yPos = yPos + 345;		
     		xPosHelper = 1;
@@ -1155,6 +1160,10 @@ public class MainWindowController {
     		xPos = xPos + 217;
     		xPosHelper++;
     	}
+//    	System.out.println("Breit: " + main.pane.getPrefWidth());
+//    	System.out.println("xPosHelper: " + xPosHelper);
+//    	System.out.println("yPos: " + yPos);
+//    	System.out.println("xPos: " + xPos);
     }
     
     private void applyColor() {
@@ -1227,7 +1236,11 @@ public class MainWindowController {
 				props.setProperty("color", getColor());
 				props.setProperty("fullscreen", String.valueOf(isFullscreen()));
 				props.setProperty("cloudSync", String.valueOf(cloudSync));
-				props.setProperty("cloudService", getCloudService());
+				if (getCloudService() == null) {
+					props.setProperty("cloudService", "");
+				} else {
+					props.setProperty("cloudService", getCloudService());
+				}
 				props.setProperty("folderID", main.cloudController.getFolderID(getCloudService()));
     			if(System.getProperty("os.name").equals("Linux")){
     				outputStream = new FileOutputStream(fileLinux);

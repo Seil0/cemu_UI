@@ -75,12 +75,14 @@ public class Main extends Application {
 				gamesDBFile = new File(dirLinux + "/games.db");
 				localDB = new File(dirLinux+"/localRoms.db");
 				pictureCache= new File(dirLinux+"/picture_cache");
+				pane.setPrefWidth(904);	//this could be a kde plasma specific issue
 			}else{
 				directory = new File(dirWin);	
 				configFile = new File(dirWin + "/config.xml");
 				gamesDBFile = new File(dirWin + "/games.db");
 				localDB = new File(dirWin+"/localRoms.db");
 				pictureCache= new File(dirWin+"/picture_cache");
+				pane.setPrefWidth(892);
 			}
 			
 			//startup checks
