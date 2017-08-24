@@ -232,7 +232,7 @@ public class MainWindowController {
 	private File fileLinux = new File(dirLinux + "/config.xml");
 	File pictureCacheWin = new File(dirWin+"/picture_cache");
 	File pictureCacheLinux = new File(dirLinux+"/picture_cache");
-	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2");	//TODO add more IDs
+	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2", "44fc5929");	//TODO add more IDs
 	private ObservableList<UIROMDataType> games = FXCollections.observableArrayList();
 	ObservableList<SmmdbApiDataType> courses = FXCollections.observableArrayList();
 	ArrayList<Text> courseText = new ArrayList<Text>();
