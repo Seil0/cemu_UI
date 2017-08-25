@@ -40,10 +40,6 @@ import javax.swing.ProgressMonitor;
 import javax.swing.ProgressMonitorInputStream;
 
 import org.apache.commons.io.FileUtils;
-import com.github.junrar.Archive;
-import com.github.junrar.exception.RarException;
-import com.github.junrar.impl.FileVolumeManager;
-import com.github.junrar.rarfile.FileHeader;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
 import com.jfoenix.controls.JFXDialog;
@@ -95,6 +91,8 @@ import javafx.scene.text.TextFlow;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.util.Duration;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 
 public class MainWindowController {
     
@@ -184,19 +182,19 @@ public class MainWindowController {
     private JFXTreeTableView<CourseTableDataType> courseTreeTable = new JFXTreeTableView<CourseTableDataType>();
     
     @FXML
-    TreeItem<CourseTableDataType> root = new TreeItem<>(new CourseTableDataType("",0,0,0));
+    TreeItem<CourseTableDataType> root = new TreeItem<>(new CourseTableDataType("","",0,0));
     
     @FXML
     private JFXTreeTableColumn<CourseTableDataType, String> titleColumn = new JFXTreeTableColumn<>("title");
     
     @FXML
+    private JFXTreeTableColumn<CourseTableDataType, String> idColumn = new JFXTreeTableColumn<>("id");
+    
+    @FXML
     private JFXTreeTableColumn<CourseTableDataType, Integer> starsColumn = new JFXTreeTableColumn<>("stars");
     
     @FXML
-    private JFXTreeTableColumn<CourseTableDataType, Integer> downloadsColumn = new JFXTreeTableColumn<>("downloads");
-    
-    @FXML
-    private JFXTreeTableColumn<CourseTableDataType, Integer> idColumn = new JFXTreeTableColumn<>("id");
+    private JFXTreeTableColumn<CourseTableDataType, Integer> timeColumn = new JFXTreeTableColumn<>("time");
     
     Main main;
     dbController dbController;
@@ -217,14 +215,14 @@ public class MainWindowController {
     private String color;
     private String dialogBtnStyle;
     private String version = "0.1.6";
-    private String buildNumber = "029";
+    private String buildNumber = "031";
 	private String versionName = "Throwback Galaxy";
     private int xPos = -200;
     private int yPos = 17;
     private int xPosHelper;
     private int selectedUIDataIndex;
     private int selected;
-    private int id;
+    private String id;
 	private DirectoryChooser directoryChooser = new DirectoryChooser();
 	private File dirWin = new File(System.getProperty("user.home") + "/Documents/cemu_UI");
 	private File dirLinux = new File(System.getProperty("user.home") + "/cemu_UI");
@@ -276,7 +274,7 @@ public class MainWindowController {
 		
 		//initialize courseTable
 		titleColumn.setPrefWidth(160);
-		downloadsColumn.setPrefWidth(127);
+		timeColumn.setPrefWidth(127);
 		starsColumn.setPrefWidth(100);
 		
 		courseTreeTable.setRoot(root);
@@ -284,14 +282,17 @@ public class MainWindowController {
 		courseTreeTable.setEditable(false);
 		
 		titleColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().title);
+		idColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().id);
 		starsColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().stars.asObject());
-		downloadsColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().downloads.asObject());
-		idColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().id.asObject());
+		timeColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().time.asObject());
 		
-		courseTreeTable.getColumns().setAll(titleColumn, downloadsColumn, starsColumn, idColumn);
+		courseTreeTable.getColumns().setAll(titleColumn, timeColumn, starsColumn, idColumn);
 		courseTreeTable.getColumns().get(3).setVisible(false); //hide idColumn (important)
 	}
 	
+	/**
+	 * initialize all actions not initialized by a own method
+	 */
 	void initActions() {
 		System.out.println("initializing Actions... ");
 		
@@ -531,22 +532,19 @@ public class MainWindowController {
 				@Override
 				public void changed(ObservableValue<?> observable, Object oldVal, Object newVal){
 					selected = courseTreeTable.getSelectionModel().getSelectedIndex(); //get selected item
-					id = idColumn.getCellData(selected); //get name of selected item
 					
+					//FIXME if a item is selected and you change the sorting,you can't select a new item
+					id = idColumn.getCellData(selected); //get name of selected item
+
 					for (int i = 0; i < courses.size(); i++) {
-						if (courses.get(i).getId() == id) {		
-							if (courses.get(i).getHasimage() == 1) {	
-								try {
-//									URL url = new URL("http://smmdb.ddns.net/img/courses/thumbnails/" + id + ".pic");	//alt
-									System.out.println("http://smmdb.ddns.net/courseimg/" + id + "_full.jpg?v=3");
-									URL url = new URL("http://smmdb.ddns.net/courseimg/" + id + "_full.jpg?v=3");
-									
-									Image image = new Image(url.toURI().toString());
-									smmdbImageView.setImage(image);
-								} catch (MalformedURLException | URISyntaxException e) {
-									e.printStackTrace();
-								}
-							} else {
+						if (courses.get(i).getId() == id) {	
+							try {
+//								System.out.println("http://smmdb.ddns.net/courseimg/" + id + "_full.jpg?v=3");
+								URL url = new URL("http://smmdb.ddns.net/courseimg/" + id + "_full.jpg?v=3");
+								Image image = new Image(url.toURI().toString());
+								smmdbImageView.setImage(image);
+							} catch (MalformedURLException | URISyntaxException e) {
+								e.printStackTrace();
 								smmdbImageView.setImage(close_black);
 							}
 							addCourseDescription(courses.get(i));
@@ -646,8 +644,8 @@ public class MainWindowController {
     	
     	//add query response to courseTreeTable
 		for(int i = 0; i < courses.size(); i++){
-			CourseTableDataType helpCourse = new CourseTableDataType(courses.get(i).getTitle(), courses.get(i).getDownloads(),
-																	courses.get(i).getStars(), courses.get(i).getId());
+			CourseTableDataType helpCourse = new CourseTableDataType(courses.get(i).getTitle(),  courses.get(i).getId(),
+																	 courses.get(i).getTime(), courses.get(i).getStars());
 			
 			root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse));	//add data to root-node
 		}
@@ -712,7 +710,7 @@ public class MainWindowController {
     @FXML
     void smmdbDownloadBtnAction(ActionEvent event){
     	String downloadUrl = "http://smmdb.ddns.net/api/downloadcourse?id=" + id + "&type=zip";
-    	String downloadFileURL = getCemuPath() + "/" + id + ".rar";	//getCemuPath() + "/" + smmID + "/" + id + ".rar"
+    	String downloadFileURL = getCemuPath() + "/" + id + ".zip";	//getCemuPath() + "/" + smmID + "/" + id + ".rar"
     	String outputFile = getCemuPath() + "/";
     	
     	try {
@@ -728,44 +726,29 @@ public class MainWindowController {
 			System.out.println("downloaded successfull");
 
 			File downloadFile = new File(downloadFileURL);
-			Archive a = null;
-			try {
-				a = new Archive(new FileVolumeManager(downloadFile));
-			} catch (RarException | IOException e) {
-				// Auto-generated catch block
-				e.printStackTrace();
-			}
-			if (a != null) {
-				a.getMainHeader().print();
-				FileHeader fh = a.nextFileHeader();
-				
-				for (int i = 0; i < smmIDs.size(); i++) {
-					if (new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(i)).exists()) {
-						File courseDirectory = new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(0) + "/" + fh.getFileNameString().substring(0, fh.getFileNameString().indexOf('\\')));
-						System.out.println("Path: " + courseDirectory.getAbsolutePath());
-						if (!courseDirectory.exists()) {
-							courseDirectory.mkdir();
-						}
-						while (fh != null) {
-							try {
-								File out = new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(0) + "/" + fh.getFileNameString().trim());
-								if (!out.getAbsolutePath().equals(courseDirectory.getAbsolutePath())) {
-									System.out.println(out.getAbsolutePath());
-									FileOutputStream os = new FileOutputStream(out);
-									a.extractFile(fh, os);
-									os.close();
-								}
-
-							} catch (RarException | IOException e) {
-								// Auto-generated catch block
-								e.printStackTrace();
-							}
-							fh = a.nextFileHeader();
-						}
+			
+			String source = downloadFileURL;
+			String destination = null;
+			
+			for (int i = 0; i < smmIDs.size(); i++) {
+				if (new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(i)).exists()) {
+					File courseDirectory = new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(i) + "/" + id);
+					System.out.println("Path: " + courseDirectory.getAbsolutePath());
+					if (!courseDirectory.exists()) {
+						courseDirectory.mkdir();
 					}
-				}
+					destination = courseDirectory.getPath();
+				}	
 			}
-			a.close();
+
+			try {
+				ZipFile zipFile = new ZipFile(source);
+			    zipFile.extractAll(destination);
+			} catch (ZipException e) {
+			    e.printStackTrace();
+			    System.err.println("an error occurred during unziping the file!");
+			}
+	
 			downloadFile.delete();		
 		} catch (IOException e) {
 			System.err.println("something went wrong during downloading the course");
@@ -1056,46 +1039,53 @@ public class MainWindowController {
     }
     
     private void addCourseDescription(SmmdbApiDataType course) {
-    	String coursetype;
-    	String leveltype;
+    	String courseTheme;
+    	String gameStyle;
     	String difficulty;
+    	String autoscroll;
     	smmdbTextFlow.getChildren().remove(0, smmdbTextFlow.getChildren().size());
     	nameText.clear();
     	courseText.clear();
     	
-    	switch (course.getCoursetype()) {
+    	switch (course.getCourseTheme()) {
 		case 0:
-			coursetype = "Creation";
+			courseTheme = "Ground";
 			break;
 		case 1:
-			coursetype = "Recreation";
+			courseTheme = "Underground";
 			break;
 		case 2:
-			coursetype = "Wii U Dump";
+			courseTheme = "Castle";
+			break;
+		case 3:
+			courseTheme = "Airship";
+			break;
+		case 4:
+			courseTheme = "Underwater";
+			break;
+		case 5:
+			courseTheme = "Ghost House";
 			break;
 		default:
-			coursetype = "notset";
+			courseTheme = "notset";
 			break;
 		}
     	
-    	switch (course.getGamestyle()) {
+    	switch (course.getGameStyle()) {
 		case 0:
-			leveltype = "NSMBU";
+			gameStyle = "SMB";
 			break;
 		case 1:
-			leveltype = "SMW";
+			gameStyle = "SMB3";
 			break;
 		case 2:
-			leveltype = "SMB3";
+			gameStyle = "SMW";
 			break;
 		case 3:
-			leveltype = "SMB";
-			break;
-		case 4:
-			leveltype = "Mixed";
+			gameStyle = "NSMBU";
 			break;
 		default:
-			leveltype = "notset";
+			gameStyle = "notset";
 			break;
 		}
 
@@ -1120,23 +1110,45 @@ public class MainWindowController {
 			break;
 		}
     	
+    	switch (course.getAutoScroll()) {
+		case 0:
+			autoscroll = "disabled";
+			break;
+		case 1:
+			autoscroll = "slow";
+			break;
+		case 2:
+			autoscroll = "medium";
+			break;
+		case 3:
+			autoscroll = "fast";
+			break;
+		default:
+			autoscroll = "notset";
+			break;
+		}
+    	
     	nameText.add(0, new Text("title" + ": "));
     	nameText.add(1, new Text("owner" + ": "));
-    	nameText.add(2, new Text("coursetype" + ": "));
-    	nameText.add(3, new Text("leveltype" + ": "));
+    	nameText.add(2, new Text("Course-Theme" + ": "));
+    	nameText.add(3, new Text("Game-Style" + ": "));
     	nameText.add(4, new Text("difficulty" + ": "));
-    	nameText.add(5, new Text("lastmodified" + ": "));
-    	nameText.add(6, new Text("uploaded" + ": "));
-    	nameText.add(7, new Text("nintendoid" + ": "));
+    	nameText.add(5, new Text("Auto-Scroll" + ": "));
+    	nameText.add(6, new Text("Time" + ": "));
+    	nameText.add(7, new Text("lastmodified" + ": "));
+    	nameText.add(8, new Text("uploaded" + ": "));
+    	nameText.add(9, new Text("nintendoid" + ": "));
     	
     	courseText.add(0, new Text(course.getTitle() + "\n"));
-    	courseText.add(1, new Text(Integer.toString(course.getOwner()) + "\n"));
-    	courseText.add(2, new Text(coursetype + "\n"));
-    	courseText.add(3, new Text(leveltype + "\n"));
+    	courseText.add(1, new Text(course.getOwner() + "\n"));
+    	courseText.add(2, new Text(courseTheme + "\n"));
+    	courseText.add(3, new Text(gameStyle + "\n"));
     	courseText.add(4, new Text(difficulty + "\n"));
-    	courseText.add(5, new Text(new java.util.Date((long)course.getLastmodified()*1000) + "\n"));
-    	courseText.add(6, new Text(new java.util.Date((long)course.getUploaded()*1000) + "\n"));
-    	courseText.add(7, new Text(course.getNintendoid() + "\n"));
+    	courseText.add(5, new Text(autoscroll + "\n"));
+    	courseText.add(6, new Text(course.getTime() + "\n"));
+    	courseText.add(7, new Text(new java.util.Date((long)course.getLastmodified()*1000) + "\n"));
+    	courseText.add(8, new Text(new java.util.Date((long)course.getUploaded()*1000) + "\n"));
+    	courseText.add(9, new Text(course.getNintendoid() + "\n"));
     	
     	for(int i=0; i<nameText.size(); i++){
 			nameText.get(i).setFont(Font.font ("System", FontWeight.BOLD, 14));
@@ -1146,7 +1158,11 @@ public class MainWindowController {
 
     }
 
-    //TODO xPosHelper based on window with breite -24(windows, Linx = 36)
+    //TODO Changelistener for resizing
+    /**
+     * xPosHelper based on window width = -24(Windows)/-36(Linux)
+     * calculates how many games can be displayed in one row
+     */
     private void generatePosition() {
     	int xPosHelperMax;
     	if(System.getProperty("os.name").equals("Linux")){
@@ -1361,6 +1377,9 @@ public class MainWindowController {
 	}
 	
 	@SuppressWarnings("unused")
+	/**
+	 * @return the main color in hexadecimal format
+	 */
 	private String hexToRgb() {
 		System.out.println(getColor());
 		int hex = Integer.parseInt(getColor().substring(0, 5), 16);
@@ -1372,6 +1391,14 @@ public class MainWindowController {
 	    return r + ", " + g + ", " + b;
 	}
 	
+	/**
+	 * 
+	 * @param originalImage original image which size is changed
+	 * @param type type of the original image (PNG,JPEG,...)
+	 * @param imgWidth wanted width
+	 * @param imgHeigth wanted height
+	 * @return the rezised image
+	 */
 	private static BufferedImage resizeImage(BufferedImage originalImage, int type, int imgWidth, int imgHeigth) {
 	    BufferedImage resizedImage = new BufferedImage(imgWidth, imgHeigth, type);
 	    Graphics2D g = resizedImage.createGraphics();

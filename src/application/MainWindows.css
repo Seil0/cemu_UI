@@ -16,14 +16,16 @@
  * TREE TABLE CSS
  */
 
+
 .tree-table-view {
     -fx-tree-table-color: rgba(0, 168, 204, 0.2);
     -fx-tree-table-rippler-color: rgba(0, 168, 204, 0.4);
 }
 
+
 .tree-table-view:focused .tree-table-row-cell:selected {
     -fx-background-color: -fx-tree-table-color;
-    -fx-table-cell-border-color: -fx-tree-table-color;
+	-fx-table-cell-border-color: -fx-tree-table-color;
     -fx-text-fill: BLACK;
 }
 
@@ -31,9 +33,12 @@
     -fx-text-fill: BLACK;
 }
 
+
 .tree-table-view .jfx-rippler {
-    -jfx-rippler-fill: -fx-tree-table-rippler-color;
+	-jfx-rippler-fill: -fx-tree-table-rippler-color;
 }
+
+
 
 .tree-table-view .column-header,
 .tree-table-view .column-header-background,

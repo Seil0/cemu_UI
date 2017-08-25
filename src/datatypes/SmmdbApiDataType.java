@@ -10,58 +10,43 @@ import javafx.beans.property.StringProperty;
 
 public class SmmdbApiDataType {
 
-	private final IntegerProperty id = new SimpleIntegerProperty();
-	private final IntegerProperty owner = new SimpleIntegerProperty();
-	private final IntegerProperty coursetype = new SimpleIntegerProperty();
-	private final IntegerProperty gamestyle = new SimpleIntegerProperty();
+	private final IntegerProperty courseTheme = new SimpleIntegerProperty();
+	private final IntegerProperty gameStyle = new SimpleIntegerProperty();
 	private final IntegerProperty difficulty = new SimpleIntegerProperty();
 	private final IntegerProperty lastmodified = new SimpleIntegerProperty();
 	private final IntegerProperty uploaded = new SimpleIntegerProperty();
-	private final IntegerProperty downloads = new SimpleIntegerProperty();
+	private final IntegerProperty autoScroll = new SimpleIntegerProperty();
 	private final IntegerProperty stars = new SimpleIntegerProperty();
-	private final IntegerProperty hasimage = new SimpleIntegerProperty();
-	private final IntegerProperty ispackage = new SimpleIntegerProperty();
-	private final IntegerProperty updatereq = new SimpleIntegerProperty();
+	private final IntegerProperty time = new SimpleIntegerProperty();
+	private final StringProperty owner = new SimpleStringProperty();
+	private final StringProperty id = new SimpleStringProperty();
 	private final StringProperty nintendoid = new SimpleStringProperty();
 	private final StringProperty title = new SimpleStringProperty();
 	
-	public SmmdbApiDataType(final int id, final int owner, final int coursetype, final int gamestyle, final int difficulty, 
-							final int lastmodified, final int uploaded, final int downloads, final int stars, final int hasimage,
-							final int ispackage, final int updatereq, final String nintendoid, final String title) {
+	public SmmdbApiDataType(final int courseTheme, final int gameStyle, final int difficulty, final int lastmodified,
+							final int uploaded, final int autoScroll, final int stars, final int time,
+							final String owner, final String id, final String nintendoid, final String title) {
 		this.id.set(id);
 		this.owner.set(owner);
-		this.coursetype.set(coursetype);
-		this.gamestyle.set(gamestyle);
+		this.courseTheme.set(courseTheme);
+		this.gameStyle.set(gameStyle);
 		this.difficulty.set(difficulty);
 		this.lastmodified.set(lastmodified);
 		this.uploaded.set(uploaded);
-		this.downloads.set(downloads);
+		this.autoScroll.set(autoScroll);
 		this.stars.set(stars);
-		this.hasimage.set(hasimage);
-		this.ispackage.set(ispackage);
-		this.updatereq.set(updatereq);
+		this.time.set(time);
 		this.nintendoid.set(nintendoid);
 		this.title.set(title);
 	}
 	
-	public IntegerProperty idProperty(){
-		return id;
+	public IntegerProperty courseThemeProperty(){
+		return courseTheme;
 	}
 	
-	public IntegerProperty ownerProperty(){
-		return owner;
-	}
 	
-	public IntegerProperty coursetypeProperty(){
-		return coursetype;
-	}
-	
-	public StringProperty nintendoidProperty(){
-		return nintendoid;
-	}
-	
-	public IntegerProperty gamestyleProperty(){
-		return gamestyle;
+	public IntegerProperty gameStyleProperty(){
+		return gameStyle;
 	}
 	
 	public IntegerProperty difficultyProperty(){
@@ -76,44 +61,40 @@ public class SmmdbApiDataType {
 		return uploaded;
 	}
 	
-	public IntegerProperty downloadsProperty(){
-		return downloads;
+	public IntegerProperty autoScrollProperty(){
+		return autoScroll;
 	}
 	
 	public IntegerProperty starsProperty(){
 		return stars;
 	}
 	
-	public IntegerProperty hasimageProperty(){
-		return hasimage;
+	public IntegerProperty timeProperty(){
+		return time;
 	}
 	
-	public IntegerProperty ispackageProperty(){
-		return ispackage;
+	public StringProperty ownerProperty(){
+		return owner;
 	}
 	
-	public IntegerProperty updatereqProperty(){
-		return updatereq;
+	public StringProperty idProperty(){
+		return id;
+	}
+	
+	public StringProperty nintendoidProperty(){
+		return nintendoid;
 	}
 	
 	public StringProperty titleProperty(){
 		return title;
 	}
 
-	public int getId() {
-		return idProperty().get();
+	public int getCourseTheme() {
+		return courseThemeProperty().get();
 	}
 
-	public int getOwner() {
-		return ownerProperty().get();
-	}
-
-	public int getCoursetype() {
-		return coursetypeProperty().get();
-	}
-
-	public int getGamestyle() {
-		return gamestyleProperty().get();
+	public int getGameStyle() {
+		return gameStyleProperty().get();
 	}
 
 	public int getDifficulty() {
@@ -128,24 +109,24 @@ public class SmmdbApiDataType {
 		return uploadedProperty().get();
 	}
 
-	public int getDownloads() {
-		return downloadsProperty().get();
+	public int getAutoScroll() {
+		return autoScrollProperty().get();
 	}
 
 	public int getStars() {
 		return starsProperty().get();
 	}
 	
-	public int getHasimage() {
-		return hasimageProperty().get();
+	public int getTime() {
+		return timeProperty().get();
 	}
 	
-	public int getIspackage() {
-		return ispackageProperty().get();
+	public String getOwner() {
+		return ownerProperty().get();
 	}
 
-	public int getUpdatereq() {
-		return updatereqProperty().get();
+	public String getId() {
+		return idProperty().get();
 	}
 	
 	public String getNintendoid() {
@@ -156,20 +137,12 @@ public class SmmdbApiDataType {
 		return titleProperty().get();
 	}
 
-	public final void setId(int id) {
-		idProperty().set(id);
+	public final void setCourseTheme(int courseTheme) {
+		courseThemeProperty().set(courseTheme);
 	}
 
-	public final void setOwner(int owner) {
-		ownerProperty().set(owner);
-	}
-
-	public final void setCoursetype(int coursetype) {
-		coursetypeProperty().set(coursetype);
-	}
-
-	public final void setGamestyle(int leveltype) {
-		gamestyleProperty().set(leveltype);
+	public final void setGameStyle(int gameStyle) {
+		gameStyleProperty().set(gameStyle);
 	}
 
 	public final void setDifficulty(int difficulty) {
@@ -184,26 +157,26 @@ public class SmmdbApiDataType {
 		uploadedProperty().set(uploaded);
 	}
 
-	public final void setDownloads(int downloads) {
-		downloadsProperty().set(downloads);
+	public final void setAutoScroll(int autoScroll) {
+		autoScrollProperty().set(autoScroll);
 	}
 
 	public final void setStars(int stars) {
 		starsProperty().set(stars);
 	}
-	
-	public final void setHasimage(int hasimage) {
-		hasimageProperty().set(hasimage);
+
+	public final void setTime(int time) {
+		timeProperty().set(time);
 	}
 	
-	public final void setIspackage(int ispackage) {
-		ispackageProperty().set(ispackage);
+	public final void setOwner(String owner) {
+		ownerProperty().set(owner);
 	}
 
-	public final void setUpdatereq(int updatereq) {
-		updatereqProperty().set(updatereq);
+	public final void setId(String id) {
+		idProperty().set(id);
 	}
-
+	
 	public final void setNintendoid(String nintendoid) {
 		nintendoidProperty().set(nintendoid);
 	}

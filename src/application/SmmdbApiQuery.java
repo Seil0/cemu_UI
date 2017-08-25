@@ -11,7 +11,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
-import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 
 import datatypes.SmmdbApiDataType;
@@ -24,9 +23,11 @@ public class SmmdbApiQuery {
 		//Auto-generated constructor stub
 	}
 	
-	//start api query
+	/**
+	 * start smmdb api query
+	 * @return a ArryList with all courses found at smmdb
+	 */
 	public ArrayList<SmmdbApiDataType> startQuery() {
-    	ArrayList<Integer> courseIDs = new ArrayList<>();
     	ArrayList<SmmdbApiDataType> course = new ArrayList<>();
     	String output = "";
     	
@@ -48,93 +49,77 @@ public class SmmdbApiQuery {
         
         JsonArray items = Json.parse(apiOutput).asObject().get("courses").asArray();
         for (JsonValue item : items) {
-        	int id, owner, coursetype, gamestyle, difficulty, lastmodified, uploaded, downloads, stars, hasimage, ispackage, updatereq;
-        	String nintendoid, title;
-        	
-        	//TODO add "courseTheme", "time", "autoScroll"
+        	int courseTheme, gameStyle, difficulty, lastmodified, uploaded, autoScroll, stars ,time;
+        	String owner, id, nintendoid, title;
         	
         	//geht
         	try {
-        		id = item.asObject().getInt("id", 0);
+        		courseTheme = item.asObject().getInt("courseTheme", 9);
 			} catch (Exception e) {
-				id = 9;
+				courseTheme = 9;
 			}
         	
         	//geht
         	try {
-        		owner = item.asObject().getInt("owner", 0);
+        		gameStyle = item.asObject().getInt("gameStyle", 9);
 			} catch (Exception e) {
-				owner = 9;
-			}
-        	
-        	//test
-        	try {
-        		coursetype = item.asObject().getInt("coursetype", 0);
-			} catch (Exception e) {
-				coursetype = 9;
+				gameStyle = 9;
 			}
         	
         	//geht
         	try {
-        		gamestyle = item.asObject().getInt("gamestyle", 0);
-			} catch (Exception e) {
-				gamestyle = 9;
-			}
-        	
-        	//geht
-        	try {
-        		difficulty = item.asObject().getInt("difficulty", 0);
+        		difficulty = item.asObject().getInt("difficulty", 9);
 			} catch (Exception e) {
 				difficulty = 9;
 			}
         	
         	//geht
         	try {
-        		lastmodified = item.asObject().getInt("lastmodified", 0);
+        		lastmodified = item.asObject().getInt("lastmodified", 9);
 			} catch (Exception e) {
 				lastmodified = 9;
 			}
         	
         	//geht
         	try {
-        		uploaded = item.asObject().getInt("uploaded", 0);
+        		uploaded = item.asObject().getInt("uploaded", 9);
 			} catch (Exception e) {
 				uploaded = 9;
 			}
         	
-        	//gestrichen
+        	//geht
         	try {
-        		downloads = item.asObject().getInt("downloads", 0);
+        		autoScroll = item.asObject().getInt("autoScroll", 9);
 			} catch (Exception e) {
-				downloads = 9;
+				autoScroll = 9;
 			}
         	
         	//geht
         	try {
-        		stars = item.asObject().getInt("stars", 0);
+        		stars = item.asObject().getInt("stars", 9);
 			} catch (Exception e) {
 				stars = 9;
 			}
         	
-        	//gestrichen
+        	//geht
         	try {
-        		hasimage = item.asObject().getInt("hasimage", 0);
+        		time = item.asObject().getInt("time", 9);
 			} catch (Exception e) {
-				hasimage = 9;
+				time = 9;
 			}
         	
-        	//gestrichen
+        	//geht
         	try {
-        		ispackage = item.asObject().getInt("ispackage", 0);
+        		owner = item.asObject().getString("owner", "");
 			} catch (Exception e) {
-				ispackage = 9;
+				owner = "notset";
 			}
         	
-        	//gestrichen
+        	//geht
         	try {
-        		updatereq = item.asObject().getInt("updatereq", 0);
+        		id = item.asObject().getString("id", "");
 			} catch (Exception e) {
-				updatereq = 9;
+				id = "notset";
 			}
         	
         	//geht
@@ -149,8 +134,8 @@ public class SmmdbApiQuery {
 				title = "notset";
 			}
 
-        	course.add(new SmmdbApiDataType(id, owner, coursetype, gamestyle, difficulty, lastmodified, uploaded, downloads,
-        			 						stars, hasimage, ispackage, updatereq, nintendoid, title));
+        	course.add(new SmmdbApiDataType(courseTheme, gameStyle, difficulty, lastmodified, uploaded, autoScroll,
+        			 						stars, time, owner, id, nintendoid, title));
         }
         
 		return course;

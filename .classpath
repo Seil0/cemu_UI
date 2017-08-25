@@ -17,11 +17,11 @@
 	<classpathentry kind="lib" path="src/libraries/google_apis/jackson-core-2.8.8.jar"/>
 	<classpathentry kind="lib" path="src/libraries/commons-codec-1.10.jar"/>
 	<classpathentry kind="lib" path="src/libraries/minimal-json-0.9.4.jar"/>
-	<classpathentry kind="lib" path="src/libraries/junrar-0.7.jar"/>
 	<classpathentry kind="lib" path="src/libraries/commons-logging-api-1.1.jar"/>
 	<classpathentry kind="lib" path="src/libraries/commons-vfs2-2.1.1744488.2.jar"/>
 	<classpathentry kind="lib" path="src/libraries/flow-8.0.1.jar"/>
 	<classpathentry kind="lib" path="src/libraries/jfoenix-1.7.0.jar"/>
 	<classpathentry kind="lib" path="src/libraries/sqlite-jdbc-3.19.3.jar"/>
+	<classpathentry kind="lib" path="src/libraries/zip4j-1.3.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

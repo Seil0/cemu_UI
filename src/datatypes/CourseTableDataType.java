@@ -13,14 +13,14 @@ import javafx.beans.property.StringProperty;
 public class CourseTableDataType extends RecursiveTreeObject<CourseTableDataType> {
 
 	 public final StringProperty title;
-	 public final IntegerProperty downloads;
+	 public final StringProperty id;
+	 public final IntegerProperty time;
 	 public final IntegerProperty stars;
-	 public final IntegerProperty id;
 
-     public CourseTableDataType(String title, int downloads, int stars, int id) {
+     public CourseTableDataType(String title, String id, int time, int stars) {
          this.title = new SimpleStringProperty(title);
-         this.downloads = new SimpleIntegerProperty(downloads);
+         this.id = new SimpleStringProperty(id);
+         this.time = new SimpleIntegerProperty(time);
          this.stars = new SimpleIntegerProperty(stars);
-         this.id = new SimpleIntegerProperty(id);
      }
 }

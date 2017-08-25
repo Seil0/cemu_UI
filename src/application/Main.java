@@ -86,6 +86,17 @@ public class Main extends Application {
 			}
 			
 			//startup checks
+			//check if client_secret.jason is present
+			if (Main.class.getResourceAsStream("/resources/client_secret.json") == null) {
+				System.err.println("client_secret is missing!!!!!");
+				
+				Alert alert = new Alert(AlertType.ERROR);
+		    	alert.setTitle("cemu_UI");
+		    	alert.setHeaderText("Error");
+		    	alert.setContentText("client_secret is missing! Please contact the maintainer. \nIf you compiled cemu_UI by yourself see: \nhttps://github.com/Seil0/cemu_UI/wiki/Documantation");
+		    	alert.showAndWait();
+			}
+
 			System.out.println("Directory: " + directory.exists());
 			System.out.println("configfile: " + configFile.exists());
 			if(directory.exists() != true){
