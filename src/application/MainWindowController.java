@@ -534,11 +534,13 @@ public class MainWindowController {
 					id = idColumn.getCellData(selected); //get name of selected item
 					
 					for (int i = 0; i < courses.size(); i++) {
-						if (courses.get(i).getId() == id) {
-							
+						if (courses.get(i).getId() == id) {		
 							if (courses.get(i).getHasimage() == 1) {	
 								try {
-									URL url = new URL("http://smmdb.ddns.net/img/courses/thumbnails/" + id + ".pic");
+//									URL url = new URL("http://smmdb.ddns.net/img/courses/thumbnails/" + id + ".pic");	//alt
+									System.out.println("http://smmdb.ddns.net/courseimg/" + id + "_full.jpg?v=3");
+									URL url = new URL("http://smmdb.ddns.net/courseimg/" + id + "_full.jpg?v=3");
+									
 									Image image = new Image(url.toURI().toString());
 									smmdbImageView.setImage(image);
 								} catch (MalformedURLException | URISyntaxException e) {
@@ -709,7 +711,7 @@ public class MainWindowController {
     
     @FXML
     void smmdbDownloadBtnAction(ActionEvent event){
-    	String downloadUrl = "http://smmdb.ddns.net/courses/" + id;
+    	String downloadUrl = "http://smmdb.ddns.net/api/downloadcourse?id=" + id + "&type=zip";
     	String downloadFileURL = getCemuPath() + "/" + id + ".rar";	//getCemuPath() + "/" + smmID + "/" + id + ".rar"
     	String outputFile = getCemuPath() + "/";
     	
@@ -1076,7 +1078,7 @@ public class MainWindowController {
 			break;
 		}
     	
-    	switch (course.getLeveltype()) {
+    	switch (course.getGamestyle()) {
 		case 0:
 			leveltype = "NSMBU";
 			break;

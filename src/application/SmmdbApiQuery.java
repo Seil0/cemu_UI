@@ -41,93 +41,117 @@ public class SmmdbApiQuery {
 			e.printStackTrace();
 		}
         
-        JsonObject mainObject = Json.parse(output).asObject().get("courses").asObject();
-        JsonArray objectAssets = Json.parse(output).asObject().get("order").asArray();
+        System.out.println(URL);
+        System.out.println("{ \"courses\": " + output + "}");
         
-        for (JsonValue asset : objectAssets) {
-        	courseIDs.add(asset.asInt());
-        }
+        String apiOutput = "{ \"courses\": " + output + "}";
         
-        //if value is 9 or "notset" the api returned NULL as value
-        for (int i = 0; i < courseIDs.size(); i++) {
-        	int id, owner, coursetype, leveltype, difficulty, lastmodified, uploaded, downloads, stars, hasimage, ispackage, updatereq;
+        JsonArray items = Json.parse(apiOutput).asObject().get("courses").asArray();
+        for (JsonValue item : items) {
+        	int id, owner, coursetype, gamestyle, difficulty, lastmodified, uploaded, downloads, stars, hasimage, ispackage, updatereq;
         	String nintendoid, title;
-        	JsonObject singleObject = mainObject.get(courseIDs.get(i).toString()).asObject();
-
+        	
+        	//TODO add "courseTheme", "time", "autoScroll"
+        	
+        	//geht
         	try {
-        		id = singleObject.getInt("id", 0);
+        		id = item.asObject().getInt("id", 0);
 			} catch (Exception e) {
 				id = 9;
 			}
+        	
+        	//geht
         	try {
-        		owner = singleObject.getInt("owner", 0);
+        		owner = item.asObject().getInt("owner", 0);
 			} catch (Exception e) {
 				owner = 9;
 			}
+        	
+        	//test
         	try {
-        		coursetype = singleObject.getInt("coursetype", 0);
+        		coursetype = item.asObject().getInt("coursetype", 0);
 			} catch (Exception e) {
 				coursetype = 9;
 			}
+        	
+        	//geht
         	try {
-        		leveltype = singleObject.getInt("leveltype", 0);
+        		gamestyle = item.asObject().getInt("gamestyle", 0);
 			} catch (Exception e) {
-				leveltype = 9;
+				gamestyle = 9;
 			}
+        	
+        	//geht
         	try {
-        		difficulty = singleObject.getInt("difficulty", 0);
+        		difficulty = item.asObject().getInt("difficulty", 0);
 			} catch (Exception e) {
 				difficulty = 9;
 			}
+        	
+        	//geht
         	try {
-        		lastmodified = singleObject.getInt("lastmodified", 0);
+        		lastmodified = item.asObject().getInt("lastmodified", 0);
 			} catch (Exception e) {
 				lastmodified = 9;
 			}
+        	
+        	//geht
         	try {
-        		uploaded = singleObject.getInt("uploaded", 0);
+        		uploaded = item.asObject().getInt("uploaded", 0);
 			} catch (Exception e) {
 				uploaded = 9;
 			}
+        	
+        	//gestrichen
         	try {
-        		downloads = singleObject.getInt("downloads", 0);
+        		downloads = item.asObject().getInt("downloads", 0);
 			} catch (Exception e) {
 				downloads = 9;
 			}
+        	
+        	//geht
         	try {
-        		stars = singleObject.getInt("stars", 0);
+        		stars = item.asObject().getInt("stars", 0);
 			} catch (Exception e) {
 				stars = 9;
 			}
+        	
+        	//gestrichen
         	try {
-        		hasimage = singleObject.getInt("hasimage", 0);
+        		hasimage = item.asObject().getInt("hasimage", 0);
 			} catch (Exception e) {
 				hasimage = 9;
 			}
+        	
+        	//gestrichen
         	try {
-        		ispackage = singleObject.getInt("ispackage", 0);
+        		ispackage = item.asObject().getInt("ispackage", 0);
 			} catch (Exception e) {
 				ispackage = 9;
 			}
+        	
+        	//gestrichen
         	try {
-        		updatereq = singleObject.getInt("updatereq", 0);
+        		updatereq = item.asObject().getInt("updatereq", 0);
 			} catch (Exception e) {
 				updatereq = 9;
 			}
+        	
+        	//geht
         	try {
-        		nintendoid = singleObject.getString("nintendoid", "");
+        		nintendoid = item.asObject().getString("nintendoid", "");
 			} catch (Exception e) {
 				nintendoid = "notset";
 			}
         	try {
-        		title = singleObject.getString("title", "");;
+        		title = item.asObject().getString("title", "");;
 			} catch (Exception e) {
 				title = "notset";
 			}
 
-        	course.add(new SmmdbApiDataType(id, owner, coursetype, leveltype, difficulty, lastmodified, uploaded, downloads,
+        	course.add(new SmmdbApiDataType(id, owner, coursetype, gamestyle, difficulty, lastmodified, uploaded, downloads,
         			 						stars, hasimage, ispackage, updatereq, nintendoid, title));
-		}
+        }
         
 		return course;
 	}

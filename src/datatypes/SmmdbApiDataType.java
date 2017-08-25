@@ -13,7 +13,7 @@ public class SmmdbApiDataType {
 	private final IntegerProperty id = new SimpleIntegerProperty();
 	private final IntegerProperty owner = new SimpleIntegerProperty();
 	private final IntegerProperty coursetype = new SimpleIntegerProperty();
-	private final IntegerProperty leveltype = new SimpleIntegerProperty();
+	private final IntegerProperty gamestyle = new SimpleIntegerProperty();
 	private final IntegerProperty difficulty = new SimpleIntegerProperty();
 	private final IntegerProperty lastmodified = new SimpleIntegerProperty();
 	private final IntegerProperty uploaded = new SimpleIntegerProperty();
@@ -25,13 +25,13 @@ public class SmmdbApiDataType {
 	private final StringProperty nintendoid = new SimpleStringProperty();
 	private final StringProperty title = new SimpleStringProperty();
 	
-	public SmmdbApiDataType(final int id, final int owner, final int coursetype, final int leveltype, final int difficulty, 
+	public SmmdbApiDataType(final int id, final int owner, final int coursetype, final int gamestyle, final int difficulty, 
 							final int lastmodified, final int uploaded, final int downloads, final int stars, final int hasimage,
 							final int ispackage, final int updatereq, final String nintendoid, final String title) {
 		this.id.set(id);
 		this.owner.set(owner);
 		this.coursetype.set(coursetype);
-		this.leveltype.set(leveltype);
+		this.gamestyle.set(gamestyle);
 		this.difficulty.set(difficulty);
 		this.lastmodified.set(lastmodified);
 		this.uploaded.set(uploaded);
@@ -60,8 +60,8 @@ public class SmmdbApiDataType {
 		return nintendoid;
 	}
 	
-	public IntegerProperty leveltypeProperty(){
-		return leveltype;
+	public IntegerProperty gamestyleProperty(){
+		return gamestyle;
 	}
 	
 	public IntegerProperty difficultyProperty(){
@@ -112,8 +112,8 @@ public class SmmdbApiDataType {
 		return coursetypeProperty().get();
 	}
 
-	public int getLeveltype() {
-		return leveltypeProperty().get();
+	public int getGamestyle() {
+		return gamestyleProperty().get();
 	}
 
 	public int getDifficulty() {
@@ -168,8 +168,8 @@ public class SmmdbApiDataType {
 		coursetypeProperty().set(coursetype);
 	}
 
-	public final void setLeveltype(int leveltype) {
-		leveltypeProperty().set(leveltype);
+	public final void setGamestyle(int leveltype) {
+		gamestyleProperty().set(leveltype);
 	}
 
 	public final void setDifficulty(int difficulty) {
