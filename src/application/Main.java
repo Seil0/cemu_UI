@@ -21,6 +21,8 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Optional;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.DirectoryChooser;
@@ -48,7 +50,7 @@ public class Main extends Application {
 	@SuppressWarnings("unused")
 	private File localDB;
 	private File pictureCache;
-
+    private static final Logger LOGGER = LogManager.getLogger(Main.class.getName());
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -88,7 +90,8 @@ public class Main extends Application {
 			//startup checks
 			//check if client_secret.jason is present
 			if (Main.class.getResourceAsStream("/resources/client_secret.json") == null) {
-				System.err.println("client_secret is missing!!!!!");
+				LOGGER.error("client_secret is missing!!!!!");
+//				System.err.println("client_secret is missing!!!!!");
 				
 				Alert alert = new Alert(AlertType.ERROR);
 		    	alert.setTitle("cemu_UI");
@@ -97,22 +100,26 @@ public class Main extends Application {
 		    	alert.showAndWait();
 			}
 
-			System.out.println("Directory: " + directory.exists());
-			System.out.println("configfile: " + configFile.exists());
-			if(directory.exists() != true){
-				System.out.println("mkdir all");
+			LOGGER.info("Directory: " + directory.exists());
+			LOGGER.info("Configfile: " + configFile.exists());
+//			System.out.println("Directory: " + directory.exists());
+//			System.out.println("configfile: " + configFile.exists());
+			if(!directory.exists()){
+				LOGGER.info("creating cemu_UI directory");
+//				System.out.println("mkdir all");
 				directory.mkdir();
 				pictureCache.mkdir();
 			}
 			
-			if(configFile.exists() != true){
-				System.out.println("firststart");
+			if(!configFile.exists()){
+				LOGGER.info("firststart, setting default values");
+//				System.out.println("firststart");
 				firstStart();
 				mainWindowController.setColor("00a8cc");
 				mainWindowController.setxPosHelper(0);
 				mainWindowController.saveSettings();
 				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
-				System.exit(0);	//finishes itself
+				System.exit(0);	//finishes itselfdownloading games.db... 
 			}
 			
 			if(pictureCache.exists() != true){
@@ -121,13 +128,15 @@ public class Main extends Application {
 			
 			if(gamesDBFile.exists() != true){
 				try {
-					System.out.print("downloading games.db... ");
+					LOGGER.info("downloading games.db... ");
+//					System.out.print("downloading games.db... ");
 					URL website = new URL(gamesDBdownloadURL);
 					ReadableByteChannel rbc = Channels.newChannel(website.openStream());
 					FileOutputStream fos = new FileOutputStream(gamesDBFile);
 					fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 					fos.close();
-					System.out.println("done!");
+					LOGGER.info("finished downloading games.db");
+//					System.out.println("done!");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

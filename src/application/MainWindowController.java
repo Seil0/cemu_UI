@@ -40,6 +40,8 @@ import javax.swing.ProgressMonitor;
 import javax.swing.ProgressMonitorInputStream;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
@@ -211,19 +213,19 @@ public class MainWindowController {
     private String cemuPath;
     private String romPath;
     private String gameExecutePath;
-    private String selectedGameTitleID;
-    private String selectedGameTitle;
     private String color;
     private String dialogBtnStyle;
+    private String selectedGameTitleID;
+    private String selectedGameTitle;
+    private String id;
     private String version = "0.1.6";
-    private String buildNumber = "035";
+    private String buildNumber = "037";
 	private String versionName = "Throwback Galaxy";
     private int xPos = -200;
     private int yPos = 17;
     private int xPosHelper;
     private int selectedUIDataIndex;
     private int selected;
-    private String id;
 	private DirectoryChooser directoryChooser = new DirectoryChooser();
 	private File dirWin = new File(System.getProperty("user.home") + "/Documents/cemu_UI");
 	private File dirLinux = new File(System.getProperty("user.home") + "/cemu_UI");
@@ -238,6 +240,7 @@ public class MainWindowController {
 	ArrayList<Text> nameText = new ArrayList<Text>();
     Properties props = new Properties();
     Properties gameProps = new Properties();
+    private static final Logger LOGGER = LogManager.getLogger(MainWindowController.class.getName());
     private MenuItem edit = new MenuItem("edit");
     private MenuItem remove = new MenuItem("remove");
     private MenuItem update = new MenuItem("update");
@@ -297,7 +300,8 @@ public class MainWindowController {
 	 * initialize all actions not initialized by a own method
 	 */
 	void initActions() {
-		System.out.println("initializing Actions... ");
+		LOGGER.info("initializing Actions... ");
+//		System.out.println("initializing Actions... ");
 		
 		HamburgerBackArrowBasicTransition burgerTask = new HamburgerBackArrowBasicTransition(menuHam);
 		menuHam.addEventHandler(MouseEvent.MOUSE_PRESSED, (e)->{
@@ -568,8 +572,8 @@ public class MainWindowController {
 		        }
 		    }
 		});
-		
-		System.out.println("initializing Actions done!");
+		LOGGER.info("initializing Actions done!");
+//		System.out.println("initializing Actions done!");
 	}
     
     @FXML
@@ -1264,7 +1268,8 @@ public class MainWindowController {
     }
 		
     void saveSettings(){
-    	System.out.print("saving Settings... ");
+    	LOGGER.info("saving Settings...");
+//    	System.out.print("saving Settings... ");
     		OutputStream outputStream;	//new output-stream
     		try {
     			props.setProperty("cemuPath", getCemuPath());
@@ -1285,14 +1290,17 @@ public class MainWindowController {
     			}
     			props.storeToXML(outputStream, "cemu_UI settings");	//write new .xml
     			outputStream.close();
-    			System.out.println("done!");
+    			LOGGER.info("saving Settings done!");
+//    			System.out.println("done!");
     		} catch (IOException e) {
-    			e.printStackTrace();
+    			LOGGER.error("an error occured", e);
+//    			e.printStackTrace();
     		}
     }
     
     void loadSettings(){
-    	System.out.print("loading settings... ");
+    	LOGGER.info("loading settings...");
+//    	System.out.print("loading settings... ");
 		InputStream inputStream;
 		try {
 			if(System.getProperty("os.name").equals("Linux")){
@@ -1309,9 +1317,11 @@ public class MainWindowController {
 			setCloudService(props.getProperty("cloudService"));
 			main.cloudController.setFolderID(props.getProperty("folderID"), getCloudService());
 			inputStream.close();
-			System.out.println("done!");
+	    	LOGGER.info("loading settings done!");
+//			System.out.println("done!");
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error("an error occured", e);
+//			e.printStackTrace();
 		}
     }
     
