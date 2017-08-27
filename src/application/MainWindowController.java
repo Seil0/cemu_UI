@@ -40,6 +40,7 @@ import javax.swing.ProgressMonitor;
 import javax.swing.ProgressMonitorInputStream;
 
 import org.apache.commons.io.FileUtils;
+
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
 import com.jfoenix.controls.JFXDialog;
@@ -215,7 +216,7 @@ public class MainWindowController {
     private String color;
     private String dialogBtnStyle;
     private String version = "0.1.6";
-    private String buildNumber = "031";
+    private String buildNumber = "033";
 	private String versionName = "Throwback Galaxy";
     private int xPos = -200;
     private int yPos = 17;
@@ -344,7 +345,6 @@ public class MainWindowController {
 		});
 		
 		remove.setOnAction(new EventHandler<ActionEvent>() {
-			@SuppressWarnings("unlikely-arg-type")	//FIXME SuppressWarnings("unlikely-arg-type")
 			@Override
             public void handle(ActionEvent event) {
             	System.out.println("remove "+selectedGameTitleID);
@@ -729,26 +729,45 @@ public class MainWindowController {
 			
 			String source = downloadFileURL;
 			String destination = null;
+			int highestCourseNumber = 0;
+			String courseName = null;
 			
 			for (int i = 0; i < smmIDs.size(); i++) {
-				if (new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(i)).exists()) {
-					File courseDirectory = new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(i) + "/" + id);
-					System.out.println("Path: " + courseDirectory.getAbsolutePath());
-					if (!courseDirectory.exists()) {
-						courseDirectory.mkdir();
+				File smmDirectory = new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(i));
+
+				if (smmDirectory.exists()) {
+					File[] courses = smmDirectory.listFiles(File::isDirectory);
+
+					//get all existing courses in smm directory, new name is highest number +1
+					for (int j = 0; j < courses.length; j++) {
+						System.out.println(courses[j].getName());
+						int courseNumber = Integer.parseInt(courses[j].getName().substring(6));
+			
+						if (courseNumber > highestCourseNumber) {
+							highestCourseNumber = courseNumber;
+						}
 					}
+					
+					String number = "000" + (highestCourseNumber +1);
+					courseName = "course" + number.substring(number.length() -3, number.length());
+					File courseDirectory = new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(i) + "/");
+					System.out.println("Path: " + courseDirectory.getPath());
 					destination = courseDirectory.getPath();
 				}	
 			}
 
-			try {
+			try {			
 				ZipFile zipFile = new ZipFile(source);
 			    zipFile.extractAll(destination);
+			    
+			    //rename zipfile
+			    File course = new File(destination + "/course000");
+			    course.renameTo( new File(destination + "/" + courseName));
 			} catch (ZipException e) {
 			    e.printStackTrace();
 			    System.err.println("an error occurred during unziping the file!");
 			}
-	
+			
 			downloadFile.delete();		
 		} catch (IOException e) {
 			System.err.println("something went wrong during downloading the course");
