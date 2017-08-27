@@ -216,7 +216,7 @@ public class MainWindowController {
     private String color;
     private String dialogBtnStyle;
     private String version = "0.1.6";
-    private String buildNumber = "033";
+    private String buildNumber = "035";
 	private String versionName = "Throwback Galaxy";
     private int xPos = -200;
     private int yPos = 17;
@@ -263,7 +263,6 @@ public class MainWindowController {
 		smmdbApiQuery = new SmmdbApiQuery();
 	}
 	
-	@SuppressWarnings("unchecked")	//FIXME SuppressWarnings
 	void initUI(){		
 		cemuTextField.setText(cemuPath);
 		romTextField.setText(romPath);
@@ -287,7 +286,10 @@ public class MainWindowController {
 		starsColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().stars.asObject());
 		timeColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().time.asObject());
 		
-		courseTreeTable.getColumns().setAll(titleColumn, timeColumn, starsColumn, idColumn);
+		courseTreeTable.getColumns().add(titleColumn);
+		courseTreeTable.getColumns().add(timeColumn);
+		courseTreeTable.getColumns().add(starsColumn);
+		courseTreeTable.getColumns().add(idColumn);
 		courseTreeTable.getColumns().get(3).setVisible(false); //hide idColumn (important)
 	}
 	
@@ -376,7 +378,7 @@ public class MainWindowController {
     						games.remove(selectedUIDataIndex);
 							dbController.removeRom(selectedGameTitleID);
 							//remove all games form gamesAnchorPane (UI)
-	    					gamesAnchorPane.getChildren().removeAll(games);
+							gamesAnchorPane.getChildren().removeAll(gamesAnchorPane.getChildren());
 	    					//reset position
 	    				    xPos = -200;
 	    				    yPos = 17;
@@ -634,21 +636,19 @@ public class MainWindowController {
     	} else {
     		smmdbAnchorPane.setVisible(true);
     		smmdbTrue = true;
-    	}
     		
-    	//start query
-    	courses.addAll(smmdbApiQuery.startQuery());
-    	
-    	System.out.println("size: " + courses.size());
-    	System.out.println(courses.get(3).getNintendoid());
-    	
-    	//add query response to courseTreeTable
-		for(int i = 0; i < courses.size(); i++){
-			CourseTableDataType helpCourse = new CourseTableDataType(courses.get(i).getTitle(),  courses.get(i).getId(),
-																	 courses.get(i).getTime(), courses.get(i).getStars());
-			
-			root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse));	//add data to root-node
-		}
+    		//start query
+        	courses.removeAll(courses);
+        	courses.addAll(smmdbApiQuery.startQuery());
+        	
+        	//add query response to courseTreeTable
+    		for(int i = 0; i < courses.size(); i++){
+    			CourseTableDataType helpCourse = new CourseTableDataType(courses.get(i).getTitle(),  courses.get(i).getId(),
+    																	 courses.get(i).getTime(), courses.get(i).getStars());
+    			
+    			root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse));	//add data to root-node
+    		}
+    	}
     }
     	
     @FXML
@@ -740,9 +740,7 @@ public class MainWindowController {
 
 					//get all existing courses in smm directory, new name is highest number +1
 					for (int j = 0; j < courses.length; j++) {
-						System.out.println(courses[j].getName());
 						int courseNumber = Integer.parseInt(courses[j].getName().substring(6));
-			
 						if (courseNumber > highestCourseNumber) {
 							highestCourseNumber = courseNumber;
 						}
@@ -751,7 +749,7 @@ public class MainWindowController {
 					String number = "000" + (highestCourseNumber +1);
 					courseName = "course" + number.substring(number.length() -3, number.length());
 					File courseDirectory = new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(i) + "/");
-					System.out.println("Path: " + courseDirectory.getPath());
+					
 					destination = courseDirectory.getPath();
 				}	
 			}
@@ -763,6 +761,7 @@ public class MainWindowController {
 			    //rename zipfile
 			    File course = new File(destination + "/course000");
 			    course.renameTo( new File(destination + "/" + courseName));
+			    System.out.println("Added new course: " + courseName + ", full path is: " + destination + "/" + courseName);
 			} catch (ZipException e) {
 			    e.printStackTrace();
 			    System.err.println("an error occurred during unziping the file!");
