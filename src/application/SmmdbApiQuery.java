@@ -37,92 +37,80 @@ public class SmmdbApiQuery {
         	BufferedReader ina = new BufferedReader(new InputStreamReader(apiUrl.openStream()));
 			output = ina.readLine();
 			ina.close();
+	        System.out.println("response from " + URL + " was valid");
 		} catch (IOException e) {
 			System.out.println("error while making api request or reading response");
+			System.out.println("response from " + URL + " was: " + output);
 			e.printStackTrace();
 		}
         
-        System.out.println(URL);
-        System.out.println("{ \"courses\": " + output + "}");
-        
-        String apiOutput = "{ \"courses\": " + output + "}";
-        
+        String apiOutput = "{ \"courses\": " + output + "}";  
         JsonArray items = Json.parse(apiOutput).asObject().get("courses").asArray();
+        
         for (JsonValue item : items) {
         	int courseTheme, gameStyle, difficulty, lastmodified, uploaded, autoScroll, stars ,time;
         	String owner, id, nintendoid, title;
-        	
-        	//geht
+
         	try {
         		courseTheme = item.asObject().getInt("courseTheme", 9);
 			} catch (Exception e) {
 				courseTheme = 9;
 			}
-        	
-        	//geht
+
         	try {
         		gameStyle = item.asObject().getInt("gameStyle", 9);
 			} catch (Exception e) {
 				gameStyle = 9;
 			}
-        	
-        	//geht
+
         	try {
         		difficulty = item.asObject().getInt("difficulty", 9);
 			} catch (Exception e) {
 				difficulty = 9;
 			}
-        	
-        	//geht
+
         	try {
         		lastmodified = item.asObject().getInt("lastmodified", 9);
 			} catch (Exception e) {
 				lastmodified = 9;
 			}
-        	
-        	//geht
+
         	try {
         		uploaded = item.asObject().getInt("uploaded", 9);
 			} catch (Exception e) {
 				uploaded = 9;
 			}
-        	
-        	//geht
+
         	try {
         		autoScroll = item.asObject().getInt("autoScroll", 9);
 			} catch (Exception e) {
 				autoScroll = 9;
 			}
-        	
-        	//geht
+
         	try {
         		stars = item.asObject().getInt("stars", 9);
 			} catch (Exception e) {
 				stars = 9;
 			}
-        	
-        	//geht
+
         	try {
         		time = item.asObject().getInt("time", 9);
 			} catch (Exception e) {
 				time = 9;
 			}
-        	
-        	//geht
+
         	try {
         		owner = item.asObject().getString("owner", "");
 			} catch (Exception e) {
 				owner = "notset";
 			}
-        	
-        	//geht
+
         	try {
         		id = item.asObject().getString("id", "");
 			} catch (Exception e) {
 				id = "notset";
 			}
-        	
-        	//geht
+
         	try {
         		nintendoid = item.asObject().getString("nintendoid", "");
 			} catch (Exception e) {
