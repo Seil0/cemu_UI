@@ -91,7 +91,6 @@ public class Main extends Application {
 			//check if client_secret.jason is present
 			if (Main.class.getResourceAsStream("/resources/client_secret.json") == null) {
 				LOGGER.error("client_secret is missing!!!!!");
-//				System.err.println("client_secret is missing!!!!!");
 				
 				Alert alert = new Alert(AlertType.ERROR);
 		    	alert.setTitle("cemu_UI");
@@ -102,18 +101,14 @@ public class Main extends Application {
 
 			LOGGER.info("Directory: " + directory.exists());
 			LOGGER.info("Configfile: " + configFile.exists());
-//			System.out.println("Directory: " + directory.exists());
-//			System.out.println("configfile: " + configFile.exists());
 			if(!directory.exists()){
 				LOGGER.info("creating cemu_UI directory");
-//				System.out.println("mkdir all");
 				directory.mkdir();
 				pictureCache.mkdir();
 			}
 			
 			if(!configFile.exists()){
 				LOGGER.info("firststart, setting default values");
-//				System.out.println("firststart");
 				firstStart();
 				mainWindowController.setColor("00a8cc");
 				mainWindowController.setxPosHelper(0);
@@ -129,14 +124,12 @@ public class Main extends Application {
 			if(gamesDBFile.exists() != true){
 				try {
 					LOGGER.info("downloading games.db... ");
-//					System.out.print("downloading games.db... ");
 					URL website = new URL(gamesDBdownloadURL);
 					ReadableByteChannel rbc = Channels.newChannel(website.openStream());
 					FileOutputStream fos = new FileOutputStream(gamesDBFile);
 					fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 					fos.close();
 					LOGGER.info("finished downloading games.db");
-//					System.out.println("done!");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

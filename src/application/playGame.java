@@ -28,6 +28,7 @@ public class playGame extends Thread{
 		dbController = db;
 	}
 	
+	@Override
 	public void run(){
 		String selectedGameTitleID = mainWindowController.getSelectedGameTitleID();
 		String executeComand;

@@ -9,6 +9,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonValue;
@@ -18,6 +22,7 @@ import datatypes.SmmdbApiDataType;
 public class SmmdbApiQuery {
 	
 	private String URL = "http://smmdb.ddns.net/api/getcourses?";
+	private static final Logger LOGGER = LogManager.getLogger(SmmdbApiQuery.class.getName());
 
 	public SmmdbApiQuery() {
 		//Auto-generated constructor stub
@@ -37,11 +42,10 @@ public class SmmdbApiQuery {
         	BufferedReader ina = new BufferedReader(new InputStreamReader(apiUrl.openStream()));
 			output = ina.readLine();
 			ina.close();
-	        System.out.println("response from " + URL + " was valid");
+			LOGGER.info("response from " + URL + " was valid");
 		} catch (IOException e) {
-			System.out.println("error while making api request or reading response");
-			System.out.println("response from " + URL + " was: " + output);
-			e.printStackTrace();
+			LOGGER.error("error while making api request or reading response");
+			LOGGER.error("response from " + URL + " was: " + output, e);
 		}
         
         String apiOutput = "{ \"courses\": " + output + "}";  
@@ -116,6 +120,7 @@ public class SmmdbApiQuery {
 			} catch (Exception e) {
 				nintendoid = "notset";
 			}
+        	
         	try {
         		title = item.asObject().getString("title", "");;
 			} catch (Exception e) {

@@ -229,8 +229,8 @@ public class MainWindowController {
 	private DirectoryChooser directoryChooser = new DirectoryChooser();
 	private File dirWin = new File(System.getProperty("user.home") + "/Documents/cemu_UI");
 	private File dirLinux = new File(System.getProperty("user.home") + "/cemu_UI");
-	private File fileWin = new File(dirWin + "/config.xml");
-	private File fileLinux = new File(dirLinux + "/config.xml");
+	private File configFileWin = new File(dirWin + "/config.xml");
+	private File configFileLinux = new File(dirLinux + "/config.xml");
 	File pictureCacheWin = new File(dirWin+"/picture_cache");
 	File pictureCacheLinux = new File(dirLinux+"/picture_cache");
 	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2", "44fc5929");	//TODO add more IDs
@@ -301,7 +301,6 @@ public class MainWindowController {
 	 */
 	void initActions() {
 		LOGGER.info("initializing Actions... ");
-//		System.out.println("initializing Actions... ");
 		
 		HamburgerBackArrowBasicTransition burgerTask = new HamburgerBackArrowBasicTransition(menuHam);
 		menuHam.addEventHandler(MouseEvent.MOUSE_PRESSED, (e)->{
@@ -409,7 +408,7 @@ public class MainWindowController {
             	String updatePath;
             	System.out.println("update: "+selectedGameTitleID);
             	if(selectedGameTitleID == null){
-            		System.out.println("trying to update null! null is not valid!");
+            		LOGGER.error("trying to update null! null is not valid!");
 	            	Alert alert = new Alert(AlertType.WARNING);
 	            	alert.setTitle("edit");
 	            	alert.setHeaderText("cemu_UI");
@@ -433,21 +432,21 @@ public class MainWindowController {
             			File srcDir = new File(updatePath);
             			File destDir = new File(cemuPath+"\\mlc01\\usr\\title\\"+parts[0]+"\\"+parts[1]);
             			
-            			System.out.println(updatePath);
-            			System.out.println(destDir.toString());
+            			LOGGER.info(updatePath);
+            			LOGGER.info(destDir.toString());
 
             			if(destDir.exists() != true){
             				destDir.mkdir();
             			}
 
         	            try {
-        	            	System.out.println("copying files...");
+        	            	LOGGER.info("copying files...");
         	            	playBtn.setText("updating...");
         	            	playBtn.setDisable(true);
 							FileUtils.copyDirectory(srcDir, destDir);	//TODO progress indicator
 							playBtn.setText("play");
 							playBtn.setDisable(false);
-							System.out.println("done!");
+							LOGGER.info("copying files done!");
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
@@ -464,7 +463,7 @@ public class MainWindowController {
              	String titleID = selectedGameTitleID;
             	String dlcPath;
             	
-            	System.out.println("add DLC: "+selectedGameTitleID);
+            	LOGGER.info("add DLC: "+selectedGameTitleID);
             	if(selectedGameTitleID == null){
             		System.out.println("trying to add a dlc to null! null is not valid!");
 	            	Alert alert = new Alert(AlertType.WARNING);
@@ -490,21 +489,21 @@ public class MainWindowController {
             			File srcDir = new File(dlcPath);
             			File destDir = new File(cemuPath+"\\mlc01\\usr\\title\\"+parts[0]+"\\"+parts[1]+"\\aoc");
             			
-            			System.out.println(dlcPath);
-            			System.out.println(destDir.toString());
+            			LOGGER.info(dlcPath);
+            			LOGGER.info(destDir.toString());
 
             			if(destDir.exists() != true){
             				destDir.mkdir();
             			}
 
         	            try {
-        	            	System.out.println("copying files...");
+        	            	LOGGER.info("copying files...");
         	            	playBtn.setText("copying files...");
         	            	playBtn.setDisable(true);
 							FileUtils.copyDirectory(srcDir, destDir);	//TODO progress indicator
 							playBtn.setText("play");
 							playBtn.setDisable(false);
-							System.out.println("done!");
+							LOGGER.info("copying files done!");
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
@@ -545,7 +544,6 @@ public class MainWindowController {
 					for (int i = 0; i < courses.size(); i++) {
 						if (courses.get(i).getId() == id) {	
 							try {
-//								System.out.println("http://smmdb.ddns.net/courseimg/" + id + "_full.jpg?v=3");
 								URL url = new URL("http://smmdb.ddns.net/courseimg/" + id + "_full.jpg?v=3");
 								Image image = new Image(url.toURI().toString());
 								smmdbImageView.setImage(image);
@@ -573,7 +571,6 @@ public class MainWindowController {
 		    }
 		});
 		LOGGER.info("initializing Actions done!");
-//		System.out.println("initializing Actions done!");
 	}
     
     @FXML
@@ -677,7 +674,7 @@ public class MainWindowController {
     void cemuTFBtnAction(ActionEvent event) {
     	File cemuDirectory = directoryChooser.showDialog(main.primaryStage);
         if(cemuDirectory == null){
-            System.out.println("No Directory selected");
+        	LOGGER.info("No Directory selected");
         }else{
         	setCemuPath(cemuDirectory.getAbsolutePath());
         	saveSettings();
@@ -696,7 +693,7 @@ public class MainWindowController {
     void romTFBtnAction(ActionEvent event) {
     	File romDirectory = directoryChooser.showDialog(main.primaryStage); 
         if(romDirectory == null){
-            System.out.println("No Directory selected");
+        	LOGGER.info("No Directory selected");
         }else{
         	setRomPath(romDirectory.getAbsolutePath());
         	saveSettings();
@@ -727,7 +724,7 @@ public class MainWindowController {
 	        pm.setMaximum(conn.getContentLength());	// tell the progress bar the total number of bytes we are going to read.
 			FileUtils.copyInputStreamToFile(pmis, new File(downloadFileURL));	//download file  + "/mlc01/emulatorSave"
 			pmis.close();
-			System.out.println("downloaded successfull");
+			LOGGER.info("downloaded successfull");
 
 			File downloadFile = new File(downloadFileURL);
 			
@@ -765,16 +762,14 @@ public class MainWindowController {
 			    //rename zipfile
 			    File course = new File(destination + "/course000");
 			    course.renameTo( new File(destination + "/" + courseName));
-			    System.out.println("Added new course: " + courseName + ", full path is: " + destination + "/" + courseName);
+			    LOGGER.info("Added new course: " + courseName + ", full path is: " + destination + "/" + courseName);
 			} catch (ZipException e) {
-			    e.printStackTrace();
-			    System.err.println("an error occurred during unziping the file!");
+			    LOGGER.error("an error occurred during unziping the file!", e);
 			}
 			
 			downloadFile.delete();		
 		} catch (IOException e) {
-			System.err.println("something went wrong during downloading the course");
-			e.printStackTrace();
+			LOGGER.error("something went wrong during downloading the course", e);
 		}
     }
     
@@ -934,7 +929,7 @@ public class MainWindowController {
 		 * then add the rom to the local_roms database
 		 */
 		if(exit){
-			System.out.println("No parameter set!");
+			LOGGER.info("No parameter set!");
 		}else{
 			coverName = new File(coverPath).getName();
 			try	{
@@ -950,16 +945,14 @@ public class MainWindowController {
 			    ImageIO.write(resizeImagePNG, "png", new File(pictureCache+"\\"+coverName)); //save image to pictureCache
 			    coverPath = pictureCache+"\\"+coverName;
 			} catch (IOException e) {
-			    System.out.println("Ops something went wrong!");
+				LOGGER.error("Ops something went wrong!", e);
 			}
 			
 			try {	
 				dbController.addRom(title, coverPath, romPath, titleID, "", "", "", "0");
 				dbController.loadSingleRom(titleID);
 			} catch (SQLException e) {
-				// Auto-generated catch block
-				System.out.println("Oops, something went wrong! Error during adding a game.");
-				e.printStackTrace();
+				LOGGER.error("Oops, something went wrong! Error during adding a game.", e);
 			}
 		}
     }
@@ -980,7 +973,7 @@ public class MainWindowController {
     	Image coverImage = new Image(coverFile.toURI().toString());
     	
     	generatePosition();
-    	System.out.println("add " + getxPos());	//TODO debug
+    	LOGGER.info("add " + getxPos());	//TODO debug
     	VBox.setLayoutX(getxPos());
     	VBox.setLayoutY(getyPos());
     	VBox.getChildren().addAll(gameTitleLabel,gameBtn);	
@@ -996,7 +989,7 @@ public class MainWindowController {
     	gameBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
 		     @Override
 		     public void handle(MouseEvent event) {
-            	System.out.println("selected: "+title+"; ID: "+titleID);
+		    	 LOGGER.info("selected: "+title+"; ID: "+titleID);
             	
             	//getting the selected game index by comparing event.getSource() with games.get(i).getButton()
             	for(int i=0; i<games.size(); i++){
@@ -1269,59 +1262,100 @@ public class MainWindowController {
 		
     void saveSettings(){
     	LOGGER.info("saving Settings...");
-//    	System.out.print("saving Settings... ");
-    		OutputStream outputStream;	//new output-stream
-    		try {
-    			props.setProperty("cemuPath", getCemuPath());
-				props.setProperty("romPath", getRomPath());
-				props.setProperty("color", getColor());
-				props.setProperty("fullscreen", String.valueOf(isFullscreen()));
-				props.setProperty("cloudSync", String.valueOf(cloudSync));
-				if (getCloudService() == null) {
-					props.setProperty("cloudService", "");
-				} else {
-					props.setProperty("cloudService", getCloudService());
-				}
-				props.setProperty("folderID", main.cloudController.getFolderID(getCloudService()));
-    			if(System.getProperty("os.name").equals("Linux")){
-    				outputStream = new FileOutputStream(fileLinux);
-    			}else{
-    				outputStream = new FileOutputStream(fileWin);
-    			}
-    			props.storeToXML(outputStream, "cemu_UI settings");	//write new .xml
-    			outputStream.close();
-    			LOGGER.info("saving Settings done!");
-//    			System.out.println("done!");
-    		} catch (IOException e) {
-    			LOGGER.error("an error occured", e);
-//    			e.printStackTrace();
+    	OutputStream outputStream;	//new output-stream
+    	try {
+    		props.setProperty("cemuPath", getCemuPath());
+			props.setProperty("romPath", getRomPath());
+			props.setProperty("color", getColor());
+			props.setProperty("fullscreen", String.valueOf(isFullscreen()));
+			props.setProperty("cloudSync", String.valueOf(cloudSync));
+			if (getCloudService() == null) {
+				props.setProperty("cloudService", "");
+			} else {
+				props.setProperty("cloudService", getCloudService());
+			}
+			props.setProperty("folderID", main.cloudController.getFolderID(getCloudService()));
+    		if(System.getProperty("os.name").equals("Linux")){
+    			outputStream = new FileOutputStream(configFileLinux);
+    		}else{
+    			outputStream = new FileOutputStream(configFileWin);
     		}
+    		props.storeToXML(outputStream, "cemu_UI settings");	//write new .xml
+    		outputStream.close();
+    		LOGGER.info("saving Settings done!");
+    	} catch (IOException e) {
+    		LOGGER.error("an error occured", e);
+    	}
     }
     
+    /**
+     * loading saved settings from the config.xml file
+     * if a value is not present, default is used instead
+     */
     void loadSettings(){
     	LOGGER.info("loading settings...");
-//    	System.out.print("loading settings... ");
 		InputStream inputStream;
 		try {
 			if(System.getProperty("os.name").equals("Linux")){
-				inputStream = new FileInputStream(fileLinux);
+				inputStream = new FileInputStream(configFileLinux);
 			}else{
-				inputStream = new FileInputStream(fileWin);
+				inputStream = new FileInputStream(configFileWin);
 			}
 			props.loadFromXML(inputStream);	//new input-stream from .xml
-			setCemuPath(props.getProperty("cemuPath"));
-			setRomPath(props.getProperty("romPath"));
-			setColor(props.getProperty("color"));
-			setFullscreen(Boolean.parseBoolean(props.getProperty("fullscreen")));
-			setCloudSync(Boolean.parseBoolean(props.getProperty("cloudSync")));
-			setCloudService(props.getProperty("cloudService"));
-			main.cloudController.setFolderID(props.getProperty("folderID"), getCloudService());
+			
+			try {
+				setCemuPath(props.getProperty("cemuPath"));
+			} catch (Exception e) {
+				LOGGER.error("cloud not load cemuPath", e);
+				setCemuPath("");
+			}
+			
+			try {
+				setRomPath(props.getProperty("romPath"));
+			} catch (Exception e) {
+				LOGGER.error("could not load romPath", e);
+				setRomPath("");
+			}
+			
+			try {
+				setColor(props.getProperty("color"));
+			} catch (Exception e) {
+				LOGGER.error("could not load color value, setting default instead", e);
+				setColor("00a8cc");
+			}
+			
+			try {
+				setFullscreen(Boolean.parseBoolean(props.getProperty("fullscreen")));
+			} catch (Exception e) {
+				LOGGER.error("could not load fullscreen, setting default instead", e);
+				setFullscreen(false);
+			}
+			
+			try {
+				setCloudSync(Boolean.parseBoolean(props.getProperty("cloudSync")));
+			} catch (Exception e) {
+				LOGGER.error("could not load cloudSync, setting default instead", e);
+				setCloudSync(false);
+			}
+			
+			try {
+				setCloudService(props.getProperty("cloudService"));
+			} catch (Exception e) {
+				LOGGER.error("could not load cloudSync", e);
+				setCloudService("");
+			}
+			
+			try {
+				main.cloudController.setFolderID(props.getProperty("folderID"), getCloudService());
+			} catch (Exception e) {
+				LOGGER.error("could not load folderID, disable cloud sync. Please contact an developer", e);
+				setCloudSync(false);
+			}
+			
 			inputStream.close();
 	    	LOGGER.info("loading settings done!");
-//			System.out.println("done!");
 		} catch (IOException e) {
 			LOGGER.error("an error occured", e);
-//			e.printStackTrace();
 		}
     }
     

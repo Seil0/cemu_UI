@@ -53,7 +53,8 @@ public class CloudController {
 					main.mainWindowController.saveSettings();
 					
 	        		Thread thread = new Thread(new Runnable() {
-	        			public void run() {
+	        			@Override
+						public void run() {
 	        				Platform.runLater(() -> {
 	    	            		main.mainWindowController.getPlayBtn().setText("syncing...");
 	    	                });
@@ -82,6 +83,7 @@ public class CloudController {
 		
 		//running sync in a new thread, instead of blocking the main thread
 		Thread thread = new Thread(new Runnable() {
+			@Override
 			public void run() {
             	Platform.runLater(() -> {
         			main.mainWindowController.getPlayBtn().setText("syncing...");
@@ -113,7 +115,8 @@ public class CloudController {
 		
 		//running uploadFile in a new thread, instead of blocking the main thread
 		new Thread() {
-            public void run() {
+            @Override
+			public void run() {
             	System.out.println("starting uploadFile in new thread...");
             	
             	if(cloudService.equals("GoogleDrive")) {
