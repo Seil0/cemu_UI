@@ -41,8 +41,8 @@ public class Main extends Application {
 	CloudController cloudController;
 	AnchorPane pane;
 	private Scene scene;
-	private String dirWin = System.getProperty("user.home") + "/Documents/cemu_UI";	//Windows: C:/Users/"User"/Documents/HomeFlix
-	private String dirLinux = System.getProperty("user.home") + "/cemu_UI";	//Linux: /home/"User"/HomeFlix
+	private String dirWin = System.getProperty("user.home") + "/Documents/cemu_UI";	//Windows: C:/Users/"User"/Documents/cemu_UI
+	private String dirLinux = System.getProperty("user.home") + "/cemu_UI";	//Linux: /home/"User"/cemu_UI
 	private String gamesDBdownloadURL = "https://github.com/Seil0/cemu_UI/raw/master/downloadContent/games.db";
 	private File directory;
 	private File configFile;
@@ -50,7 +50,7 @@ public class Main extends Application {
 	@SuppressWarnings("unused")
 	private File localDB;
 	private File pictureCache;
-    private static final Logger LOGGER = LogManager.getLogger(Main.class.getName());
+    private static Logger LOGGER;
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -79,7 +79,7 @@ public class Main extends Application {
 				pictureCache= new File(dirLinux+"/picture_cache");
 				pane.setPrefWidth(904);	//this could be a kde plasma specific issue
 			}else{
-				directory = new File(dirWin);	
+				directory = new File(dirWin);
 				configFile = new File(dirWin + "/config.xml");
 				gamesDBFile = new File(dirWin + "/games.db");
 				localDB = new File(dirWin+"/localRoms.db");
@@ -188,6 +188,17 @@ public class Main extends Application {
 	}
 	
 	public static void main(String[] args) {
+		//delete old log file and create new
+		if(System.getProperty("os.name").equals("Linux")){
+			System.setProperty("logFilename", System.getProperty("user.home") + "/cemu_UI/app.log");
+			File logFile = new File(System.getProperty("user.home") + "/cemu_UI/app.log");
+			logFile.delete();
+		}else{
+			System.setProperty("logFilename", System.getProperty("user.home") + "/Documents/cemu_UI/app.log");
+			File logFile = new File(System.getProperty("user.home") + "/Documents/cemu_UI/app.log");
+			logFile.delete();
+		}
+		LOGGER = LogManager.getLogger(Main.class.getName());
 		launch(args);
 	}
 }
