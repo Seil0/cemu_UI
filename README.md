@@ -32,14 +32,7 @@ If you want to use the cloud sync function read the [wiki](https://github.com/Se
 
 ### If you have another idea, make a "new issue" with the ![#f03c15](https://placehold.it/15/fbca04/000000?text=+)`idea` lable
 
-## FAQ
-
-* My game is not detected automaticaly   
-  * You need to add it to the [games.db](https://github.com/Seil0/cemu_UI/blob/master/downloadContent/games.db) database or you add it to the [games.csv](https://github.com/Seil0/cemu_UI/blob/master/downloadContent/games.csv) table so everyone can use it.
-* How can I update the games.db?
-  * Delete the games.db file in "C:\Users\USERNAME\Documents\cemu_UI" it will be downloaded again at the next start of cemu_UI.
-* I have another question
-  * make a new issue and let me know
+## [FAQ](https://github.com/Seil0/cemu_UI/wiki#faq)
   
 ## Screenshots
   
