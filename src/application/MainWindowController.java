@@ -34,7 +34,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Properties;
-
 import javax.imageio.ImageIO;
 import javax.swing.ProgressMonitor;
 import javax.swing.ProgressMonitorInputStream;
@@ -163,6 +162,9 @@ public class MainWindowController {
     private AnchorPane gamesAnchorPane;
     
     @FXML
+    private AnchorPane mainAnchorPane;
+    
+    @FXML
     private ScrollPane scrollPaneMain;
     
     @FXML
@@ -219,7 +221,7 @@ public class MainWindowController {
     private String selectedGameTitle;
     private String id;
     private String version = "0.1.7";
-    private String buildNumber = "039";
+    private String buildNumber = "041";
     private String versionName = "Throwback Galaxy";
     private int xPos = -200;
     private int yPos = 17;
@@ -300,7 +302,7 @@ public class MainWindowController {
 	 * initialize all actions not initialized by a own method
 	 */
 	void initActions() {
-		LOGGER.info("initializing Actions... ");
+		LOGGER.info("initializing Actions ...");
 		
 		HamburgerBackArrowBasicTransition burgerTask = new HamburgerBackArrowBasicTransition(menuHam);
 		menuHam.addEventHandler(MouseEvent.MOUSE_PRESSED, (e)->{
@@ -373,28 +375,14 @@ public class MainWindowController {
                 	Optional<ButtonType> result = alert.showAndWait();
         			if (result.get() == ButtonType.OK){
     					try {
-    						//remove all elements from gamesAnchorPane
-	    					for(int i=0; i< games.size(); i++){
-	    						gamesAnchorPane.getChildren().remove(games.get(i).getVBox());
-	    					}
-	    					//remove game from database
+    						//remove game from database
     						games.remove(selectedUIDataIndex);
 							dbController.removeRom(selectedGameTitleID);
-							//remove all games form gamesAnchorPane (UI)
-							gamesAnchorPane.getChildren().removeAll(gamesAnchorPane.getChildren());
-	    					//reset position
-	    				    xPos = -200;
-	    				    yPos = 17;
-	    				    xPosHelper = 0;
-	    					//add all games to gamesAnchorPane (UI)
-	    					for(int i=0; i< games.size(); i++){
-	    				    	generatePosition();
-	    				    	games.get(i).getVBox().setLayoutX(getxPos());
-	    				    	games.get(i).getVBox().setLayoutY(getyPos());
-	    						gamesAnchorPane.getChildren().add(games.get(i).getVBox());
-	    					}
+							
+    						//refresh all games at gamesAnchorPane (UI)
+    						refreshUIData();  						
 						} catch (Exception e) {
-							e.printStackTrace();
+							LOGGER.error("error!",e);
 						}
         			}
             	}
@@ -958,7 +946,7 @@ public class MainWindowController {
     }
     
     /**
-     * add game to the program and initialize all needed actions (start, time stamps, titleID)
+     * add game to games(ArrayList) and initialize all needed actions (start, time stamps, titleID)
      * @param title : game title
      * @param coverPath : path to cover (cache)
      * @param romPath : path to rom file (.rpx)
@@ -990,7 +978,6 @@ public class MainWindowController {
 		     @Override
 		     public void handle(MouseEvent event) {
 		    	 LOGGER.info("selected: "+title+"; ID: "+titleID);
-            	
             	//getting the selected game index by comparing event.getSource() with games.get(i).getButton()
             	for(int i=0; i<games.size(); i++){
             		if(games.get(i).getButton() == event.getSource()){
@@ -1007,7 +994,7 @@ public class MainWindowController {
             	games.get(selectedUIDataIndex).getLabel().setStyle("-fx-underline: true;");
             	lastGameLabel = games.get(selectedUIDataIndex).getLabel();
             	
-            	//setting last played
+            	//setting last played, if lastPlayed is empty game was never played before, else set correct date
             	if(dbController.getLastPlayed(titleID).equals("") || dbController.getLastPlayed(titleID).equals(null)){
             		lastTimePlayedBtn.setText("Last played, never");
             		totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID)+ " min");
@@ -1016,22 +1003,24 @@ public class MainWindowController {
                 	
                 	int today = Integer.parseInt(dtf.format(LocalDate.now()).replaceAll("-", ""));
                 	int yesterday  = Integer.parseInt(dtf.format(LocalDate.now().minusDays(1)).replaceAll("-", ""));
-                	int lastday = Integer.parseInt(dbController.getLastPlayed(titleID).replaceAll("-", ""));
+                	int lastPlayedDay = Integer.parseInt(dbController.getLastPlayed(titleID).replaceAll("-", ""));
                 	
-                	if(today == lastday){
+                	if(today == lastPlayedDay){
                 		lastTimePlayedBtn.setText("Last played, today");
-                	}else if(yesterday == lastday){
+                	}else if(yesterday == lastPlayedDay){
                 		lastTimePlayedBtn.setText("Last played, yesterday");
                 	}else{
                     	lastTimePlayedBtn.setText("Last played, "+dbController.getLastPlayed(titleID));
                 	}
-                	if(Integer.parseInt(dbController.getTotalPlaytime(titleID)) > 60){
-                		int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTotalPlaytime(titleID))/60);
-                		int minutesPlayed = Integer.parseInt(dbController.getTotalPlaytime(titleID))-60*hoursPlayed;
-                		totalPlaytimeBtn.setText(hoursPlayed+"h "+minutesPlayed+"min");
-                	}else{
-                		totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID)+ " min");
-                	}
+            	}
+            	
+            	//setting total playtime, if total playtime > 60 minutes, formate is "x hours x minutes" (xh x min), else only minutes are showed 
+            	if(Integer.parseInt(dbController.getTotalPlaytime(titleID)) > 60){
+            		int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTotalPlaytime(titleID))/60);
+            		int minutesPlayed = Integer.parseInt(dbController.getTotalPlaytime(titleID))-60*hoursPlayed;
+            		totalPlaytimeBtn.setText(hoursPlayed+" h     "+minutesPlayed+" min");
+            	}else{
+            		totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID)+ " min");
             	}
             	
             	if (!playTrue) {
@@ -1046,11 +1035,36 @@ public class MainWindowController {
     	games.add(new UIROMDataType(VBox, gameTitleLabel, gameBtn, titleID, romPath));
     }
     
-    //add all games to the UI (only called on startup)
-    void addUIData(){
+    //add all games saved in games(ArrayList) to the gamesAnchorPane
+    void addUIData() {
     	for(int i=0; i<games.size(); i++){
     		gamesAnchorPane.getChildren().add(games.get(i).getVBox());
     	}
+    }
+    
+    //remove all games from gamesAnchorPane and add them afterwards
+    void refreshUIData() {
+    	//remove all games form gamesAnchorPane
+    	gamesAnchorPane.getChildren().removeAll(gamesAnchorPane.getChildren());
+
+		//reset position
+	    xPos = -200;
+	    yPos = 17;
+	    xPosHelper = 0;
+	    
+	    //add all games to gamesAnchorPane (UI)
+		for(int i=0; i< games.size(); i++){
+			generatePosition();
+	    	games.get(i).getVBox().setLayoutX(getxPos());
+	    	games.get(i).getVBox().setLayoutY(getyPos());
+			gamesAnchorPane.getChildren().add(games.get(i).getVBox());
+		}
+    }
+    
+    void refreshplayBtnPosition() {
+    	playBtn.setLayoutX((mainAnchorPane.getWidth()/2)-50);
+    	totalPlaytimeBtn.setLayoutX((mainAnchorPane.getWidth()/2)-50-20.5-100);
+    	lastTimePlayedBtn.setLayoutX((mainAnchorPane.getWidth()/2)+50+20.5);
     }
     
     private void addCourseDescription(SmmdbApiDataType course) {
@@ -1173,7 +1187,6 @@ public class MainWindowController {
 
     }
 
-    //TODO Changelistener for resizing
     /**
      * xPosHelper based on window width = -24(Windows)/-36(Linux)
      * calculates how many games can be displayed in one row

@@ -20,10 +20,11 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Optional;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
@@ -56,6 +57,7 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
 		cloudController = new CloudController(this);
+		initActions();
 		mainWindow();
 	}
 	
@@ -63,7 +65,7 @@ public class Main extends Application {
 		try {
 			FXMLLoader loader = new FXMLLoader(Main.class.getResource("MainWindow.fxml"));
 			pane = loader.load();
-			primaryStage.setResizable(false);
+//			primaryStage.setResizable(false);
 			primaryStage.setTitle("cemu_UI");
 //			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/resources/Homeflix_Icon_64x64.png"))); //adds application icon
 
@@ -114,7 +116,7 @@ public class Main extends Application {
 				mainWindowController.setxPosHelper(0);
 				mainWindowController.saveSettings();
 				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
-				System.exit(0);	//finishes itselfdownloading games.db... 
+				System.exit(0);	//finishes itself
 			}
 			
 			if(pictureCache.exists() != true){
@@ -185,6 +187,19 @@ public class Main extends Application {
 		} else {
 			mainWindowController.setRomPath(null);
 		}
+	}
+	
+	private void initActions() {
+		final ChangeListener<Number> listener = new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, final Number newValue) {
+				mainWindowController.refreshUIData();
+				mainWindowController.refreshplayBtnPosition();
+			}
+		};
+
+		//add listener to primaryStage
+		primaryStage.widthProperty().addListener(listener);
 	}
 	
 	public static void main(String[] args) {
