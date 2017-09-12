@@ -16,6 +16,9 @@ package application;
 import java.io.File;
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import cloudControllerInstances.GoogleDriveController;
 import javafx.application.Platform;
 
@@ -27,26 +30,27 @@ public class CloudController {
 	
 	private Main main;
 	private GoogleDriveController googleDriveController = new GoogleDriveController();
+	private static final Logger LOGGER = LogManager.getLogger(CloudController.class.getName());
 	
 	void initializeConnection(String cloudService, String cemuDirectory) {
-		System.out.println("sartting cloud initialisation... ");
+		LOGGER.info("sartting cloud initialisation ...");
 		if(cloudService.equals("GoogleDrive")) {
-			System.out.println("selected service is Google Drive");
+			LOGGER.info("selected service is Google Drive");
 			try {
 				googleDriveController.main(cemuDirectory);
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOGGER.error("error while initialize connection", e);
 			}
 		}
 		if(cloudService.equals("Dropbox")) {
-			System.out.println("selected service is Dropbox");
+			LOGGER.info("selected service is Dropbox");
 		}
-		System.out.println("cloud initialisation done!");
+		LOGGER.info("cloud initialisation done!");
 	}
 	
 	void stratupCheck(String cloudService, String cemuDirectory) {
 		if(cloudService.equals("GoogleDrive")) {
-			System.out.println("starting startup check google drive...");
+			LOGGER.info("starting startup check google drive ...");
 			try {
 				if (!googleDriveController.checkFolder()) {
 					googleDriveController.creatFolder();
@@ -69,7 +73,7 @@ public class CloudController {
 					sync(cloudService, cemuDirectory);
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				LOGGER.error("google drive startup check failed", e);
 			}
 		}
 		if(cloudService.equals("Dropbox")) {
@@ -88,13 +92,13 @@ public class CloudController {
             	Platform.runLater(() -> {
         			main.mainWindowController.getPlayBtn().setText("syncing...");
                  });
-            	System.out.println("starting sync in new thread...");
+            	LOGGER.info("starting synchronization in new thread ...");
             	
             	if(cloudService.equals("GoogleDrive")) {
         			try {
         				googleDriveController.sync(cemuDirectory);
         			} catch (IOException e) {
-        				e.printStackTrace();
+        				LOGGER.error("google drive synchronization failed", e);
         			}
         		}
         		if(cloudService.equals("Dropbox")) {
@@ -104,7 +108,7 @@ public class CloudController {
             		main.mainWindowController.getPlayBtn().setText("play");
                  });
         		main.mainWindowController.saveSettings();
-        		System.out.println("sync finished!");
+        		LOGGER.info("synchronization successful!");
             }
         });
 		thread.start();
@@ -117,13 +121,13 @@ public class CloudController {
 		new Thread() {
             @Override
 			public void run() {
-            	System.out.println("starting uploadFile in new thread...");
+            	LOGGER.info("starting uploadFile in new thread ...");
             	
             	if(cloudService.equals("GoogleDrive")) {
        			 	try {
        			 		googleDriveController.uploadFile(file);
        			 	} catch (IOException e) {
-       			 		e.printStackTrace();
+       			 		LOGGER.error("google drive uploadFile failed" ,e);
        			 	}
             	}
             	if(cloudService.equals("Dropbox")) {

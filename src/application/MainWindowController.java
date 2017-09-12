@@ -130,7 +130,7 @@ public class MainWindowController {
     private JFXButton lastTimePlayedBtn;
     
     @FXML
-    JFXButton timePlayedBtn;
+    JFXButton totalPlaytimeBtn;
     
     @FXML
     private JFXHamburger menuHam;
@@ -218,9 +218,9 @@ public class MainWindowController {
     private String selectedGameTitleID;
     private String selectedGameTitle;
     private String id;
-    private String version = "0.1.6";
-    private String buildNumber = "037";
-	private String versionName = "Throwback Galaxy";
+    private String version = "0.1.7";
+    private String buildNumber = "039";
+    private String versionName = "Throwback Galaxy";
     private int xPos = -200;
     private int yPos = 17;
     private int xPosHelper;
@@ -661,7 +661,7 @@ public class MainWindowController {
     }
     
     @FXML
-    void timePlayedBtnAction(ActionEvent event){
+    void totalPlaytimeBtnAction(ActionEvent event){
     	
     }
     
@@ -1010,7 +1010,7 @@ public class MainWindowController {
             	//setting last played
             	if(dbController.getLastPlayed(titleID).equals("") || dbController.getLastPlayed(titleID).equals(null)){
             		lastTimePlayedBtn.setText("Last played, never");
-            		timePlayedBtn.setText(dbController.getTimePlayed(titleID)+ " min");
+            		totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID)+ " min");
             	}else{
                 	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
                 	
@@ -1025,12 +1025,12 @@ public class MainWindowController {
                 	}else{
                     	lastTimePlayedBtn.setText("Last played, "+dbController.getLastPlayed(titleID));
                 	}
-                	if(Integer.parseInt(dbController.getTimePlayed(titleID)) > 60){
-                		int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTimePlayed(titleID))/60);
-                		int minutesPlayed = Integer.parseInt(dbController.getTimePlayed(titleID))-60*hoursPlayed;
-                		timePlayedBtn.setText(hoursPlayed+"h "+minutesPlayed+"min");
+                	if(Integer.parseInt(dbController.getTotalPlaytime(titleID)) > 60){
+                		int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTotalPlaytime(titleID))/60);
+                		int minutesPlayed = Integer.parseInt(dbController.getTotalPlaytime(titleID))-60*hoursPlayed;
+                		totalPlaytimeBtn.setText(hoursPlayed+"h "+minutesPlayed+"min");
                 	}else{
-                	timePlayedBtn.setText(dbController.getTimePlayed(titleID)+ " min");
+                		totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID)+ " min");
                 	}
             	}
             	
@@ -1261,7 +1261,7 @@ public class MainWindowController {
     }
 		
     void saveSettings(){
-    	LOGGER.info("saving Settings...");
+    	LOGGER.info("saving Settings ...");
     	OutputStream outputStream;	//new output-stream
     	try {
     		props.setProperty("cemuPath", getCemuPath());
@@ -1293,7 +1293,7 @@ public class MainWindowController {
      * if a value is not present, default is used instead
      */
     void loadSettings(){
-    	LOGGER.info("loading settings...");
+    	LOGGER.info("loading settings ...");
 		InputStream inputStream;
 		try {
 			if(System.getProperty("os.name").equals("Linux")){
@@ -1394,7 +1394,7 @@ public class MainWindowController {
 	private void playBtnSlideIn(){
 		playBtn.setVisible(true);
 		lastTimePlayedBtn.setVisible(true);
-		timePlayedBtn.setVisible(true);
+		totalPlaytimeBtn.setVisible(true);
 		playTrue = true;
 		
 		TranslateTransition playBtnTransition = new TranslateTransition(Duration.millis(300), playBtn);
@@ -1407,7 +1407,7 @@ public class MainWindowController {
 		lastTimePlayedBtnTransition.setToY(0);
 		lastTimePlayedBtnTransition.play();
 		
-		TranslateTransition timePlayedBtnTransition = new TranslateTransition(Duration.millis(300), timePlayedBtn);
+		TranslateTransition timePlayedBtnTransition = new TranslateTransition(Duration.millis(300), totalPlaytimeBtn);
 		timePlayedBtnTransition.setFromY(55);
 		timePlayedBtnTransition.setToY(0);
 		timePlayedBtnTransition.play();
@@ -1425,7 +1425,7 @@ public class MainWindowController {
 		lastTimePlayedBtnTransition.setToY(56);
 		lastTimePlayedBtnTransition.play();
 		
-		TranslateTransition timePlayedBtnTransition = new TranslateTransition(Duration.millis(300), timePlayedBtn);
+		TranslateTransition timePlayedBtnTransition = new TranslateTransition(Duration.millis(300), totalPlaytimeBtn);
 		timePlayedBtnTransition.setFromY(0);
 		timePlayedBtnTransition.setToY(56);
 		timePlayedBtnTransition.play();

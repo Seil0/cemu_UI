@@ -16,12 +16,16 @@ package application;
 
 import java.io.IOException;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import javafx.application.Platform;
 
 public class playGame extends Thread{
 
 	MainWindowController mainWindowController;
 	dbController dbController;
+	private static final Logger LOGGER = LogManager.getLogger(playGame.class.getName());
 	
 	public playGame(MainWindowController m, dbController db){
 		mainWindowController = m;
@@ -56,22 +60,22 @@ public class playGame extends Thread{
 					executeComand = mainWindowController.getCemuPath()+"\\Cemu.exe -g \""+mainWindowController.getGameExecutePath()+"\"";
 				}
 			}
-			System.out.println(executeComand);
+			LOGGER.info(executeComand);
 			
 			p = Runtime.getRuntime().exec(executeComand);
 			p.waitFor();
 			endTime = System.currentTimeMillis();
     		timePlayedNow = (int)  Math.floor(((endTime - startTime)/1000/60));   			
-    		timePlayed = Integer.parseInt(dbController.getTimePlayed(selectedGameTitleID))+timePlayedNow;
+    		timePlayed = Integer.parseInt(dbController.getTotalPlaytime(selectedGameTitleID))+timePlayedNow;
     		
-    		dbController.setTimePlayed(Integer.toString(timePlayed), selectedGameTitleID);
+    		dbController.setTotalPlaytime(Integer.toString(timePlayed), selectedGameTitleID);
     		Platform.runLater(() -> {
-    			if(Integer.parseInt(dbController.getTimePlayed(selectedGameTitleID)) > 60){
-            		int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTimePlayed(selectedGameTitleID))/60);
-            		int minutesPlayed = Integer.parseInt(dbController.getTimePlayed(selectedGameTitleID))-60*hoursPlayed;
-            		mainWindowController.timePlayedBtn.setText(hoursPlayed+"h "+minutesPlayed+"min");
+    			if(Integer.parseInt(dbController.getTotalPlaytime(selectedGameTitleID)) > 60){
+            		int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTotalPlaytime(selectedGameTitleID))/60);
+            		int minutesPlayed = Integer.parseInt(dbController.getTotalPlaytime(selectedGameTitleID))-60*hoursPlayed;
+            		mainWindowController.totalPlaytimeBtn.setText(hoursPlayed+"h "+minutesPlayed+"min");
             	}else{
-            		mainWindowController.timePlayedBtn.setText(dbController.getTimePlayed(selectedGameTitleID)+ " min");
+            		mainWindowController.totalPlaytimeBtn.setText(dbController.getTotalPlaytime(selectedGameTitleID)+ " min");
             	}
         		mainWindowController.main.primaryStage.setIconified(false);
              });

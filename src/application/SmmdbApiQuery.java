@@ -21,7 +21,8 @@ import datatypes.SmmdbApiDataType;
 
 public class SmmdbApiQuery {
 	
-	private String URL = "http://smmdb.ddns.net/api/getcourses?";
+	//FIXME limit=70 as workaround for to long response, courseDataGz is to long
+	private String URL = "http://smmdb.ddns.net/api/getcourses?format=json&limit=70";
 	private static final Logger LOGGER = LogManager.getLogger(SmmdbApiQuery.class.getName());
 
 	public SmmdbApiQuery() {
@@ -42,13 +43,14 @@ public class SmmdbApiQuery {
         	BufferedReader ina = new BufferedReader(new InputStreamReader(apiUrl.openStream()));
 			output = ina.readLine();
 			ina.close();
+			System.out.println(output);
 			LOGGER.info("response from " + URL + " was valid");
 		} catch (IOException e) {
 			LOGGER.error("error while making api request or reading response");
 			LOGGER.error("response from " + URL + " was: " + output, e);
 		}
         
-        String apiOutput = "{ \"courses\": " + output + "}";  
+        String apiOutput = "{ \"courses\": " + output + "}";
         JsonArray items = Json.parse(apiOutput).asObject().get("courses").asArray();
         
         for (JsonValue item : items) {

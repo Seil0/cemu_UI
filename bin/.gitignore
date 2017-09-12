@@ -1,4 +1,3 @@
 /application/
 /resources/
-/log4j2.xml
-/snippet/
+/cloudControllerInstances/

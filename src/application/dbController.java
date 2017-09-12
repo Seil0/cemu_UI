@@ -32,6 +32,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -47,15 +49,16 @@ public class dbController {
 	private String DB_PATH_games;
 	private Connection connection = null;
 	private Connection connectionGames = null;
+	private static final Logger LOGGER = LogManager.getLogger(dbController.class.getName());
 	
 	public void main(){
-		System.out.println("<==========starting loading sql==========>");
+		LOGGER.info("<==========starting loading sql==========>");
 		loadRomDatabase();
 		loadGamesDatabase();
 		createRomDatabase();
 		loadAllRoms();
 		checkRemoveEntry();
-		System.out.println("<==========finished loading sql==========>"); 
+		LOGGER.info("<==========finished loading sql==========>");
 	}
 	
 	private void loadRomDatabase(){
@@ -70,9 +73,9 @@ public class dbController {
 			connection.setAutoCommit(false);	//AutoCommit to false -> manual commit is active
 		} catch (SQLException e) {
 			// if the error message is "out of memory", it probably means no database file is found
-			System.err.println(e.getMessage());
+			LOGGER.error("error while loading the ROM database", e);
 		}
-		System.out.println("rom database loaded successfull");
+		LOGGER.info("ROM database loaded successfull");
 	}
 	
 	/**
@@ -91,9 +94,9 @@ public class dbController {
 			connectionGames.setAutoCommit(false);	//AutoCommit to false -> manual commit is active
 		} catch (SQLException e) {
 			// if the error message is "out of memory", it probably means no database file is found
-			System.err.println(e.getMessage());
+			LOGGER.error("error while loading the games database", e);
 		}
-		System.out.println("games database loaded successfull");
+		LOGGER.info("games database loaded successfull");
 	}
 	
 	//creating database, if database has 0 entries search for all .rpx files in the roms directory and add them
@@ -103,8 +106,8 @@ public class dbController {
 			stmt.executeUpdate("create table if not exists local_roms (title, coverPath, romPath, titleID, productCode, region, lastPlayed, timePlayed)");
 			stmt.close();
 			connection.commit();
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+		} catch (SQLException e) {
+			LOGGER.error("error while creating ROM database", e);
 		}
 		
 		try { 
@@ -115,9 +118,8 @@ public class dbController {
 			}
 			stmt.close();
 			rs.close();
-		}catch (SQLException ea){
-			System.err.println("Ups! an error occured!"); 
-			ea.printStackTrace();
+		}catch (SQLException e){
+			LOGGER.error("error while loading ROMs from ROM database, local_roms table", e);
 		}
 		if(entries.size() == 0){
 			loadRomDirectory(mainWindowController.getRomPath());
@@ -129,7 +131,7 @@ public class dbController {
 		stmt.executeUpdate("insert into local_roms values ('"+title+"','"+coverPath+"','"+romPath+"','"+titleID+"','"+productCode+"','"+region+"','"+lastPlayed+"','"+timePlayed+"')");
 		connection.commit();
 		stmt.close();
-		System.out.println("added \""+title+"\" to databsae");
+		LOGGER.info("added \""+title+"\" to ROM database");
 	}
 	
 	void removeRom(String titleID) throws SQLException{
@@ -137,12 +139,12 @@ public class dbController {
 		stmt.executeUpdate("delete from local_roms where titleID = '"+titleID+"'");
 		connection.commit();
 		stmt.close();
-		System.out.println("removed \""+titleID+"\" from databsae");
+		LOGGER.info("removed \""+titleID+"\" from ROM database");
 	}
 	
-	//load all rom's on startup to the UI
+	//load all ROMs on startup to the mainWindowController
 	void loadAllRoms(){
-		System.out.println("loading all rom's on startup to mwc ..."); 
+		LOGGER.info("loading all rom's on startup into the mainWindowController ...");
 		try { 
 			Statement stmt = connection.createStatement(); 
 			ResultSet rs = stmt.executeQuery("SELECT * FROM local_roms"); 
@@ -152,13 +154,13 @@ public class dbController {
 			stmt.close();
 			rs.close();
 		}catch (Exception e){
-			e.printStackTrace();
+			LOGGER.error("error while loading all ROMs into the mainWindowController", e);
 		}
 	}
 	
-	//load one single rom after manual adding one
+	//load one single ROM after manual adding into the mainWindowController
 	void loadSingleRom(String titleID){
-		System.out.println("loading a single rom (ID: "+titleID+") to mwc ..."); 
+		LOGGER.info("loading a single ROM (ID: "+titleID+") into the mainWindowController ..."); 
 		try { 
 			Statement stmt = connection.createStatement(); 
 			ResultSet rs = stmt.executeQuery("SELECT * FROM local_roms where titleID = '"+titleID+"'"); 
@@ -168,7 +170,7 @@ public class dbController {
 			stmt.close();
 			rs.close();
 		}catch (Exception e){
-			e.printStackTrace();
+			LOGGER.error("error while loading a single ROM into the mainWindowController", e);
 		}
 	}
 	
@@ -188,7 +190,7 @@ public class dbController {
 		
 		try {
 			Statement stmt = connectionGames.createStatement(); 
-			System.out.println("Getting all .rpx files in " + dir.getCanonicalPath()+" including those in subdirectories \n");
+			LOGGER.info("Getting all .rpx files in " + dir.getCanonicalPath()+" including those in subdirectories");
 			List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, true);
 			for (File file : files) {
 				if(System.getProperty("os.name").equals("Linux")){
@@ -201,16 +203,13 @@ public class dbController {
 				Document document = documentBuilder.parse(appFile);
 				String title_ID = document.getElementsByTagName("title_id").item(0).getTextContent();
 				title_ID = title_ID.substring(0, 8) + "-" + title_ID.substring(8, title_ID.length());
-				System.out.println("Name: "+file.getName()+"; Title ID: "+title_ID);
+				LOGGER.info("Name: "+file.getName()+"; Title ID: "+title_ID);
 				ResultSet rs = stmt.executeQuery("SELECT * FROM games WHERE TitleID = '"+title_ID+"';");
 				while (rs.next()) {
-					System.out.print(rs.getString(2));
 					if (checkEntry(rs.getString(2))) {
-						System.out.println(": game already in database");
+						LOGGER.info(rs.getString(2) + ": game already in database");
 					}else{
-						System.out.println(": add game");
-						System.out.println("adding cover to cache ...");
-						
+						LOGGER.info("adding cover to cache ...");
 						BufferedImage originalImage = ImageIO.read(new URL(rs.getString(6)));//change path to where file is located
 					    int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
 					    BufferedImage resizeImagePNG = resizeImage(originalImage, type, 400, 600);
@@ -221,15 +220,14 @@ public class dbController {
 						    ImageIO.write(resizeImagePNG, "png", new File(pictureCache+"\\"+rs.getString(3)+".png")); //change path where you want it saved
 						    coverPath = pictureCache+"\\"+rs.getString(3)+".png";
 					    }
-
+					    
+						LOGGER.info(rs.getString(2) + ": adding ROM");
 						addRom(rs.getString(2), coverPath, file.getCanonicalPath(), rs.getString(1), rs.getString(3), rs.getString(5),"","0");
 					}
 				}
-				System.out.println("");
 			}
 		} catch (IOException | SQLException | ParserConfigurationException | SAXException e) {
-			System.out.println("Ups something went wrong!");
-			e.printStackTrace();
+			LOGGER.error("error while loading ROMs from directory", e);
 		}
 	}
 	
@@ -244,8 +242,11 @@ public class dbController {
 	}
 	
 	private void checkRemoveEntry() {
-		// TODO needs to be implemented!
-		System.out.println("check if entry removed not done yet!");
+		/**
+		 *  TODO needs to be implemented!
+		 *  don't show ROM on the UI, but keep all parameter in case it's showing up again ask if old data should be used
+		 */
+		//LOGGER.info("check if entry removed not done yet!");
 	}
 	
 	private static BufferedImage resizeImage(BufferedImage originalImage, int type, int IMG_WIDTH, int IMG_HEIGHT) {
@@ -264,7 +265,7 @@ public class dbController {
 			connection.commit();
 			stmt.close();
 		}catch(SQLException e){
-			e.printStackTrace();
+			LOGGER.error("failed to set the last played", e);
 		}
 	}
 	
@@ -277,23 +278,24 @@ public class dbController {
 			stmt.close();
 			rs.close();
 		}catch(SQLException e){
-			e.printStackTrace();
+			LOGGER.error("failed to get the last played", e);
 		}
 		return lastPlayed;
 	}
 	
-	void setTimePlayed(String timePlayed, String titleID){
+	void setTotalPlaytime(String timePlayed, String titleID){
 		try{
 			Statement stmt = connection.createStatement(); 
 			stmt.executeUpdate("UPDATE local_roms SET timePlayed='"+timePlayed+"' WHERE titleID = '"+titleID+"';");
 			connection.commit();
 			stmt.close();
 		}catch(SQLException e){
+			LOGGER.error("failed to set total play time", e);
 			e.printStackTrace();
 		}
 	}
 	
-	String getTimePlayed(String titleID){
+	String getTotalPlaytime(String titleID){
 		String timePlayed = null;
 		try{
 			Statement stmt = connection.createStatement(); 
@@ -302,7 +304,7 @@ public class dbController {
 			stmt.close();
 			rs.close();
 		}catch(SQLException e){
-			e.printStackTrace();
+			LOGGER.error("failed to get total play time", e);
 		}
 		return timePlayed;
 	}
