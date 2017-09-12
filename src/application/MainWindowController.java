@@ -228,6 +228,8 @@ public class MainWindowController {
     private int xPosHelper;
     private int selectedUIDataIndex;
     private int selected;
+    private double windowWidth;
+    private double windowHeight;
 	private DirectoryChooser directoryChooser = new DirectoryChooser();
 	private File dirWin = new File(System.getProperty("user.home") + "/Documents/cemu_UI");
 	private File dirLinux = new File(System.getProperty("user.home") + "/cemu_UI");
@@ -268,7 +270,13 @@ public class MainWindowController {
 		smmdbApiQuery = new SmmdbApiQuery();
 	}
 	
-	void initUI(){		
+	void initUI() {
+		System.out.println(getWindowWidth());
+		if (getWindowWidth() > 100 && getWindowHeight() > 100) {
+			mainAnchorPane.setPrefSize(getWindowWidth(), getWindowHeight());	
+		}
+		refreshplayBtnPosition();
+		
 		cemuTextField.setText(cemuPath);
 		romTextField.setText(romPath);
 		colorPicker.setValue(Color.valueOf(getColor()));
@@ -1288,6 +1296,8 @@ public class MainWindowController {
 				props.setProperty("cloudService", getCloudService());
 			}
 			props.setProperty("folderID", main.cloudController.getFolderID(getCloudService()));
+			props.setProperty("windowWidth", String.valueOf(mainAnchorPane.getWidth()));
+			props.setProperty("windowHeight", String.valueOf(mainAnchorPane.getHeight()));
     		if(System.getProperty("os.name").equals("Linux")){
     			outputStream = new FileOutputStream(configFileLinux);
     		}else{
@@ -1363,6 +1373,20 @@ public class MainWindowController {
 			} catch (Exception e) {
 				LOGGER.error("could not load folderID, disable cloud sync. Please contact an developer", e);
 				setCloudSync(false);
+			}
+			
+			try {
+				setWindowWidth(Double.parseDouble(props.getProperty("windowWidth")));
+			} catch (Exception e) {
+				LOGGER.error("could not load windowWidth, setting default instead", e);
+				setWindowWidth(904);
+			}
+			
+			try {
+				setWindowHeight(Double.parseDouble(props.getProperty("windowHeight")));
+			} catch (Exception e) {
+				LOGGER.error("could not load windowHeight, setting default instead", e);
+				setWindowHeight(600);
 			}
 			
 			inputStream.close();
@@ -1577,6 +1601,22 @@ public class MainWindowController {
 
 	public void setPlayBtn(JFXButton playBtn) {
 		this.playBtn = playBtn;
+	}
+
+	public double getWindowWidth() {
+		return windowWidth;
+	}
+
+	public void setWindowWidth(double windowWidth) {
+		this.windowWidth = windowWidth;
+	}
+
+	public double getWindowHeight() {
+		return windowHeight;
+	}
+
+	public void setWindowHeight(double windowHeight) {
+		this.windowHeight = windowHeight;
 	}
 
 }

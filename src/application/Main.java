@@ -195,6 +195,8 @@ public class Main extends Application {
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, final Number newValue) {
 				mainWindowController.refreshUIData();
 				mainWindowController.refreshplayBtnPosition();
+				//TODO saveSettings only on left mouseBtn release
+				mainWindowController.saveSettings();
 			}
 		};
 
