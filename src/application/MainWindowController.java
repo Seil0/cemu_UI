@@ -1201,6 +1201,7 @@ public class MainWindowController {
      */
     private void generatePosition() {
     	int xPosHelperMax;
+    	//TODO  see issue #main.1
     	if(System.getProperty("os.name").equals("Linux")){
     		xPosHelperMax = (int) Math.floor((main.pane.getPrefWidth() - 36) / 217);
     	} else {

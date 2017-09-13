@@ -86,7 +86,7 @@ public class Main extends Application {
 				gamesDBFile = new File(dirWin + "/games.db");
 				localDB = new File(dirWin+"/localRoms.db");
 				pictureCache= new File(dirWin+"/picture_cache");
-				pane.setPrefWidth(892);
+				pane.setPrefWidth(892);	//FIXME this is not working under Windows anymore, need to test which size is correct. see issue #main.1
 			}
 			
 			//startup checks
@@ -193,8 +193,19 @@ public class Main extends Application {
 		final ChangeListener<Number> listener = new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, final Number newValue) {
-				mainWindowController.refreshUIData();
+				int xPosHelperMax;
+				//TODO  see issue #main.1
+				if(System.getProperty("os.name").equals("Linux")){
+		    		xPosHelperMax = (int) Math.floor((pane.getPrefWidth() - 36) / 217);
+		    	} else {
+		    		xPosHelperMax = (int) Math.floor((pane.getPrefWidth() - 24) / 217);
+		    	}
 				mainWindowController.refreshplayBtnPosition();
+				//call only if there is enough space for a new row TODO test this!
+				if (mainWindowController.getxPosHelper() != xPosHelperMax) {
+					mainWindowController.refreshUIData();
+				}
+//				mainWindowController.refreshUIData();
 				//TODO saveSettings only on left mouseBtn release
 				mainWindowController.saveSettings();
 			}
