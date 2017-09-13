@@ -1203,9 +1203,9 @@ public class MainWindowController {
     	int xPosHelperMax;
     	//TODO  see issue #main.1
     	if(System.getProperty("os.name").equals("Linux")){
-    		xPosHelperMax = (int) Math.floor((main.pane.getPrefWidth() - 36) / 217);
+    		xPosHelperMax = (int) Math.floor((mainAnchorPane.getWidth() - 36) / 217);
     	} else {
-    		xPosHelperMax = (int) Math.floor((main.pane.getPrefWidth() - 24) / 217);
+    		xPosHelperMax = (int) Math.floor((mainAnchorPane.getWidth() - 24) / 217);
     	}
     	if(xPosHelper == xPosHelperMax){
     		xPos = 17;
@@ -1215,7 +1215,7 @@ public class MainWindowController {
     		xPos = xPos + 217;
     		xPosHelper++;
     	}
-//    	System.out.println("Breit: " + main.pane.getPrefWidth());
+//    	System.out.println("Breit: " + mainAnchorPane.getWidth());
 //    	System.out.println("xPosHelper: " + xPosHelper);
 //    	System.out.println("yPos: " + yPos);
 //    	System.out.println("xPos: " + xPos);
