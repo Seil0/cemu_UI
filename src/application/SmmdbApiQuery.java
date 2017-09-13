@@ -21,8 +21,7 @@ import datatypes.SmmdbApiDataType;
 
 public class SmmdbApiQuery {
 	
-	//FIXME limit=70 as workaround for to long response, courseDataGz is to long
-	private String URL = "http://smmdb.ddns.net/api/getcourses?format=json&limit=70";
+	private String URL = "http://smmdb.ddns.net/api/getcourses?format=json";
 	private static final Logger LOGGER = LogManager.getLogger(SmmdbApiQuery.class.getName());
 
 	public SmmdbApiQuery() {

@@ -557,7 +557,6 @@ public class MainWindowController {
 		    @Override
 		    public void handle(MouseEvent mouseEvent) {
 		        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
-		            System.out.println("I'll help you");
 		            try {
 						Desktop.getDesktop().browse(new URI("https://github.com/Seil0/cemu_UI/issues/3"));
 					} catch (IOException | URISyntaxException e) {
