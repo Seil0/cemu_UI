@@ -57,7 +57,7 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
 		cloudController = new CloudController(this);
-		initActions();
+		initActions();	//TODO this should be called after mainWindow(), but if we do so mainAnchorPane.getWidth() is 0
 		mainWindow();
 	}
 	
@@ -70,7 +70,7 @@ public class Main extends Application {
 //			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/resources/Homeflix_Icon_64x64.png"))); //adds application icon
 
 			mainWindowController = loader.getController();	//Link of FXMLController and controller class
-			mainWindowController.setMain(this);	//call setMain		
+			mainWindowController.setMain(this);	//call setMain
 			
 			//get os and the right paths
 			if(System.getProperty("os.name").equals("Linux")){
@@ -79,14 +79,12 @@ public class Main extends Application {
 				gamesDBFile = new File(dirLinux + "/games.db");
 				localDB = new File(dirLinux+"/localRoms.db");
 				pictureCache= new File(dirLinux+"/picture_cache");
-				pane.setPrefWidth(904);	//this could be a kde plasma specific issue
 			}else{
 				directory = new File(dirWin);
 				configFile = new File(dirWin + "/config.xml");
 				gamesDBFile = new File(dirWin + "/games.db");
 				localDB = new File(dirWin+"/localRoms.db");
 				pictureCache= new File(dirWin+"/picture_cache");
-				pane.setPrefWidth(892);	//FIXME this is not working under Windows anymore, need to test which size is correct. see issue #main.1
 			}
 			
 			//startup checks
@@ -190,29 +188,53 @@ public class Main extends Application {
 	}
 	
 	private void initActions() {
-		final ChangeListener<Number> listener = new ChangeListener<Number>() {
+		final ChangeListener<Number> widthListener = new ChangeListener<Number>() {
+			
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, final Number newValue) {
-				int xPosHelperMax;
-				//TODO  see issue #main.1
-				if(System.getProperty("os.name").equals("Linux")){
-		    		xPosHelperMax = (int) Math.floor((pane.getPrefWidth() - 36) / 217);
-		    	} else {
-		    		xPosHelperMax = (int) Math.floor((pane.getPrefWidth() - 24) / 217);
-		    	}
+				int xPosHelperMax = (int) Math.floor((mainWindowController.getMainAnchorPane().getWidth() - 36) / 217);
+
 				mainWindowController.refreshplayBtnPosition();
-				//call only if there is enough space for a new row TODO test this!
-				if (mainWindowController.getxPosHelper() != xPosHelperMax) {
+				
+				//call only if there is enough space for a new row
+				if (mainWindowController.getOldXPosHelper() != xPosHelperMax) {
 					mainWindowController.refreshUIData();
 				}
-//				mainWindowController.refreshUIData();
+				
 				//TODO saveSettings only on left mouseBtn release
 				mainWindowController.saveSettings();
 			}
 		};
-
+		
+		final ChangeListener<Number> heightListener = new ChangeListener<Number>() {
+			
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, final Number newValue) {
+				mainWindowController.saveSettings();
+			}
+		};
+		
+		final ChangeListener<Boolean> maximizeListener = new ChangeListener<Boolean>() {
+			
+		    @Override
+		    public void changed(ObservableValue<? extends Boolean> ov, Boolean t, Boolean t1) {
+            	primaryStage.setMaximized(false);
+		    	
+		    	Alert alert = new Alert(AlertType.WARNING);
+            	alert.setTitle("edit");
+            	alert.setHeaderText("cemu_UI");
+            	alert.setContentText("maximized Window is not supporte!");
+            	alert.initOwner(primaryStage);
+            	alert.showAndWait();
+            	
+		    	LOGGER.warn("maximized Window is not supported");
+		    }
+		};
+		
 		//add listener to primaryStage
-		primaryStage.widthProperty().addListener(listener);
+		primaryStage.widthProperty().addListener(widthListener);
+		primaryStage.heightProperty().addListener(heightListener);
+		primaryStage.maximizedProperty().addListener(maximizeListener);
 	}
 	
 	public static void main(String[] args) {

@@ -226,6 +226,7 @@ public class MainWindowController {
     private int xPos = -200;
     private int yPos = 17;
     private int xPosHelper;
+    private int oldXPosHelper;
     private int selectedUIDataIndex;
     private int selected;
     private double windowWidth;
@@ -271,7 +272,6 @@ public class MainWindowController {
 	}
 	
 	void initUI() {
-		System.out.println(getWindowWidth());
 		if (getWindowWidth() > 100 && getWindowHeight() > 100) {
 			mainAnchorPane.setPrefSize(getWindowWidth(), getWindowHeight());	
 		}
@@ -344,9 +344,9 @@ public class MainWindowController {
 		edit.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-            	System.out.println("edit "+selectedGameTitleID);
+            	LOGGER.info("edit "+selectedGameTitleID);
             	if(selectedGameTitleID == null){
-            		System.out.println("trying to edit null! null is not valid!");
+            		LOGGER.warn("trying to edit null! null is not valid!");
 	            	Alert alert = new Alert(AlertType.WARNING);
 	            	alert.setTitle("edit");
 	            	alert.setHeaderText("cemu_UI");
@@ -354,7 +354,7 @@ public class MainWindowController {
 	            	alert.initOwner(main.primaryStage);
 	            	alert.showAndWait();
             	}else{
-            		System.out.println("show edit window TODO!"); //TODO show edit window
+            		//TODO show edit window
             	}
             }
 		});
@@ -362,9 +362,9 @@ public class MainWindowController {
 		remove.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
             public void handle(ActionEvent event) {
-            	System.out.println("remove "+selectedGameTitleID);
+				LOGGER.info("remove "+selectedGameTitleID);
             	if(selectedGameTitleID == null){
-            		System.out.println("trying to remove null! null is not valid!");
+            		LOGGER.warn("trying to remove null! null is not valid!");
                 	Alert alert = new Alert(AlertType.WARNING);
                 	alert.setTitle("remove");
                 	alert.setHeaderText("cemu_UI");
@@ -402,9 +402,9 @@ public class MainWindowController {
             public void handle(ActionEvent event) {
             	String titleID = selectedGameTitleID;
             	String updatePath;
-            	System.out.println("update: "+selectedGameTitleID);
+            	LOGGER.info("update: "+selectedGameTitleID);
             	if(selectedGameTitleID == null){
-            		LOGGER.error("trying to update null! null is not valid!");
+            		LOGGER.warn("trying to update null! null is not valid!");
 	            	Alert alert = new Alert(AlertType.WARNING);
 	            	alert.setTitle("edit");
 	            	alert.setHeaderText("cemu_UI");
@@ -461,7 +461,7 @@ public class MainWindowController {
             	
             	LOGGER.info("add DLC: "+selectedGameTitleID);
             	if(selectedGameTitleID == null){
-            		System.out.println("trying to add a dlc to null! null is not valid!");
+            		LOGGER.warn("trying to add a dlc to null! null is not valid!");
 	            	Alert alert = new Alert(AlertType.WARNING);
 	            	alert.setTitle("add DLC");
 	            	alert.setHeaderText("cemu_UI");
@@ -565,6 +565,7 @@ public class MainWindowController {
 		        }
 		    }
 		});
+
 		LOGGER.info("initializing Actions done!");
 	}
     
@@ -678,8 +679,7 @@ public class MainWindowController {
 				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again
 				System.exit(0);	//finishes itself
 			} catch (IOException e) {
-				System.out.println("es ist ein Fehler aufgetreten");
-				e.printStackTrace();
+				LOGGER.error("an error occurred", e);
 			}
         }
     }
@@ -697,8 +697,7 @@ public class MainWindowController {
 				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again
 				System.exit(0);	//finishes itself
 			} catch (IOException e) {
-				System.out.println("es ist ein Fehler aufgetreten");
-				e.printStackTrace();
+				LOGGER.error("an error occurred", e);
 			}
         }
     }
@@ -1069,9 +1068,9 @@ public class MainWindowController {
     }
     
     void refreshplayBtnPosition() {
-    	playBtn.setLayoutX((mainAnchorPane.getWidth()/2)-50);
-    	totalPlaytimeBtn.setLayoutX((mainAnchorPane.getWidth()/2)-50-20.5-100);
-    	lastTimePlayedBtn.setLayoutX((mainAnchorPane.getWidth()/2)+50+20.5);
+    	playBtn.setLayoutX((main.pane.getWidth()/2)-50);
+    	totalPlaytimeBtn.setLayoutX((main.pane.getWidth()/2)-50-20.5-100);
+    	lastTimePlayedBtn.setLayoutX((main.pane.getWidth()/2)+50+20.5);
     }
     
     private void addCourseDescription(SmmdbApiDataType course) {
@@ -1199,14 +1198,10 @@ public class MainWindowController {
      * calculates how many games can be displayed in one row
      */
     private void generatePosition() {
-    	int xPosHelperMax;
-    	//TODO  see issue #main.1
-    	if(System.getProperty("os.name").equals("Linux")){
-    		xPosHelperMax = (int) Math.floor((mainAnchorPane.getWidth() - 36) / 217);
-    	} else {
-    		xPosHelperMax = (int) Math.floor((mainAnchorPane.getWidth() - 24) / 217);
-    	}
+    	int xPosHelperMax = (int) Math.floor((mainAnchorPane.getWidth() - 36) / 217);
+
     	if(xPosHelper == xPosHelperMax){
+    		oldXPosHelper = xPosHelper;
     		xPos = 17;
     		yPos = yPos + 345;		
     		xPosHelper = 1;
@@ -1480,7 +1475,7 @@ public class MainWindowController {
 	 * @return the main color in hexadecimal format
 	 */
 	private String hexToRgb() {
-		System.out.println(getColor());
+		LOGGER.info(getColor());
 		int hex = Integer.parseInt(getColor().substring(0, 5), 16);
 		
 	    int r = (hex & 0xFF0000) >> 16;
@@ -1617,6 +1612,18 @@ public class MainWindowController {
 
 	public void setWindowHeight(double windowHeight) {
 		this.windowHeight = windowHeight;
+	}
+	
+	public int getOldXPosHelper() {
+		return oldXPosHelper;
+	}
+
+	public void setOldXPosHelper(int oldXPosHelper) {
+		this.oldXPosHelper = oldXPosHelper;
+	}
+
+	public AnchorPane getMainAnchorPane() {
+		return mainAnchorPane;
 	}
 
 }
