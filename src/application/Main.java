@@ -20,6 +20,9 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import javafx.application.Application;
@@ -189,6 +192,10 @@ public class Main extends Application {
 	
 	private void initActions() {
 		final ChangeListener<Number> widthListener = new ChangeListener<Number>() {
+
+			final Timer timer = new Timer();
+			TimerTask saveTask = null; //task to execute save operation
+			final long delayTime = 500; //delay until the window size is saved, if the window is resized earlier it will be killed, default is 500ms
 			
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, final Number newValue) {
@@ -201,16 +208,37 @@ public class Main extends Application {
 					mainWindowController.refreshUIData();
 				}
 				
-				//TODO saveSettings only on left mouseBtn release
-				mainWindowController.saveSettings();
+				//if saveTask is already running kill it
+				if (saveTask != null) saveTask.cancel();
+
+				saveTask = new TimerTask() {
+					@Override
+				    public void run() { 
+						mainWindowController.saveSettings();
+					}
+				};
+				timer.schedule(saveTask, delayTime);
 			}
 		};
 		
 		final ChangeListener<Number> heightListener = new ChangeListener<Number>() {
 			
+			final Timer timer = new Timer();
+			TimerTask saveTask = null; //task to execute save operation
+			final long delayTime = 500; //delay until the window size is saved, if the window is resized earlier it will be killed, default is 500ms
+			
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, final Number newValue) {
-				mainWindowController.saveSettings();
+				
+				if (saveTask != null) saveTask.cancel();
+				
+				saveTask = new TimerTask() {
+					@Override
+				    public void run() { 
+						mainWindowController.saveSettings();
+					}
+				};
+				timer.schedule(saveTask, delayTime);
 			}
 		};
 		
