@@ -1,7 +1,8 @@
 # cemu_UI
 
 ![Total Downloads](https://img.shields.io/github/downloads/Seil0/cemu_UI/total.svg?style=flat-square)
-![Latest](https://img.shields.io/github/release/Seil0/cemu_UI/all.svg?style=flat-square)
+[![Latest](https://img.shields.io/github/release/Seil0/cemu_UI/all.svg?style=flat-square)](https://github.com/Seil0/cemu_UI/releases)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
 
 cemu_UI is a simple, material design graphical frontend for [cemu](http://cemu.info/), a Wii U emulator. Downloads can be found [here](https://github.com/Seil0/cemu_UI/releases).
 
