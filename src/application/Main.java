@@ -76,13 +76,13 @@ public class Main extends Application {
 			mainWindowController.setMain(this);	//call setMain
 			
 			//get os and the right paths
-			if(System.getProperty("os.name").equals("Linux")){
+			if (System.getProperty("os.name").equals("Linux")) {
 				directory = new File(dirLinux);
 				configFile = new File(dirLinux + "/config.xml");
 				gamesDBFile = new File(dirLinux + "/games.db");
 				localDB = new File(dirLinux+"/localRoms.db");
 				pictureCache= new File(dirLinux+"/picture_cache");
-			}else{
+			} else {
 				directory = new File(dirWin);
 				configFile = new File(dirWin + "/config.xml");
 				gamesDBFile = new File(dirWin + "/games.db");
@@ -104,13 +104,13 @@ public class Main extends Application {
 
 			LOGGER.info("Directory: " + directory.exists());
 			LOGGER.info("Configfile: " + configFile.exists());
-			if(!directory.exists()){
+			if (!directory.exists()) {
 				LOGGER.info("creating cemu_UI directory");
 				directory.mkdir();
 				pictureCache.mkdir();
 			}
 			
-			if(!configFile.exists()){
+			if (!configFile.exists()) {
 				LOGGER.info("firststart, setting default values");
 				firstStart();
 				mainWindowController.setColor("00a8cc");
@@ -120,11 +120,11 @@ public class Main extends Application {
 				System.exit(0);	//finishes itself
 			}
 			
-			if(pictureCache.exists() != true){
+			if (pictureCache.exists() != true) {
 				pictureCache.mkdir();
 			}
 			
-			if(gamesDBFile.exists() != true){
+			if (gamesDBFile.exists() != true) {
 				try {
 					LOGGER.info("downloading games.db... ");
 					URL website = new URL(gamesDBdownloadURL);
@@ -165,7 +165,7 @@ public class Main extends Application {
 		alert.setContentText("please select your cemu installation");
 
 		Optional<ButtonType> result = alert.showAndWait();
-		if (result.get() == ButtonType.OK){
+		if (result.get() == ButtonType.OK) {
 			DirectoryChooser directoryChooser = new DirectoryChooser();
             File selectedDirectory = directoryChooser.showDialog(primaryStage);
             mainWindowController.setCemuPath(selectedDirectory.getAbsolutePath());
@@ -180,7 +180,7 @@ public class Main extends Application {
 		alert2.setContentText("please select your rom directory");
 
 		Optional<ButtonType> result2 = alert2.showAndWait();
-		if (result2.get() == ButtonType.OK){
+		if (result2.get() == ButtonType.OK) {
 			DirectoryChooser directoryChooser = new DirectoryChooser();
             File selectedDirectory = directoryChooser.showDialog(primaryStage);
                 mainWindowController.setRomPath(selectedDirectory.getAbsolutePath());

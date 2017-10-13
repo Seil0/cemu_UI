@@ -317,7 +317,7 @@ public class MainWindowController {
 			if (playTrue) {
 	    		playBtnSlideOut();
 	    	}
-	    	if (menuTrue){ 
+	    	if (menuTrue) { 
 				sideMenuSlideOut();
 				burgerTask.setRate(-1.0);
 				burgerTask.play();
