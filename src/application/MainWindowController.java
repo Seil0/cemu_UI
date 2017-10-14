@@ -272,6 +272,8 @@ public class MainWindowController {
 	}
 	
 	void initUI() {
+		LOGGER.info("initializing UI ...");
+		
 		if (getWindowWidth() > 100 && getWindowHeight() > 100) {
 			mainAnchorPane.setPrefSize(getWindowWidth(), getWindowHeight());	
 		}
@@ -304,6 +306,8 @@ public class MainWindowController {
 		courseTreeTable.getColumns().add(starsColumn);
 		courseTreeTable.getColumns().add(idColumn);
 		courseTreeTable.getColumns().get(3).setVisible(false); //hide idColumn (important)
+		
+		LOGGER.info("initializing UI done");
 	}
 	
 	/**
@@ -1038,7 +1042,89 @@ public class MainWindowController {
             	
             }	
         });
-    	games.add(new UIROMDataType(VBox, gameTitleLabel, gameBtn, titleID, romPath));
+    	games.add(new UIROMDataType(VBox, gameTitleLabel, gameBtn, imageView, titleID, romPath));
+    	
+//    	//THIS IS TESTING AREA!!!!
+//    	UIROMDataType test = new UIROMDataType(VBox, gameTitleLabel, gameBtn, imageView, titleID, romPath);
+//    	
+//    	test.getLabel().setText(title);
+//    	test.getLabel().setMaxWidth(200);
+//    	test.getLabel().setPadding(new Insets(0,0,0,8));
+//    	test.getLabel().setFont(Font.font("System", FontWeight.BOLD, 14));
+//    	
+//    	//i think we can do this locally and remove the imageView from the datatype since it's used as graphic
+//    	test.getImageView().setImage(coverImage);
+//    	test.getImageView().setFitHeight(300);
+//    	test.getImageView().setFitWidth(200);
+//    	
+//    	test.getButton().setGraphic(test.getImageView());
+//    	test.getButton().setContextMenu(gameContextMenu);
+//    	test.getButton().setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 3); ");
+//		test.getButton().addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+//			@Override
+//			public void handle(MouseEvent event) {
+//				LOGGER.info("selected: " + title + "; ID: " + titleID);
+//				// getting the selected game index by comparing event.getSource() with games.get(i).getButton()
+//				for (int i = 0; i < games.size(); i++) {
+//					if (games.get(i).getButton() == event.getSource()) {
+//						selectedUIDataIndex = i;
+//					}
+//				}
+//
+//				gameExecutePath = romPath;
+//				selectedGameTitleID = titleID;
+//				selectedGameTitle = title;
+//
+//				// underling selected Label
+//				lastGameLabel.setStyle("-fx-underline: false;");
+//				games.get(selectedUIDataIndex).getLabel().setStyle("-fx-underline: true;");
+//				lastGameLabel = games.get(selectedUIDataIndex).getLabel();
+//
+//				// setting last played, if lastPlayed is empty game was never played before, else set correct date
+//				if (dbController.getLastPlayed(titleID).equals("") || dbController.getLastPlayed(titleID).equals(null)) {
+//					lastTimePlayedBtn.setText("Last played, never");
+//					totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID) + " min");
+//				} else {
+//					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//
+//					int today = Integer.parseInt(dtf.format(LocalDate.now()).replaceAll("-", ""));
+//					int yesterday = Integer.parseInt(dtf.format(LocalDate.now().minusDays(1)).replaceAll("-", ""));
+//					int lastPlayedDay = Integer.parseInt(dbController.getLastPlayed(titleID).replaceAll("-", ""));
+//
+//					if (today == lastPlayedDay) {
+//						lastTimePlayedBtn.setText("Last played, today");
+//					} else if (yesterday == lastPlayedDay) {
+//						lastTimePlayedBtn.setText("Last played, yesterday");
+//					} else {
+//						lastTimePlayedBtn.setText("Last played, " + dbController.getLastPlayed(titleID));
+//					}
+//				}
+//
+//				// setting total playtime, if total playtime > 60 minutes, formate is "x hours x 
+//				// minutes" (xh x min), else only minutes are showed
+//				if (Integer.parseInt(dbController.getTotalPlaytime(titleID)) > 60) {
+//					int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTotalPlaytime(titleID)) / 60);
+//					int minutesPlayed = Integer.parseInt(dbController.getTotalPlaytime(titleID)) - 60 * hoursPlayed;
+//					totalPlaytimeBtn.setText(hoursPlayed + " h     " + minutesPlayed + " min");
+//				} else {
+//					totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID) + " min");
+//				}
+//
+//				if (!playTrue) {
+//					playBtnSlideIn();
+//				}
+//				if (menuTrue) {
+//					sideMenuSlideOut();
+//				}
+//
+//			}
+//		});
+//    	
+//    	test.getVBox().setLayoutX(getxPos());
+//    	test.getVBox().setLayoutY(getyPos());
+//    	test.getVBox().getChildren().addAll(gameTitleLabel,gameBtn);
+//    	
+//    	games.add(test);
     }
     
     //add all games saved in games(ArrayList) to the gamesAnchorPane
@@ -1198,8 +1284,16 @@ public class MainWindowController {
      * calculates how many games can be displayed in one row
      */
     private void generatePosition() {
-    	int xPosHelperMax = (int) Math.floor((mainAnchorPane.getWidth() - 36) / 217);
-
+    	int xPosHelperMax;
+    	
+    	//FIXME somehow the window width is set to 8, if we can find a way to get always the real window with
+    	//(at the beginning we have to use prefWidth after resizing Width) we can remove this
+    	if (mainAnchorPane.getWidth() < 10) {
+    		xPosHelperMax = (int) Math.floor((mainAnchorPane.getPrefWidth() - 36) / 217);
+    	} else {
+    		xPosHelperMax = (int) Math.floor((mainAnchorPane.getWidth() - 36) / 217);
+    	}
+    	
     	if(xPosHelper == xPosHelperMax){
     		oldXPosHelper = xPosHelper;
     		xPos = 17;
@@ -1209,7 +1303,7 @@ public class MainWindowController {
     		xPos = xPos + 217;
     		xPosHelper++;
     	}
-//    	System.out.println("Breit: " + mainAnchorPane.getWidth());
+//    	System.out.println("Breit: " + mainAnchorPane.getPrefWidth());
 //    	System.out.println("xPosHelper: " + xPosHelper);
 //    	System.out.println("yPos: " + yPos);
 //    	System.out.println("xPos: " + xPos);

@@ -9,6 +9,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Label;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
 public class UIROMDataType {
@@ -16,14 +17,17 @@ public class UIROMDataType {
 	private final SimpleObjectProperty<VBox> vBox = new SimpleObjectProperty<>();
 	private final SimpleObjectProperty<Label> label = new SimpleObjectProperty<>();
 	private final SimpleObjectProperty<JFXButton> button = new SimpleObjectProperty<>();
+	private final SimpleObjectProperty<ImageView> imageView = new SimpleObjectProperty<>();
 	private final StringProperty titleID = new SimpleStringProperty();
 	private final StringProperty romPath = new SimpleStringProperty();
 	
-	public UIROMDataType (final VBox vBox, final Label label, final JFXButton button, final String titleID, final String romPath){
+	public UIROMDataType (final VBox vBox, final Label label, final JFXButton button, final ImageView imageView, final String titleID, final String romPath){
 		this.vBox.set(vBox);
 		this.label.set(label);
 		this.button.set(button);
+		this.imageView.set(imageView);
 		this.titleID.set(titleID);
+		this.romPath.set(romPath);
 	}
 	
 	public SimpleObjectProperty<VBox> vBoxProperty(){
@@ -36,6 +40,10 @@ public class UIROMDataType {
 	
 	public SimpleObjectProperty<JFXButton> buttonProperty(){
 		return button;
+	}
+	
+	public SimpleObjectProperty<ImageView> imageViewProperty(){
+		return imageView;
 	}
 	
 	public StringProperty titleIDProperty(){
@@ -59,6 +67,10 @@ public class UIROMDataType {
 		return buttonProperty().get();
 	}
 	
+	public final ImageView getImageView() {
+		return imageViewProperty().get();
+	}
+	
 	public final String getTitleID(){
 		return titleIDProperty().get();
 	}
@@ -78,6 +90,10 @@ public class UIROMDataType {
 	
 	public final void setButton(JFXButton button) {
 		buttonProperty().set(button);
+	}
+	
+	public final void setImageView(ImageView imageView) {
+		imageViewProperty().set(imageView);
 	}
 	
 	public final void setTitleID(String titleID){

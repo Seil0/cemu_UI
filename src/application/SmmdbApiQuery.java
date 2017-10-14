@@ -42,8 +42,8 @@ public class SmmdbApiQuery {
         	BufferedReader ina = new BufferedReader(new InputStreamReader(apiUrl.openStream()));
 			output = ina.readLine();
 			ina.close();
-			System.out.println(output);
 			LOGGER.info("response from " + URL + " was valid");
+			LOGGER.info(output);
 		} catch (IOException e) {
 			LOGGER.error("error while making api request or reading response");
 			LOGGER.error("response from " + URL + " was: " + output, e);
