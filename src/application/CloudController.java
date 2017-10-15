@@ -3,14 +3,22 @@
  * 
  * Copyright 2017  <@Seil0>
  * 
- * "THE CHOCOLATE-WARE LICENSE" (Revision 1):
- * As long as you retain this notice this software is licensed under the GNU GENERAL PUBLIC LICENSE Version 3,
- * with the following additions:
- * If we meet some day, and you think this stuff is worth it,
- * you can buy me a chocolate in return. - @Seil0
- * (license based in Beer-ware, see https://fedoraproject.org/wiki/Licensing/Beerware )   
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
  * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301, USA.
  */
+
 package application;
 
 import java.io.File;

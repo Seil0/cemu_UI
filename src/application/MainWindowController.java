@@ -3,14 +3,22 @@
  * 
  * Copyright 2017  <@Seil0>
  * 
- * "THE CHOCOLATE-WARE LICENSE" (Revision 1):
- * As long as you retain this notice this software is licensed under the GNU GENERAL PUBLIC LICENSE Version 3,
- * with the following additions:
- * If we meet some day, and you think this stuff is worth it,
- * you can buy me a chocolate in return. - @Seil0
- * (license based in Beer-ware, see https://fedoraproject.org/wiki/Licensing/Beerware )   
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
  * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301, USA.
  */
+
 package application;
 
 import java.awt.Desktop;
@@ -956,178 +964,179 @@ public class MainWindowController {
     }
     
     /**
-     * add game to games(ArrayList) and initialize all needed actions (start, time stamps, titleID)
+     * add game to games (ArrayList) and initialize all needed actions (start, time stamps, titleID)
      * @param title : game title
      * @param coverPath : path to cover (cache)
-     * @param romPath : path to rom file (.rpx)
-     * @param titleID : rom ID
+     * @param romPath : path to ROM file (.rpx)
+     * @param titleID : ROM ID
      */
     void addGame(String title, String coverPath, String romPath, String titleID){
-    	ImageView imageView = new ImageView();
-    	Label gameTitleLabel = new Label(title);
-    	File coverFile = new File(coverPath);
     	VBox VBox = new VBox();
+    	Label gameTitleLabel = new Label();
     	JFXButton gameBtn = new JFXButton();
-    	Image coverImage = new Image(coverFile.toURI().toString());
+    	ImageView imageView = new ImageView();
+    	Image coverImage = new Image(new File(coverPath).toURI().toString());
     	
     	generatePosition();
-    	LOGGER.info("add " + getxPos());	//TODO debug
-    	VBox.setLayoutX(getxPos());
-    	VBox.setLayoutY(getyPos());
-    	VBox.getChildren().addAll(gameTitleLabel,gameBtn);	
-    	gameTitleLabel.setMaxWidth(200);
-    	gameTitleLabel.setPadding(new Insets(0,0,0,8));
-    	gameTitleLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
-    	imageView.setImage(coverImage);
-    	imageView.setFitHeight(300);
-    	imageView.setFitWidth(200);
-    	gameBtn.setGraphic(imageView);
-    	gameBtn.setContextMenu(gameContextMenu);
-    	gameBtn.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 3); ");
-    	gameBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-		     @Override
-		     public void handle(MouseEvent event) {
-		    	 LOGGER.info("selected: "+title+"; ID: "+titleID);
-            	//getting the selected game index by comparing event.getSource() with games.get(i).getButton()
-            	for(int i=0; i<games.size(); i++){
-            		if(games.get(i).getButton() == event.getSource()){
-            			selectedUIDataIndex = i;
-            		}
-            	}
-            	
-            	gameExecutePath = romPath;
-            	selectedGameTitleID = titleID;
-            	selectedGameTitle = title;
-            	
-            	//underling selected Label
-            	lastGameLabel.setStyle("-fx-underline: false;");
-            	games.get(selectedUIDataIndex).getLabel().setStyle("-fx-underline: true;");
-            	lastGameLabel = games.get(selectedUIDataIndex).getLabel();
-            	
-            	//setting last played, if lastPlayed is empty game was never played before, else set correct date
-            	if(dbController.getLastPlayed(titleID).equals("") || dbController.getLastPlayed(titleID).equals(null)){
-            		lastTimePlayedBtn.setText("Last played, never");
-            		totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID)+ " min");
-            	}else{
-                	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                	
-                	int today = Integer.parseInt(dtf.format(LocalDate.now()).replaceAll("-", ""));
-                	int yesterday  = Integer.parseInt(dtf.format(LocalDate.now().minusDays(1)).replaceAll("-", ""));
-                	int lastPlayedDay = Integer.parseInt(dbController.getLastPlayed(titleID).replaceAll("-", ""));
-                	
-                	if(today == lastPlayedDay){
-                		lastTimePlayedBtn.setText("Last played, today");
-                	}else if(yesterday == lastPlayedDay){
-                		lastTimePlayedBtn.setText("Last played, yesterday");
-                	}else{
-                    	lastTimePlayedBtn.setText("Last played, "+dbController.getLastPlayed(titleID));
-                	}
-            	}
-            	
-            	//setting total playtime, if total playtime > 60 minutes, formate is "x hours x minutes" (xh x min), else only minutes are showed 
-            	if(Integer.parseInt(dbController.getTotalPlaytime(titleID)) > 60){
-            		int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTotalPlaytime(titleID))/60);
-            		int minutesPlayed = Integer.parseInt(dbController.getTotalPlaytime(titleID))-60*hoursPlayed;
-            		totalPlaytimeBtn.setText(hoursPlayed+" h     "+minutesPlayed+" min");
-            	}else{
-            		totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID)+ " min");
-            	}
-            	
-            	if (!playTrue) {
-            		playBtnSlideIn();
-            	}
-            	if (menuTrue) {
-					sideMenuSlideOut();
-				}
-            	
-            }	
-        });
-    	games.add(new UIROMDataType(VBox, gameTitleLabel, gameBtn, imageView, titleID, romPath));
+//    	LOGGER.info("add " + getxPos());	//TODO debug
     	
-//    	//THIS IS TESTING AREA!!!!
-//    	UIROMDataType test = new UIROMDataType(VBox, gameTitleLabel, gameBtn, imageView, titleID, romPath);
-//    	
-//    	test.getLabel().setText(title);
-//    	test.getLabel().setMaxWidth(200);
-//    	test.getLabel().setPadding(new Insets(0,0,0,8));
-//    	test.getLabel().setFont(Font.font("System", FontWeight.BOLD, 14));
-//    	
-//    	//i think we can do this locally and remove the imageView from the datatype since it's used as graphic
-//    	test.getImageView().setImage(coverImage);
-//    	test.getImageView().setFitHeight(300);
-//    	test.getImageView().setFitWidth(200);
-//    	
-//    	test.getButton().setGraphic(test.getImageView());
-//    	test.getButton().setContextMenu(gameContextMenu);
-//    	test.getButton().setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 3); ");
-//		test.getButton().addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-//			@Override
-//			public void handle(MouseEvent event) {
-//				LOGGER.info("selected: " + title + "; ID: " + titleID);
-//				// getting the selected game index by comparing event.getSource() with games.get(i).getButton()
-//				for (int i = 0; i < games.size(); i++) {
-//					if (games.get(i).getButton() == event.getSource()) {
-//						selectedUIDataIndex = i;
-//					}
-//				}
-//
-//				gameExecutePath = romPath;
-//				selectedGameTitleID = titleID;
-//				selectedGameTitle = title;
-//
-//				// underling selected Label
-//				lastGameLabel.setStyle("-fx-underline: false;");
-//				games.get(selectedUIDataIndex).getLabel().setStyle("-fx-underline: true;");
-//				lastGameLabel = games.get(selectedUIDataIndex).getLabel();
-//
-//				// setting last played, if lastPlayed is empty game was never played before, else set correct date
-//				if (dbController.getLastPlayed(titleID).equals("") || dbController.getLastPlayed(titleID).equals(null)) {
-//					lastTimePlayedBtn.setText("Last played, never");
-//					totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID) + " min");
-//				} else {
-//					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//
-//					int today = Integer.parseInt(dtf.format(LocalDate.now()).replaceAll("-", ""));
-//					int yesterday = Integer.parseInt(dtf.format(LocalDate.now().minusDays(1)).replaceAll("-", ""));
-//					int lastPlayedDay = Integer.parseInt(dbController.getLastPlayed(titleID).replaceAll("-", ""));
-//
-//					if (today == lastPlayedDay) {
-//						lastTimePlayedBtn.setText("Last played, today");
-//					} else if (yesterday == lastPlayedDay) {
-//						lastTimePlayedBtn.setText("Last played, yesterday");
-//					} else {
-//						lastTimePlayedBtn.setText("Last played, " + dbController.getLastPlayed(titleID));
-//					}
-//				}
-//
-//				// setting total playtime, if total playtime > 60 minutes, formate is "x hours x 
-//				// minutes" (xh x min), else only minutes are showed
-//				if (Integer.parseInt(dbController.getTotalPlaytime(titleID)) > 60) {
-//					int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTotalPlaytime(titleID)) / 60);
-//					int minutesPlayed = Integer.parseInt(dbController.getTotalPlaytime(titleID)) - 60 * hoursPlayed;
-//					totalPlaytimeBtn.setText(hoursPlayed + " h     " + minutesPlayed + " min");
-//				} else {
-//					totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID) + " min");
-//				}
-//
-//				if (!playTrue) {
-//					playBtnSlideIn();
-//				}
-//				if (menuTrue) {
+//    	VBox.setLayoutX(getxPos());
+//    	VBox.setLayoutY(getyPos());
+//    	VBox.getChildren().addAll(gameTitleLabel,gameBtn);	
+//    	gameTitleLabel.setMaxWidth(200);
+//    	gameTitleLabel.setPadding(new Insets(0,0,0,8));
+//    	gameTitleLabel.setFont(Font.font("System", FontWeight.BOLD, 14));
+//    	imageView.setImage(coverImage);
+//    	imageView.setFitHeight(300);
+//    	imageView.setFitWidth(200);
+//    	gameBtn.setGraphic(imageView);
+//    	gameBtn.setContextMenu(gameContextMenu);
+//    	gameBtn.setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 3); ");
+//    	gameBtn.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+//		     @Override
+//		     public void handle(MouseEvent event) {
+//		    	 LOGGER.info("selected: "+title+"; ID: "+titleID);
+//            	//getting the selected game index by comparing event.getSource() with games.get(i).getButton()
+//            	for(int i=0; i<games.size(); i++){
+//            		if(games.get(i).getButton() == event.getSource()){
+//            			selectedUIDataIndex = i;
+//            		}
+//            	}
+//            	
+//            	gameExecutePath = romPath;
+//            	selectedGameTitleID = titleID;
+//            	selectedGameTitle = title;
+//            	
+//            	//underling selected Label
+//            	lastGameLabel.setStyle("-fx-underline: false;");
+//            	games.get(selectedUIDataIndex).getLabel().setStyle("-fx-underline: true;");
+//            	lastGameLabel = games.get(selectedUIDataIndex).getLabel();
+//            	
+//            	//setting last played, if lastPlayed is empty game was never played before, else set correct date
+//            	if(dbController.getLastPlayed(titleID).equals("") || dbController.getLastPlayed(titleID).equals(null)){
+//            		lastTimePlayedBtn.setText("Last played, never");
+//            		totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID)+ " min");
+//            	}else{
+//                	DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//                	
+//                	int today = Integer.parseInt(dtf.format(LocalDate.now()).replaceAll("-", ""));
+//                	int yesterday  = Integer.parseInt(dtf.format(LocalDate.now().minusDays(1)).replaceAll("-", ""));
+//                	int lastPlayedDay = Integer.parseInt(dbController.getLastPlayed(titleID).replaceAll("-", ""));
+//                	
+//                	if(today == lastPlayedDay){
+//                		lastTimePlayedBtn.setText("Last played, today");
+//                	}else if(yesterday == lastPlayedDay){
+//                		lastTimePlayedBtn.setText("Last played, yesterday");
+//                	}else{
+//                    	lastTimePlayedBtn.setText("Last played, "+dbController.getLastPlayed(titleID));
+//                	}
+//            	}
+//            	
+//            	//setting total playtime, if total playtime > 60 minutes, formate is "x hours x minutes" (xh x min), else only minutes are showed 
+//            	if(Integer.parseInt(dbController.getTotalPlaytime(titleID)) > 60){
+//            		int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTotalPlaytime(titleID))/60);
+//            		int minutesPlayed = Integer.parseInt(dbController.getTotalPlaytime(titleID))-60*hoursPlayed;
+//            		totalPlaytimeBtn.setText(hoursPlayed+" h     "+minutesPlayed+" min");
+//            	}else{
+//            		totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID)+ " min");
+//            	}
+//            	
+//            	if (!playTrue) {
+//            		playBtnSlideIn();
+//            	}
+//            	if (menuTrue) {
 //					sideMenuSlideOut();
 //				}
-//
-//			}
-//		});
-//    	
-//    	test.getVBox().setLayoutX(getxPos());
-//    	test.getVBox().setLayoutY(getyPos());
-//    	test.getVBox().getChildren().addAll(gameTitleLabel,gameBtn);
-//    	
-//    	games.add(test);
+//            	
+//            }	
+//        });
+//    	games.add(new UIROMDataType(VBox, gameTitleLabel, gameBtn, imageView, titleID, romPath));
+    	
+    	//THIS IS TESTING AREA!!!!
+    	UIROMDataType uiROMElement = new UIROMDataType(VBox, gameTitleLabel, gameBtn, imageView, titleID, romPath);
+    	
+    	uiROMElement.getLabel().setText(title);
+    	uiROMElement.getLabel().setMaxWidth(200);
+    	uiROMElement.getLabel().setPadding(new Insets(0,0,0,8));
+    	uiROMElement.getLabel().setFont(Font.font("System", FontWeight.BOLD, 14));
+    	
+    	// i think we can do this locally and remove the imageView from the data type since it's used as graphic
+    	uiROMElement.getImageView().setImage(coverImage);
+    	uiROMElement.getImageView().setFitHeight(300);
+    	uiROMElement.getImageView().setFitWidth(200);
+    	
+    	uiROMElement.getButton().setGraphic(uiROMElement.getImageView());
+    	uiROMElement.getButton().setContextMenu(gameContextMenu);
+    	uiROMElement.getButton().setStyle("-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 3); ");
+    	uiROMElement.getButton().addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent event) {
+				LOGGER.info("selected: " + title + "; ID: " + titleID);
+				// getting the selected game index by comparing event.getSource() with games.get(i).getButton()
+				for (int i = 0; i < games.size(); i++) {
+					if (games.get(i).getButton() == event.getSource()) {
+						selectedUIDataIndex = i;
+					}
+				}
+
+				gameExecutePath = romPath;
+				selectedGameTitleID = titleID;
+				selectedGameTitle = title;
+
+				// underlining selected Label
+				lastGameLabel.setStyle("-fx-underline: false;");
+				games.get(selectedUIDataIndex).getLabel().setStyle("-fx-underline: true;");
+				lastGameLabel = games.get(selectedUIDataIndex).getLabel();
+
+				// setting last played, if lastPlayed is empty game was never played before, else set correct date
+				if (dbController.getLastPlayed(titleID).equals("") || dbController.getLastPlayed(titleID).equals(null)) {
+					lastTimePlayedBtn.setText("Last played, never");
+					totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID) + " min");
+				} else {
+					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+					int today = Integer.parseInt(dtf.format(LocalDate.now()).replaceAll("-", ""));
+					int yesterday = Integer.parseInt(dtf.format(LocalDate.now().minusDays(1)).replaceAll("-", ""));
+					int lastPlayedDay = Integer.parseInt(dbController.getLastPlayed(titleID).replaceAll("-", ""));
+
+					if (lastPlayedDay == today) {
+						lastTimePlayedBtn.setText("Last played, today");
+					} else if (lastPlayedDay == yesterday) {
+						lastTimePlayedBtn.setText("Last played, yesterday");
+					} else {
+						lastTimePlayedBtn.setText("Last played, " + dbController.getLastPlayed(titleID));
+					}
+				}
+
+				// setting total playtime, if total playtime > 60 minutes, format is "x hours x minutes" (x h x min),
+				// else only minutes are showed
+				if (Integer.parseInt(dbController.getTotalPlaytime(titleID)) > 60) {
+					int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTotalPlaytime(titleID)) / 60);
+					int minutesPlayed = Integer.parseInt(dbController.getTotalPlaytime(titleID)) - 60 * hoursPlayed;
+					totalPlaytimeBtn.setText(hoursPlayed + " h     " + minutesPlayed + " min");
+				} else {
+					totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID) + " min");
+				}
+
+				if (!playTrue) {
+					playBtnSlideIn();
+				}
+				if (menuTrue) {
+					sideMenuSlideOut();
+				}
+
+			}
+		});
+    	
+    	uiROMElement.getVBox().setLayoutX(getxPos());
+    	uiROMElement.getVBox().setLayoutY(getyPos());
+    	uiROMElement.getVBox().getChildren().addAll(gameTitleLabel,gameBtn);
+    	
+    	// add uiROMElement to games list
+    	games.add(uiROMElement);
     }
     
-    //add all games saved in games(ArrayList) to the gamesAnchorPane
+    //add all games saved in games(ArrayList) to gamesAnchorPane
     void addUIData() {
     	for(int i=0; i<games.size(); i++){
     		gamesAnchorPane.getChildren().add(games.get(i).getVBox());
