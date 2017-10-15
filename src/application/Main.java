@@ -60,8 +60,8 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		this.primaryStage = primaryStage;
 		cloudController = new CloudController(this);
-		initActions();	//TODO this should be called after mainWindow(), but if we do so mainAnchorPane.getWidth() is 0
 		mainWindow();
+		initActions();
 	}
 	
 	private void mainWindow(){
@@ -140,14 +140,14 @@ public class Main extends Application {
 			
 			//loading settings and initialize UI, dbController.main() loads all databases
 			mainWindowController.loadSettings();
+			mainWindowController.initActions();
+			mainWindowController.initUI();
 			mainWindowController.dbController.main();
 			if(mainWindowController.isCloudSync()) {
 				cloudController.initializeConnection(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
 				cloudController.stratupCheck(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
-			}
+			}			
 			mainWindowController.addUIData();
-			mainWindowController.initActions();
-			mainWindowController.initUI();
 			
 			scene = new Scene(pane);	//create new scene, append pane to scene
 			scene.getStylesheets().add(Main.class.getResource("MainWindows.css").toExternalForm());

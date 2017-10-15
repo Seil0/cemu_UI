@@ -1303,7 +1303,9 @@ public class MainWindowController {
     		xPos = xPos + 217;
     		xPosHelper++;
     	}
-//    	System.out.println("Breit: " + mainAnchorPane.getPrefWidth());
+    	
+    	System.out.println("Breit: " + mainAnchorPane.getPrefWidth());
+    	System.out.println("Breit2: " + mainAnchorPane.getWidth());
 //    	System.out.println("xPosHelper: " + xPosHelper);
 //    	System.out.println("yPos: " + yPos);
 //    	System.out.println("xPos: " + xPos);
