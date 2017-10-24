@@ -228,9 +228,9 @@ public class MainWindowController {
     private String selectedGameTitleID;
     private String selectedGameTitle;
     private String id;
-    private String version = "0.1.7";
+    private String version = "0.2.0";
     private String buildNumber = "043";
-    private String versionName = "Throwback Galaxy";
+    private String versionName = "Puzzle Plank Galaxy";
     private int xPos = -200;
     private int yPos = 17;
     private int xPosHelper;
