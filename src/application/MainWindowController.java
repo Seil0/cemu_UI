@@ -128,6 +128,9 @@ public class MainWindowController {
     private JFXButton romTFBtn;
     
     @FXML
+    private JFXButton updateBtn;
+    
+    @FXML
     private JFXButton smmdbDownloadBtn;
     
     @FXML
@@ -152,14 +155,23 @@ public class MainWindowController {
     private TextFlow smmdbTextFlow;
     
     @FXML
-    private JFXColorPicker colorPicker;
-    
-    @FXML
-    private JFXToggleButton fullscreenToggleBtn;
+    private JFXColorPicker colorPicker;  
     
     @FXML
     private JFXToggleButton cloudSyncToggleBtn;
+    
+    @FXML
+    private JFXToggleButton autoUpdateToggleBtn;
+    
+    @FXML
+    private JFXToggleButton fullscreenToggleBtn;
 
+    @FXML
+    private AnchorPane mainAnchorPane;
+    
+    @FXML
+    private AnchorPane gamesAnchorPane;
+    
     @FXML
     private AnchorPane settingsAnchorPane;
     
@@ -167,13 +179,10 @@ public class MainWindowController {
     private AnchorPane smmdbAnchorPane;
     
     @FXML
-    private AnchorPane gamesAnchorPane;
+    private ScrollPane mainScrollPane;
     
     @FXML
-    private AnchorPane mainAnchorPane;
-    
-    @FXML
-    private ScrollPane scrollPaneMain;
+    private ScrollPane settingsScrollPane;
     
     @FXML
     private ScrollPane smmdbScrollPane;
@@ -189,6 +198,24 @@ public class MainWindowController {
     
     @FXML
     private Label helpLabel;
+    
+    @FXML
+    private Label cemu_UISettingsLbl;
+    
+    @FXML
+    private Label cemuDirectoryLbl;
+    
+    @FXML
+    private Label romDirectoryLbl;
+    
+    @FXML
+    private Label mainColorLbl;
+    
+    @FXML
+    private Label updateLbl;
+    
+    @FXML
+    private Label cemuSettingsLbl;
     
     
     @FXML
@@ -341,7 +368,7 @@ public class MainWindowController {
 				menuTrue = true;
 			}
 			if (settingsTrue) {
-				settingsAnchorPane.setVisible(false);
+				settingsScrollPane.setVisible(false);
 //				setPath(tfPath.getText());
 				saveSettings();
 				settingsTrue = false;
@@ -619,11 +646,11 @@ public class MainWindowController {
     		smmdbTrue = false;
     	}
     	if (settingsTrue) {
-    		settingsAnchorPane.setVisible(false);
+    		settingsScrollPane.setVisible(false);
       		settingsTrue = false;
     		saveSettings();
     	} else {
-    		settingsAnchorPane.setVisible(true);
+    		settingsScrollPane.setVisible(true);
     		settingsTrue = true;
     	}
     }
@@ -713,6 +740,16 @@ public class MainWindowController {
 			}
         }
     }
+    
+    @FXML
+    void  updateBtnAction(ActionEvent event) {
+    	// TODO implement and call update method
+	}
+    
+    @FXML
+    void  autoUpdateToggleBtnAction(ActionEvent event) {
+    	// TODO implement auto update function
+	}
     
     @FXML
     void smmdbDownloadBtnAction(ActionEvent event){
@@ -1239,8 +1276,8 @@ public class MainWindowController {
     		xPosHelper++;
     	}
     	
-    	System.out.println("Breit: " + mainAnchorPane.getPrefWidth());
-    	System.out.println("Breit2: " + mainAnchorPane.getWidth());
+//    	System.out.println("Breit: " + mainAnchorPane.getPrefWidth());
+//    	System.out.println("Breit2: " + mainAnchorPane.getWidth());
 //    	System.out.println("xPosHelper: " + xPosHelper);
 //    	System.out.println("yPos: " + yPos);
 //    	System.out.println("xPos: " + xPos);
@@ -1269,9 +1306,10 @@ public class MainWindowController {
 			playBtn.setStyle("-fx-text-fill: WHITE; -fx-font-family: Roboto Medium;");
 			cemuTFBtn.setStyle(btnStyleWhite);
 			romTFBtn.setStyle(btnStyleWhite);
+			updateBtn.setStyle(btnStyleWhite);
 			smmdbDownloadBtn.setStyle(btnStyleWhite);
 			playBtn.setStyle(btnStyleWhite);
-			
+
 			aboutBtn.setGraphic(info_white);
 			settingsBtn.setGraphic(settings_white);
 			addBtn.setGraphic(add_circle_white);
@@ -1290,6 +1328,7 @@ public class MainWindowController {
 			playBtn.setStyle("-fx-text-fill: BLACK; -fx-font-family: Roboto Medium;");
 			cemuTFBtn.setStyle(btnStyleBlack);
 			romTFBtn.setStyle(btnStyleBlack);
+			updateBtn.setStyle(btnStyleBlack);
 			smmdbDownloadBtn.setStyle(btnStyleBlack);
 			playBtn.setStyle(btnStyleBlack);
 			
