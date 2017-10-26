@@ -42,6 +42,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Properties;
+
 import javax.imageio.ImageIO;
 import javax.swing.ProgressMonitor;
 import javax.swing.ProgressMonitorInputStream;
@@ -256,7 +257,7 @@ public class MainWindowController {
     private String selectedGameTitle;
     private String id;
     private String version = "0.2.0";
-    private String buildNumber = "043";
+    private String buildNumber = "045";
     private String versionName = "Puzzle Plank Galaxy";
     private int xPos = -200;
     private int yPos = 17;
