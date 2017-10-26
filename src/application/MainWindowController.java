@@ -1126,9 +1126,16 @@ public class MainWindowController {
     }
     
     void refreshplayBtnPosition() {
-    	playBtn.setLayoutX((main.pane.getWidth()/2)-50);
-    	totalPlaytimeBtn.setLayoutX((main.pane.getWidth()/2)-50-20.5-100);
-    	lastTimePlayedBtn.setLayoutX((main.pane.getWidth()/2)+50+20.5);
+    	double width;
+    	
+    	if (mainAnchorPane.getWidth() < 10) {
+    		width = mainAnchorPane.getPrefWidth();
+    	} else {
+    		width = mainAnchorPane.getWidth();
+    	}
+    	playBtn.setLayoutX((width/2)-50);
+    	totalPlaytimeBtn.setLayoutX((width/2)-50-20.5-100);
+    	lastTimePlayedBtn.setLayoutX((width/2)+50+20.5);
     }
     
     private void addCourseDescription(SmmdbApiDataType course) {
