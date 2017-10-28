@@ -56,7 +56,7 @@ import com.google.api.services.drive.model.FileList;
 public class GoogleDriveController {
 	
 	Drive service;
-	private String cemuDirectory;
+	private String saveDirectory;
 	private String folderID;
 	private ArrayList<java.io.File> localSavegames = new ArrayList<>();
 	private ArrayList<File> cloudSavegames = new ArrayList<>();
@@ -64,7 +64,7 @@ public class GoogleDriveController {
 	private ArrayList<String> cloudSavegamesName = new ArrayList<>();
 	private static final Logger LOGGER = LogManager.getLogger(GoogleDriveController.class.getName());
 	
-    private final String APPLICATION_NAME ="cemu_Ui Drive API Controller";
+    private final String APPLICATION_NAME ="cemu_Ui Drive API Controller";	//TODO add Google
 
     //Directory to store user credentials for this application
     private final java.io.File DATA_STORE_DIR = new java.io.File(System.getProperty("user.home"), ".credentials/cemu_UI_credential");
@@ -104,6 +104,7 @@ public class GoogleDriveController {
 	     InputStream in = getClass().getClassLoader().getResourceAsStream("resources/client_secret.json");
 	     GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
+		 //FIXME Linux fails to open a new browser window, application crashes
 	     // Build flow and trigger user authorization request.
 	     GoogleAuthorizationCodeFlow flow =
 	    		 new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
@@ -129,8 +130,18 @@ public class GoogleDriveController {
 	 
 	 
 	 public void main(String cemuDirectory) throws IOException {
+		 java.io.File dir = new java.io.File(cemuDirectory + "/mlc01/usr/save");
+		 
 		 service = getDriveService();
-		 this.cemuDirectory = cemuDirectory;
+		 
+		 // cemu >= 1.11 uses /mlc01/usr/save/... instead of /mlc01/emulatorSave/...
+		 if (dir.exists()) {
+			 LOGGER.info("using new save path");
+			 saveDirectory = cemuDirectory + "/mlc01/usr/save";
+		 } else {
+			 LOGGER.info("using old save path");
+			 saveDirectory = cemuDirectory + "/mlc01/emulatorSave";
+		 }
 	 }
 	 
 	public void sync(String cemuDirectory) throws IOException {
@@ -209,7 +220,7 @@ public class GoogleDriveController {
 	
 	//reading all local savegames
 	private void getLocalSavegames() throws IOException {
-		java.io.File dir = new  java.io.File(cemuDirectory+"/mlc01/emulatorSave");
+		java.io.File dir = new  java.io.File(saveDirectory);
 		String[] extensions = new String[] { "dat","sav","bin" };
 		localSavegames.removeAll(localSavegames);
 		localSavegamesName.removeAll(localSavegamesName);
@@ -263,17 +274,17 @@ public class GoogleDriveController {
 	//download a file from the cloud to the local savegames folder
 	private void downloadFile(File downloadFile) throws IOException{	
 		LOGGER.info("downloading "+downloadFile.getName()+" ...");
-	   java.io.File directory = new java.io.File(cemuDirectory+"/mlc01/emulatorSave/"+ downloadFile.getName().substring(0,8));
-	   String file = downloadFile.getName().substring(9,downloadFile.getName().length());
-	   if(!directory.exists()) {
-		   LOGGER.info("dir dosent exist");
-		   directory.mkdir();
-	   }
+		java.io.File directory = new java.io.File(saveDirectory + "/" + downloadFile.getName().substring(0,8));
+		String file = downloadFile.getName().substring(9,downloadFile.getName().length());
+		if(!directory.exists()) {
+			LOGGER.info("dir dosent exist");
+			directory.mkdir();
+		}
 	    
-	   OutputStream outputStream = new FileOutputStream(directory +"/"+ file);
-	   service.files().get(downloadFile.getId()).executeMediaAndDownloadTo(outputStream);
-	   outputStream.close();
-	   LOGGER.info("download successfull, File ID: " + file);	//TODO add FileID
+		OutputStream outputStream = new FileOutputStream(directory +"/"+ file);
+		service.files().get(downloadFile.getId()).executeMediaAndDownloadTo(outputStream);
+		outputStream.close();
+		LOGGER.info("download successfull, File ID: " + file);	//TODO add FileID
 	}
 	
 	//update a file in the cloud, by deleting the old one and uploading an new with the same id
