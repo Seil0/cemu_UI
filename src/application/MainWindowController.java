@@ -858,9 +858,15 @@ public class MainWindowController {
         	    	cloudSync = true;
     				//TODO rework for other cloud services
     				cloudService = "GoogleDrive";
-    	    		main.cloudController.initializeConnection(getCloudService(), getCemuPath());
-    	    		main.cloudController.sync(getCloudService(), getCemuPath());
-    	        	saveSettings();
+    	    		if (main.cloudController.initializeConnection(getCloudService(), getCemuPath())) {
+        	    		main.cloudController.sync(getCloudService(), getCemuPath());
+        	        	saveSettings();
+    	    		} else {
+    	    			cloudSyncToggleBtn.setSelected(false);
+    	    			// TODO show error message
+    	    		}
+    	    		
+//    	        	saveSettings();
         	        dialog.close();
         	    }
         	});

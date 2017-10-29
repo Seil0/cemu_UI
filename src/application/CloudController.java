@@ -40,20 +40,26 @@ public class CloudController {
 	private GoogleDriveController googleDriveController = new GoogleDriveController();
 	private static final Logger LOGGER = LogManager.getLogger(CloudController.class.getName());
 	
-	void initializeConnection(String cloudService, String cemuDirectory) {
+	boolean initializeConnection(String cloudService, String cemuDirectory) {
+		boolean success = false;
 		LOGGER.info("sartting cloud initialisation ...");
+		
 		if(cloudService.equals("GoogleDrive")) {
 			LOGGER.info("selected service is Google Drive");
 			try {
 				googleDriveController.main(cemuDirectory);
 			} catch (IOException e) {
 				LOGGER.error("error while initialize connection", e);
+				return success;
 			}
+			success = true;
 		}
+		
 		if(cloudService.equals("Dropbox")) {
 			LOGGER.info("selected service is Dropbox");
 		}
 		LOGGER.info("cloud initialisation done!");
+		return success;
 	}
 	
 	void stratupCheck(String cloudService, String cemuDirectory) {
