@@ -287,4 +287,9 @@ public class Main extends Application {
 		LOGGER = LogManager.getLogger(Main.class.getName());
 		launch(args);
 	}
+	
+	@Override
+	public void stop() {
+	    System.exit(0);
+	}
 }

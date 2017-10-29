@@ -257,7 +257,7 @@ public class MainWindowController {
     private String selectedGameTitle;
     private String id;
     private String version = "0.2.0";
-    private String buildNumber = "045";
+    private String buildNumber = "047";
     private String versionName = "Puzzle Plank Galaxy";
     private int xPos = -200;
     private int yPos = 17;
