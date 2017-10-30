@@ -78,18 +78,22 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -321,6 +325,8 @@ public class MainWindowController {
 		fullscreenToggleBtn.setSelected(isFullscreen());
 		cloudSyncToggleBtn.setSelected(isCloudSync());
 		edit.setDisable(true);
+		updateBtn.setDisable(true);
+		autoUpdateToggleBtn.setDisable(true);
 		applyColor();
 		
 		//initialize courseTable
@@ -903,106 +909,183 @@ public class MainWindowController {
     
     @FXML
     void addBtnAction(ActionEvent event){
-    	boolean exit = false;
     	String romPath = null;
     	String coverPath = null;
     	String coverName = null;
     	String title = null;
     	String titleID = null;
     	File pictureCache;
+    	
+    	//TESTING
+    	
+    	Dialog<Integer> dialog = new Dialog<>();
+    	dialog.setTitle("add Dialog");
+    	dialog.setHeaderText("Look, a Custom Login Dialog");
+
+    	// Set the icon (must be included in the project).
+//    	dialog.setGraphic(new ImageView(this.getClass().getResource("login.png").toString()));
+
+    	// Set the button types.
+    	ButtonType okayBtn = new ButtonType("Okay", ButtonData.OK_DONE);
+    	dialog.getDialogPane().getButtonTypes().addAll(okayBtn, ButtonType.CANCEL);
+
+    	// Create gameTitle, titleID, gamePath and gameCover TextFields and Labels and two Btn for filechooser
+    	GridPane grid = new GridPane();
+    	grid.setHgap(10);
+    	grid.setVgap(10);
+    	grid.setPadding(new Insets(20, 150, 10, 10));
+
+    	TextField gameTitleTF = new TextField();
+    	gameTitleTF.setPromptText("game tile");
+    	TextField titleIDTF = new TextField();
+    	titleIDTF.setPromptText("title ID");
+    	TextField romPathTF = new TextField();
+    	romPathTF.setPromptText("ROM path");
+    	TextField gameCoverTF = new TextField();
+    	gameCoverTF.setPromptText("cover path");
+    	
+    	Button selectPathBtn = new Button("select .rpx file");
+    	Button selectCoverBtn = new Button("select .rpx file");
+    	
+    	selectPathBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	FileChooser romDirectoryChooser = new FileChooser();
+                File romDirectory =  romDirectoryChooser.showOpenDialog(main.primaryStage);
+                romPathTF.setText(romDirectory.getAbsolutePath());
+            }
+    	});
+    	
+    	selectCoverBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+            	FileChooser coverDirectoryChooser = new FileChooser();
+                File coverDirectory =  coverDirectoryChooser.showOpenDialog(main.primaryStage);
+                gameCoverTF.setText(coverDirectory.getAbsolutePath());
+            }
+    	});
+    	
+    	grid.add(new Label("game title:"), 0, 0);
+    	grid.add(gameTitleTF, 1, 0);
+    	grid.add(new Label("title id:"), 0, 1);
+    	grid.add(titleIDTF, 1, 1);
+    	grid.add(new Label("ROM path:"), 0, 2);
+    	grid.add(romPathTF, 1, 2);
+    	grid.add(selectPathBtn, 2, 2);
+    	grid.add(new Label("cover path:"), 0, 3);
+    	grid.add(gameCoverTF, 1, 3);
+    	grid.add(selectCoverBtn, 2, 3);
+
+    	dialog.getDialogPane().setContent(grid);
+
+    	Optional<Integer> result2 = dialog.showAndWait();
+    	if (result2.isPresent()){
+	    	romPath = romPathTF.getText();
+	    	coverPath = gameCoverTF.getText();
+	    	title = gameTitleTF.getText();
+	    	titleID = titleIDTF.getText();
+	    	
+    		System.out.println("Game title: " + title);
+	    	System.out.println("Title ID: " + titleID);
+	    	System.out.println("ROM path: " + romPath);
+	    	System.out.println("Game cover: " + coverPath);
+    	}
+    	
+    	
+    	// END TESTING
     	   	
-    	TextInputDialog titleDialog = new TextInputDialog();
-    	titleDialog.setTitle("cemu_UI");
-    	titleDialog.setHeaderText("add new Game");
-    	titleDialog.setContentText("Please enter the name of the game you want to add:");
-    	titleDialog.initOwner(main.primaryStage);
-    	
-    	Optional<String> titleResult = titleDialog.showAndWait();
-    	if (titleResult.isPresent()){
-    		title = titleResult.get();
-    	}else{
-    		exit = true;
-    	}
-    	
-    	if(exit == false){
-        	TextInputDialog titleIDDialog = new TextInputDialog();
-        	titleIDDialog.setTitle("cemu_UI");
-        	titleIDDialog.setHeaderText("add new Game");
-        	titleIDDialog.setContentText("Please enter the title-ID (12345678-12345678) \nof the game you want to add:");
-        	titleIDDialog.initOwner(main.primaryStage);
-        	
-        	Optional<String> titleIDResult = titleIDDialog.showAndWait();
-        	if (titleIDResult.isPresent()){
-        		titleID = titleIDResult.get();
-        	}else{
-        		exit = true;
-        	}
-    	}
-
-		if(exit == false){
-			Alert romAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
-	    	romAlert.setTitle("cemu_UI");
-	    	romAlert.setHeaderText("add new Game");
-	    	romAlert.setContentText("Please select the .rpx file from the game you want to add.");
-	    	romAlert.initOwner(main.primaryStage);
-
-			Optional<ButtonType> result = romAlert.showAndWait();
-			if (result.get() == ButtonType.OK){
-				FileChooser directoryChooser = new FileChooser();
-	            File selectedDirectory =  directoryChooser.showOpenDialog(main.primaryStage);
-	            romPath = selectedDirectory.getAbsolutePath();
-			} else {
-				exit = true;
-			}
-		}
-		
-		if(exit == false){
-			Alert coverAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
-			coverAlert.setTitle("cemu_UI");
-			coverAlert.setHeaderText("add new Game");
-			coverAlert.setContentText("Please select the cover for the game you want to add.");
-			coverAlert.initOwner(main.primaryStage);
-
-			Optional<ButtonType> coverResult = coverAlert.showAndWait();
-			if (coverResult.get() == ButtonType.OK){
-				FileChooser directoryChooser = new FileChooser();
-	            File selectedDirectory =  directoryChooser.showOpenDialog(main.primaryStage);
-	            coverPath = selectedDirectory.getAbsolutePath();
-			} else {
-				exit = true;
-			}
-		}
+//    	TextInputDialog titleDialog = new TextInputDialog();
+//    	titleDialog.setTitle("cemu_UI");
+//    	titleDialog.setHeaderText("add new Game");
+//    	titleDialog.setContentText("Please enter the name of the game you want to add:");
+//    	titleDialog.initOwner(main.primaryStage);
+//    	
+//    	Optional<String> titleResult = titleDialog.showAndWait();
+//    	if (titleResult.isPresent()){
+//    		title = titleResult.get();
+//    	}else{
+//    		exit = true;
+//    	}
+//    	
+//    	if(exit == false){
+//        	TextInputDialog titleIDDialog = new TextInputDialog();
+//        	titleIDDialog.setTitle("cemu_UI");
+//        	titleIDDialog.setHeaderText("add new Game");
+//        	titleIDDialog.setContentText("Please enter the title-ID (12345678-12345678) \nof the game you want to add:");
+//        	titleIDDialog.initOwner(main.primaryStage);
+//        	
+//        	Optional<String> titleIDResult = titleIDDialog.showAndWait();
+//        	if (titleIDResult.isPresent()){
+//        		titleID = titleIDResult.get();
+//        	}else{
+//        		exit = true;
+//        	}
+//    	}
+//
+//		if(exit == false){
+//			Alert romAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
+//	    	romAlert.setTitle("cemu_UI");
+//	    	romAlert.setHeaderText("add new Game");
+//	    	romAlert.setContentText("Please select the .rpx file from the game you want to add.");
+//	    	romAlert.initOwner(main.primaryStage);
+//
+//			Optional<ButtonType> result = romAlert.showAndWait();
+//			if (result.get() == ButtonType.OK){
+//				FileChooser directoryChooser = new FileChooser();
+//	            File selectedDirectory =  directoryChooser.showOpenDialog(main.primaryStage);
+//	            romPath = selectedDirectory.getAbsolutePath();
+//			} else {
+//				exit = true;
+//			}
+//		}
+//		
+//		if(exit == false){
+//			Alert coverAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
+//			coverAlert.setTitle("cemu_UI");
+//			coverAlert.setHeaderText("add new Game");
+//			coverAlert.setContentText("Please select the cover for the game you want to add.");
+//			coverAlert.initOwner(main.primaryStage);
+//
+//			Optional<ButtonType> coverResult = coverAlert.showAndWait();
+//			if (coverResult.get() == ButtonType.OK){
+//				FileChooser directoryChooser = new FileChooser();
+//	            File selectedDirectory =  directoryChooser.showOpenDialog(main.primaryStage);
+//	            coverPath = selectedDirectory.getAbsolutePath();
+//			} else {
+//				exit = true;
+//			}
+//		}
 		
 		/**
-		 * if exit == true then don't add a rom
+		 * FIXME if statement is useless at the moment
 		 * else convert the cover to .png add copy it into the picture cache
 		 * then add the rom to the local_roms database
 		 */
-		if(exit){
+		if (romPath == "" || coverPath == "" || title == "" || titleID == "") {
 			LOGGER.info("No parameter set!");
-		}else{
+		} else {
 			coverName = new File(coverPath).getName();
 			try	{
-				if(System.getProperty("os.name").equals("Linux")){
+				if (System.getProperty("os.name").equals("Linux")) {
 					pictureCache = pictureCacheLinux;
-				}else{
+				} else {
 					pictureCache = pictureCacheWin;
 				}
 				
-			    BufferedImage originalImage = ImageIO.read(new File(coverPath));//load cover
+			    BufferedImage originalImage = ImageIO.read(new File(coverPath)); //load cover
 			    int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
 			    BufferedImage resizeImagePNG = resizeImage(originalImage, type, 400, 600);
 			    ImageIO.write(resizeImagePNG, "png", new File(pictureCache+"\\"+coverName)); //save image to pictureCache
 			    coverPath = pictureCache+"\\"+coverName;
 			} catch (IOException e) {
-				LOGGER.error("Ops something went wrong!", e);
+				LOGGER.error("Ops something went wrong! Error while resizing cover.", e);
 			}
 			
 			try {	
 				dbController.addRom(title, coverPath, romPath, titleID, "", "", "", "0");
 				dbController.loadSingleRom(titleID);
 			} catch (SQLException e) {
-				LOGGER.error("Oops, something went wrong! Error during adding a game.", e);
+				LOGGER.error("Oops, something went wrong! Error while adding a game.", e);
 			}
 		}
     }
@@ -1272,8 +1355,10 @@ public class MainWindowController {
     private void generatePosition() {
     	int xPosHelperMax;
     	
-    	//FIXME somehow the window width is set to 8, if we can find a way to get always the real window with
-    	//(at the beginning we have to use prefWidth after resizing Width) we can remove this
+    	/**FIXME somehow the window width is set to 8, if we can find a way to get always the real window with
+    	* PRIORITY_HIGH check if we can use main.pane.getWidth()!!
+    	*(at the beginning we have to use prefWidth after resizing Width) we can remove this
+    	*/
     	if (mainAnchorPane.getWidth() < 10) {
     		xPosHelperMax = (int) Math.floor((mainAnchorPane.getPrefWidth() - 36) / 217);
     	} else {
@@ -1290,7 +1375,7 @@ public class MainWindowController {
     		xPosHelper++;
     	}
     	
-//    	System.out.println("Breit: " + mainAnchorPane.getPrefWidth());
+//    	System.out.println("Breit: " + main.pane.getWidth());
 //    	System.out.println("Breit2: " + mainAnchorPane.getWidth());
 //    	System.out.println("xPosHelper: " + xPosHelper);
 //    	System.out.println("yPos: " + yPos);
