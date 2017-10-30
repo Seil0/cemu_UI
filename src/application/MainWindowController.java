@@ -286,6 +286,7 @@ public class MainWindowController {
     Properties props = new Properties();
     Properties gameProps = new Properties();
     private static final Logger LOGGER = LogManager.getLogger(MainWindowController.class.getName());
+    private HamburgerBackArrowBasicTransition burgerTask;
     private MenuItem edit = new MenuItem("edit");
     private MenuItem remove = new MenuItem("remove");
     private MenuItem update = new MenuItem("update");
@@ -325,8 +326,8 @@ public class MainWindowController {
 		fullscreenToggleBtn.setSelected(isFullscreen());
 		cloudSyncToggleBtn.setSelected(isCloudSync());
 		edit.setDisable(true);
-		updateBtn.setDisable(true);
-		autoUpdateToggleBtn.setDisable(true);
+		updateBtn.setDisable(true);	// TODO
+		autoUpdateToggleBtn.setDisable(true);	// TODO
 		applyColor();
 		
 		//initialize courseTable
@@ -358,7 +359,7 @@ public class MainWindowController {
 	void initActions() {
 		LOGGER.info("initializing Actions ...");
 		
-		HamburgerBackArrowBasicTransition burgerTask = new HamburgerBackArrowBasicTransition(menuHam);
+		burgerTask = new HamburgerBackArrowBasicTransition(menuHam);
 		menuHam.addEventHandler(MouseEvent.MOUSE_PRESSED, (e)->{
 			if (playTrue) {
 	    		playBtnSlideOut();
@@ -368,7 +369,7 @@ public class MainWindowController {
 				burgerTask.setRate(-1.0);
 				burgerTask.play();
 				menuTrue = false;
-			}else{
+			} else {
 				sideMenuSlideIn();
 				burgerTask.setRate(1.0);
 				burgerTask.play();
@@ -856,7 +857,7 @@ public class MainWindowController {
         	content.setBody(new Text("You just activate the cloud savegame sync function of cemu_UI, \nwhich is currently in beta. Are you sure you want to do this?"));
         	StackPane stackPane = new StackPane();
         	stackPane.autosize();
-        	JFXDialog dialog = new JFXDialog(stackPane, content, JFXDialog.DialogTransition.LEFT, true);
+        	JFXDialog betaDialog = new JFXDialog(stackPane, content, JFXDialog.DialogTransition.LEFT, true);
         	JFXButton okayBtn = new JFXButton("Okay");
         	okayBtn.setOnAction(new EventHandler<ActionEvent>(){
         	    @Override
@@ -869,11 +870,35 @@ public class MainWindowController {
         	        	saveSettings();
     	    		} else {
     	    			cloudSyncToggleBtn.setSelected(false);
-    	    			// TODO show error message
+    	    			
+    	    	    	//cloud sync init error dialog
+    	    			JFXDialogLayout content= new JFXDialogLayout();
+    	    	    	content.setHeading(new Text("Error while initializing cloud sync!"));
+    	    	    	content.setBody(new Text("There was some truble initializing the cloud sync."
+    	    	    			+ "\nPlease upload the app.log (which can be found in the cemu_UI directory)"
+    	    	    			+ "\nto \"https://github.com/Seil0/cemu_UI/issues\" so we can fix this.")); 
+    	    	    	content.setPrefSize(450, 170);
+    	    	    	StackPane stackPane = new StackPane();
+    	    	    	stackPane.autosize();
+    	    	    	JFXDialog dialog =new JFXDialog(stackPane, content, JFXDialog.DialogTransition.LEFT, true);
+    	    	    	JFXButton button=new JFXButton("Okay");
+    	    	    	button.setOnAction(new EventHandler<ActionEvent>(){
+    	    	    	    @Override
+    	    	    	    public void handle(ActionEvent event){
+    	    	    	        dialog.close();
+    	    	    	    }
+    	    	    	});
+    	    	    	button.setButtonType(com.jfoenix.controls.JFXButton.ButtonType.RAISED);
+    	    	    	button.setPrefHeight(32);
+    	    	    	button.setStyle(dialogBtnStyle);
+    	    	    	content.setActions(button);
+    	    	    	main.pane.getChildren().add(stackPane);
+    	    	    	AnchorPane.setTopAnchor(stackPane, (main.pane.getHeight()-content.getPrefHeight())/2);
+    	    	    	AnchorPane.setLeftAnchor(stackPane, (main.pane.getWidth()-content.getPrefWidth())/2);
+    	    	    	dialog.show();
     	    		}
     	    		
-//    	        	saveSettings();
-        	        dialog.close();
+    	    		betaDialog.close();
         	    }
         	});
         	JFXButton cancelBtn = new JFXButton("Cancel");
@@ -881,7 +906,7 @@ public class MainWindowController {
         	    @Override
         	    public void handle(ActionEvent event){
         	    	cloudSyncToggleBtn.setSelected(false);
-        	        dialog.close();
+        	    	betaDialog.close();
         	    }
         	});
         	Label placeholder = new Label();
@@ -897,7 +922,7 @@ public class MainWindowController {
         	main.pane.getChildren().add(stackPane);
         	AnchorPane.setTopAnchor(stackPane, (main.pane.getHeight()-content.getPrefHeight())/2);
         	AnchorPane.setLeftAnchor(stackPane, (main.pane.getWidth()-content.getPrefWidth())/2);
-        	dialog.show();
+        	betaDialog.show();
     	}
     }
     
@@ -916,14 +941,9 @@ public class MainWindowController {
     	String titleID = null;
     	File pictureCache;
     	
-    	//TESTING
-    	
     	Dialog<Integer> dialog = new Dialog<>();
-    	dialog.setTitle("add Dialog");
-    	dialog.setHeaderText("Look, a Custom Login Dialog");
-
-    	// Set the icon (must be included in the project).
-//    	dialog.setGraphic(new ImageView(this.getClass().getResource("login.png").toString()));
+    	dialog.setTitle("add a new game");
+    	dialog.setHeaderText("add a new game manually to cemu UI");
 
     	// Set the button types.
     	ButtonType okayBtn = new ButtonType("Okay", ButtonData.OK_DONE);
@@ -945,7 +965,7 @@ public class MainWindowController {
     	gameCoverTF.setPromptText("cover path");
     	
     	Button selectPathBtn = new Button("select .rpx file");
-    	Button selectCoverBtn = new Button("select .rpx file");
+    	Button selectCoverBtn = new Button("select cover file");
     	
     	selectPathBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -990,72 +1010,7 @@ public class MainWindowController {
 	    	System.out.println("ROM path: " + romPath);
 	    	System.out.println("Game cover: " + coverPath);
     	}
-    	
-    	
-    	// END TESTING
-    	   	
-//    	TextInputDialog titleDialog = new TextInputDialog();
-//    	titleDialog.setTitle("cemu_UI");
-//    	titleDialog.setHeaderText("add new Game");
-//    	titleDialog.setContentText("Please enter the name of the game you want to add:");
-//    	titleDialog.initOwner(main.primaryStage);
-//    	
-//    	Optional<String> titleResult = titleDialog.showAndWait();
-//    	if (titleResult.isPresent()){
-//    		title = titleResult.get();
-//    	}else{
-//    		exit = true;
-//    	}
-//    	
-//    	if(exit == false){
-//        	TextInputDialog titleIDDialog = new TextInputDialog();
-//        	titleIDDialog.setTitle("cemu_UI");
-//        	titleIDDialog.setHeaderText("add new Game");
-//        	titleIDDialog.setContentText("Please enter the title-ID (12345678-12345678) \nof the game you want to add:");
-//        	titleIDDialog.initOwner(main.primaryStage);
-//        	
-//        	Optional<String> titleIDResult = titleIDDialog.showAndWait();
-//        	if (titleIDResult.isPresent()){
-//        		titleID = titleIDResult.get();
-//        	}else{
-//        		exit = true;
-//        	}
-//    	}
-//
-//		if(exit == false){
-//			Alert romAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
-//	    	romAlert.setTitle("cemu_UI");
-//	    	romAlert.setHeaderText("add new Game");
-//	    	romAlert.setContentText("Please select the .rpx file from the game you want to add.");
-//	    	romAlert.initOwner(main.primaryStage);
-//
-//			Optional<ButtonType> result = romAlert.showAndWait();
-//			if (result.get() == ButtonType.OK){
-//				FileChooser directoryChooser = new FileChooser();
-//	            File selectedDirectory =  directoryChooser.showOpenDialog(main.primaryStage);
-//	            romPath = selectedDirectory.getAbsolutePath();
-//			} else {
-//				exit = true;
-//			}
-//		}
-//		
-//		if(exit == false){
-//			Alert coverAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
-//			coverAlert.setTitle("cemu_UI");
-//			coverAlert.setHeaderText("add new Game");
-//			coverAlert.setContentText("Please select the cover for the game you want to add.");
-//			coverAlert.initOwner(main.primaryStage);
-//
-//			Optional<ButtonType> coverResult = coverAlert.showAndWait();
-//			if (coverResult.get() == ButtonType.OK){
-//				FileChooser directoryChooser = new FileChooser();
-//	            File selectedDirectory =  directoryChooser.showOpenDialog(main.primaryStage);
-//	            coverPath = selectedDirectory.getAbsolutePath();
-//			} else {
-//				exit = true;
-//			}
-//		}
-		
+
 		/**
 		 * FIXME if statement is useless at the moment
 		 * else convert the cover to .png add copy it into the picture cache
@@ -1084,6 +1039,7 @@ public class MainWindowController {
 			try {	
 				dbController.addRom(title, coverPath, romPath, titleID, "", "", "", "0");
 				dbController.loadSingleRom(titleID);
+				refreshUIData();
 			} catch (SQLException e) {
 				LOGGER.error("Oops, something went wrong! Error while adding a game.", e);
 			}
@@ -1176,6 +1132,9 @@ public class MainWindowController {
 				}
 				if (menuTrue) {
 					sideMenuSlideOut();
+					burgerTask.setRate(-1.0);
+					burgerTask.play();
+					menuTrue = false;
 				}
 
 			}
@@ -1356,7 +1315,6 @@ public class MainWindowController {
     	int xPosHelperMax;
     	
     	/**FIXME somehow the window width is set to 8, if we can find a way to get always the real window with
-    	* PRIORITY_HIGH check if we can use main.pane.getWidth()!!
     	*(at the beginning we have to use prefWidth after resizing Width) we can remove this
     	*/
     	if (mainAnchorPane.getWidth() < 10) {
