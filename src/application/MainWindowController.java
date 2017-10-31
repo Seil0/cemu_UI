@@ -325,7 +325,6 @@ public class MainWindowController {
 		colorPicker.setValue(Color.valueOf(getColor()));
 		fullscreenToggleBtn.setSelected(isFullscreen());
 		cloudSyncToggleBtn.setSelected(isCloudSync());
-		edit.setDisable(true);
 		updateBtn.setDisable(true);	// TODO
 		autoUpdateToggleBtn.setDisable(true);	// TODO
 		applyColor();
@@ -401,7 +400,88 @@ public class MainWindowController {
 	            	alert.initOwner(main.primaryStage);
 	            	alert.showAndWait();
             	}else{
-            		//TODO show edit window
+            		String[] gameInfo = dbController.getGameInfo(selectedGameTitleID);
+
+            		//new Dialog
+                	Dialog<Integer> dialog = new Dialog<>();
+                	dialog.setTitle("edit game");
+                	dialog.setHeaderText("You can edit the tile and rom/cover path.");
+
+                	// Set the button types.
+                	ButtonType okayBtn = new ButtonType("Okay", ButtonData.OK_DONE);
+                	dialog.getDialogPane().getButtonTypes().addAll(okayBtn, ButtonType.CANCEL);
+
+                	// Create gameTitle, titleID, gamePath and gameCover TextFields and Labels and two Btn for filechooser
+                	GridPane grid = new GridPane();
+                	grid.setHgap(10);
+                	grid.setVgap(10);
+                	grid.setPadding(new Insets(20, 150, 10, 10));
+
+                	TextField gameTitleTF = new TextField();
+                	gameTitleTF.setPromptText("game tile");
+                	TextField titleIDTF = new TextField();
+                	titleIDTF.setPromptText("title ID");
+                	TextField romPathTF = new TextField();
+                	romPathTF.setPromptText("ROM path");
+                	TextField gameCoverTF = new TextField();
+                	gameCoverTF.setPromptText("cover path");
+                	
+                	gameTitleTF.setText(gameInfo[0]);
+                	titleIDTF.setText(gameInfo[3]);
+                	romPathTF.setText(gameInfo[2]);
+                	gameCoverTF.setText(gameInfo[1]);
+                	
+                	titleIDTF.setEditable(false);
+                	
+                	Button selectPathBtn = new Button("select .rpx file");
+                	Button selectCoverBtn = new Button("select cover file");
+                	
+                	selectPathBtn.setPrefWidth(110);
+                	selectCoverBtn.setPrefWidth(110);
+                	
+                	selectPathBtn.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                        	FileChooser romDirectoryChooser = new FileChooser();
+                            File romDirectory =  romDirectoryChooser.showOpenDialog(main.primaryStage);
+                            romPathTF.setText(romDirectory.getAbsolutePath());
+                        }
+                	});
+                	
+                	selectCoverBtn.setOnAction(new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent event) {
+                        	FileChooser coverDirectoryChooser = new FileChooser();
+                            File coverDirectory =  coverDirectoryChooser.showOpenDialog(main.primaryStage);
+                            gameCoverTF.setText(coverDirectory.getAbsolutePath());
+                        }
+                	});
+                	
+                	grid.add(new Label("game title:"), 0, 0);
+                	grid.add(gameTitleTF, 1, 0);
+                	grid.add(new Label("title id:"), 0, 1);
+                	grid.add(titleIDTF, 1, 1);
+                	grid.add(new Label("ROM path:"), 0, 2);
+                	grid.add(romPathTF, 1, 2);
+                	grid.add(selectPathBtn, 2, 2);
+                	grid.add(new Label("cover path:"), 0, 3);
+                	grid.add(gameCoverTF, 1, 3);
+                	grid.add(selectCoverBtn, 2, 3);
+
+                	dialog.getDialogPane().setContent(grid);
+
+                	Optional<Integer> result2 = dialog.showAndWait();
+                	if (result2.isPresent()){
+                		
+                		dbController.setGameInfo(gameTitleTF.getText(), gameInfo[3], romPathTF.getText(), gameCoverTF.getText());
+                		games.remove(selectedUIDataIndex);
+        				dbController.loadSingleRom(gameInfo[3]);
+        				refreshUIData();
+            	    	
+                		LOGGER.info("successfully edited \"" + gameInfo[0] + "\", new name is \"" + gameTitleTF.getText() + "\"");
+                	}
+            		
+            		
             	}
             }
 		});
@@ -941,6 +1021,7 @@ public class MainWindowController {
     	String titleID = null;
     	File pictureCache;
     	
+    	//new Dialog
     	Dialog<Integer> dialog = new Dialog<>();
     	dialog.setTitle("add a new game");
     	dialog.setHeaderText("add a new game manually to cemu UI");
@@ -966,6 +1047,9 @@ public class MainWindowController {
     	
     	Button selectPathBtn = new Button("select .rpx file");
     	Button selectCoverBtn = new Button("select cover file");
+    	
+    	selectPathBtn.setPrefWidth(110);
+    	selectCoverBtn.setPrefWidth(110);
     	
     	selectPathBtn.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -1005,19 +1089,18 @@ public class MainWindowController {
 	    	title = gameTitleTF.getText();
 	    	titleID = titleIDTF.getText();
 	    	
-    		System.out.println("Game title: " + title);
-	    	System.out.println("Title ID: " + titleID);
-	    	System.out.println("ROM path: " + romPath);
-	    	System.out.println("Game cover: " + coverPath);
+	    	LOGGER.info("Add new Game \"" + title + "\", title-ID: " + titleID);
     	}
 
 		/**
-		 * FIXME if statement is useless at the moment
-		 * else convert the cover to .png add copy it into the picture cache
+		 * if one parameter is dosen't contain any value do not add the game
+		 * else convert the cover to .png add copy it into the picture cache,
 		 * then add the rom to the local_roms database
 		 */
-		if (romPath == "" || coverPath == "" || title == "" || titleID == "") {
+    	System.out.println(romPath.length());
+		if (romPath.length() == 0 || coverPath.length() == 0 || title.length() == 0 || titleID.length() == 0) {
 			LOGGER.info("No parameter set!");
+			// TODO show a message that explains the error
 		} else {
 			coverName = new File(coverPath).getName();
 			try	{

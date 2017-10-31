@@ -136,7 +136,8 @@ public class dbController {
 
 	void addRom(String title, String coverPath, String romPath, String titleID, String productCode, String region, String lastPlayed, String timePlayed) throws SQLException{
 		Statement stmt = connection.createStatement();
-		stmt.executeUpdate("insert into local_roms values ('"+title+"','"+coverPath+"','"+romPath+"','"+titleID+"','"+productCode+"','"+region+"','"+lastPlayed+"','"+timePlayed+"')");
+		stmt.executeUpdate("insert into local_roms values ('"+title+"','"+coverPath+"','"+romPath+"','"+titleID+"',"
+				+ "'"+productCode+"','"+region+"','"+lastPlayed+"','"+timePlayed+"')");
 		connection.commit();
 		stmt.close();
 		LOGGER.info("added \""+title+"\" to ROM database");
@@ -197,9 +198,9 @@ public class dbController {
 		} 
 		
 		try {
-			Statement stmt = connectionGames.createStatement(); 
-			LOGGER.info("Getting all .rpx files in " + dir.getCanonicalPath()+" including those in subdirectories");
+			Statement stmt = connectionGames.createStatement();
 			List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, true);
+			LOGGER.info("Getting all .rpx files in " + dir.getCanonicalPath()+" including those in subdirectories");
 			for (File file : files) {
 				if(System.getProperty("os.name").equals("Linux")){
 					appFile = new File(file.getParent()+"/app.xml");
@@ -266,6 +267,44 @@ public class dbController {
 	    return resizedImage;
 	}
 	
+	/**
+	 * getting info for a game with titleID
+	 * @param titleID Title-ID of the Game
+	 * @return title, coverPath, romPath, titleID (in this order)
+	 */
+	String[] getGameInfo(String titleID){
+		String[] gameInfo = new String[4];
+		LOGGER.info("getting game info for titleID: "+titleID+" ..."); 
+		try { 
+			Statement stmt = connection.createStatement(); 
+			ResultSet rs = stmt.executeQuery("SELECT * FROM local_roms where titleID = '"+titleID+"'"); 
+			while (rs.next()) {
+				gameInfo[0] = rs.getString(1);// title
+				gameInfo[1] = rs.getString(2);// coverPath
+				gameInfo[2] = rs.getString(3);// romPath
+				gameInfo[3] = rs.getString(4);// titleID
+			}
+			stmt.close();
+			rs.close();
+		}catch (Exception e){
+			LOGGER.error("error while getting game info", e);
+		}
+		return gameInfo;
+	}
+	
+	void setGameInfo(String title, String titleID, String romPath, String coverPath){
+		LOGGER.info("setting game info for titleID: "+titleID+" ..."); 
+		try { 
+			Statement stmt = connection.createStatement(); 
+			stmt.executeUpdate("UPDATE local_roms SET title = '" + title + "', coverPath = '" + coverPath + "',"
+					+ " romPath = '" + romPath + "' WHERE titleID = '"+titleID+"';");
+			connection.commit();
+			stmt.close();	
+		}catch (Exception e){
+			LOGGER.error("error while setting game info", e);
+		}
+	}
+	
 	void setLastPlayed(String titleID){
 		try{
 			Statement stmt = connection.createStatement(); 
@@ -317,5 +356,5 @@ public class dbController {
 		return timePlayed;
 	}
 	
-
+	
 }
