@@ -1089,11 +1089,11 @@ public class MainWindowController {
 	    	title = gameTitleTF.getText();
 	    	titleID = titleIDTF.getText();
 	    	
-	    	LOGGER.info("Add new Game \"" + title + "\", title-ID: " + titleID);
+	    	LOGGER.info("New game data \"" + title + "\", title-ID: " + titleID + "(not a bug!)");
     	}
 
 		/**
-		 * if one parameter is dosen't contain any value do not add the game
+		 * if one parameter dosen't contain any value do not add the game
 		 * else convert the cover to .png add copy it into the picture cache,
 		 * then add the rom to the local_roms database
 		 */
