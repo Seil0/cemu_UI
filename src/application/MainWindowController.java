@@ -1100,7 +1100,32 @@ public class MainWindowController {
     	System.out.println(romPath.length());
 		if (romPath.length() == 0 || coverPath.length() == 0 || title.length() == 0 || titleID.length() == 0) {
 			LOGGER.info("No parameter set!");
-			// TODO show a message that explains the error
+			
+			//addGame error dialog
+			JFXDialogLayout content= new JFXDialogLayout();
+	    	content.setHeading(new Text("Error while adding a new Game!"));
+	    	content.setBody(new Text("There was some truble adding your game."
+	    			+ "\nOne of the needed values was empty, please try again to add your game.")); 
+	    	content.setPrefSize(450, 170);
+	    	StackPane stackPane = new StackPane();
+	    	stackPane.autosize();
+	    	JFXDialog errorDialog =new JFXDialog(stackPane, content, JFXDialog.DialogTransition.LEFT, true);
+	    	JFXButton button=new JFXButton("Okay");
+	    	button.setOnAction(new EventHandler<ActionEvent>(){
+	    	    @Override
+	    	    public void handle(ActionEvent event){
+	    	    	errorDialog.close();
+	    	    }
+	    	});
+	    	button.setButtonType(com.jfoenix.controls.JFXButton.ButtonType.RAISED);
+	    	button.setPrefHeight(32);
+	    	button.setStyle(dialogBtnStyle);
+	    	content.setActions(button);
+	    	main.pane.getChildren().add(stackPane);
+	    	AnchorPane.setTopAnchor(stackPane, (main.pane.getHeight()-content.getPrefHeight())/2);
+	    	AnchorPane.setLeftAnchor(stackPane, (main.pane.getWidth()-content.getPrefWidth())/2);
+	    	errorDialog.show();
+			
 		} else {
 			coverName = new File(coverPath).getName();
 			try	{
