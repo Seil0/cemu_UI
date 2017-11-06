@@ -122,6 +122,7 @@ public class Main extends Application {
 				LOGGER.info("firststart, setting default values");
 				firstStart();
 				mainWindowController.setColor("00a8cc");
+				mainWindowController.setAutoUpdate(false);
 				mainWindowController.setxPosHelper(0);
 				mainWindowController.saveSettings();
 				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
@@ -148,6 +149,7 @@ public class Main extends Application {
 			
 			//loading settings and initialize UI, dbController.main() loads all databases
 			mainWindowController.loadSettings();
+			mainWindowController.checkAutoUpdate();
 			mainWindowController.initActions();
 			mainWindowController.initUI();
 			mainWindowController.dbController.main();

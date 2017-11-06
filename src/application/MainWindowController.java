@@ -245,10 +245,12 @@ public class MainWindowController {
     dbController dbController;
     SmmdbApiQuery smmdbApiQuery;
     playGame playGame;
+    private UpdateController updateController;
     private boolean menuTrue = false;
     private boolean settingsTrue = false;
     private boolean playTrue = false;
     private boolean smmdbTrue = false;
+    private boolean autoUpdate = false;
     private boolean fullscreen;
     private boolean cloudSync;
     private String cloudService = ""; //set cloud provider (at the moment only GoogleDrive, Dropbox is planed)
@@ -325,8 +327,9 @@ public class MainWindowController {
 		colorPicker.setValue(Color.valueOf(getColor()));
 		fullscreenToggleBtn.setSelected(isFullscreen());
 		cloudSyncToggleBtn.setSelected(isCloudSync());
-		updateBtn.setDisable(true);	// TODO
-		autoUpdateToggleBtn.setDisable(true);	// TODO
+		autoUpdateToggleBtn.setSelected(isAutoUpdate());
+		updateBtn.setDisable(false);	// TODO
+		autoUpdateToggleBtn.setDisable(false);	// TODO
 		applyColor();
 		
 		//initialize courseTable
@@ -831,13 +834,20 @@ public class MainWindowController {
     
     @FXML
     void  updateBtnAction(ActionEvent event) {
-    	// TODO implement and call update method
+    	updateController = new UpdateController(this, buildNumber);
+		Thread updateThread = new Thread(updateController);
+		updateThread.setName("Updater");
+		updateThread.start();	
 	}
     
     @FXML
     void  autoUpdateToggleBtnAction(ActionEvent event) {
-    	// TODO implement auto update function
-	}
+    	if(isAutoUpdate()){
+    		setAutoUpdate(false);
+    	}else{
+    		setAutoUpdate(true);
+    	}
+		saveSettings();	}
     
     @FXML
     void smmdbDownloadBtnAction(ActionEvent event){
@@ -1295,6 +1305,22 @@ public class MainWindowController {
     	lastTimePlayedBtn.setLayoutX((width/2)+50+20.5);
     }
     
+    void checkAutoUpdate() {
+    	
+    	if(isAutoUpdate()){
+    		try {
+    			LOGGER.info("AutoUpdate: looking for updates on startup ...");
+    			updateController = new UpdateController(this, buildNumber);
+    			Thread updateThread = new Thread(updateController);
+    			updateThread.setName("Updater");
+    			updateThread.start();
+     			updateThread.join();
+ 			} catch (InterruptedException e) {
+ 				e.printStackTrace();
+ 			}
+    	}
+    }
+    
     private void addCourseDescription(SmmdbApiDataType course) {
     	String courseTheme;
     	String gameStyle;
@@ -1519,7 +1545,8 @@ public class MainWindowController {
 			props.setProperty("romPath", getRomPath());
 			props.setProperty("color", getColor());
 			props.setProperty("fullscreen", String.valueOf(isFullscreen()));
-			props.setProperty("cloudSync", String.valueOf(cloudSync));
+			props.setProperty("cloudSync", String.valueOf(isCloudSync()));
+			props.setProperty("autoUpdate", String.valueOf(isAutoUpdate()));
 			if (getCloudService() == null) {
 				props.setProperty("cloudService", "");
 			} else {
@@ -1590,6 +1617,14 @@ public class MainWindowController {
 				LOGGER.error("could not load cloudSync, setting default instead", e);
 				setCloudSync(false);
 			}
+			
+			try {
+				setAutoUpdate(Boolean.parseBoolean(props.getProperty("autoUpdate")));
+			} catch (Exception e) {
+				LOGGER.error("cloud not load autoUpdate", e);
+				setAutoUpdate(false);
+			}
+
 			
 			try {
 				setCloudService(props.getProperty("cloudService"));
@@ -1801,6 +1836,14 @@ public class MainWindowController {
 		this.cloudSync = cloudSync;
 	}
 
+	public boolean isAutoUpdate() {
+		return autoUpdate;
+	}
+
+	public void setAutoUpdate(boolean autoUpdate) {
+		this.autoUpdate = autoUpdate;
+	}
+
 	public String getGameExecutePath() {
 		return gameExecutePath;
 	}
@@ -1859,6 +1902,10 @@ public class MainWindowController {
 
 	public AnchorPane getMainAnchorPane() {
 		return mainAnchorPane;
+	}
+
+	public JFXButton getUpdateBtn() {
+		return updateBtn;
 	}
 
 }

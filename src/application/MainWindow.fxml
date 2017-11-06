@@ -86,7 +86,7 @@
                   </Label>
                   <JFXToggleButton fx:id="cloudSyncToggleBtn" layoutX="10.0" layoutY="247.0" onAction="#cloudSyncToggleBtnAction" text="cloud savegames (Google Drive)" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="247.0" />
                   <Label fx:id="updateLbl" layoutX="10.0" layoutY="315.0" text="Updates" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="315.0" />
-                  <JFXButton fx:id="updateBtn" layoutX="14.0" layoutY="335.0" onAction="#updateBtnAction" prefHeight="32.0" prefWidth="111.0" text="check now!" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="335.0" />
+                  <JFXButton fx:id="updateBtn" layoutX="14.0" layoutY="335.0" onAction="#updateBtnAction" prefHeight="32.0" text="check now!" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="335.0" />
                   <JFXToggleButton fx:id="autoUpdateToggleBtn" layoutX="10.0" layoutY="372.0" onAction="#autoUpdateToggleBtnAction" text="check for updates on startup" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="372.0" />
                </children>
             </AnchorPane>
