@@ -1,13 +1,4 @@
-"THE CHOCOLATE-WARE LICENSE" (Revision 1):
-<@Seil0> wrote this file. As long as you retain
-this notice this software is licensed under the
-GNU GENERAL PUBLIC LICENSE Version 3 ,with the following additions:
-* If we meet some day, and you think this stuff is worth it,
-  you can buy me a chocolate in return. - @Seil0
-(license based in Beer-ware, see https://fedoraproject.org/wiki/Licensing/Beerware )                  
-					
-					
-					GNU GENERAL PUBLIC LICENSE
+                    GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
  Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
@@ -640,8 +631,8 @@ to attach them to the start of each source file to most effectively
 state the exclusion of warranty; and each file should have at least
 the "copyright" line and a pointer to where the full notice is found.
 
-    {one line to give the program's name and a brief idea of what it does.}
-    Copyright (C) {year}  {name of author}
+    <one line to give the program's name and a brief idea of what it does.>
+    Copyright (C) <year>  <name of author>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -661,7 +652,7 @@ Also add information on how to contact you by electronic and paper mail.
   If the program does terminal interaction, make it output a short
 notice like this when it starts in an interactive mode:
 
-    {project}  Copyright (C) {year}  {fullname}
+    <program>  Copyright (C) <year>  <name of author>
     This program comes with ABSOLUTELY NO WARRANTY; for details type `show w'.
     This is free software, and you are welcome to redistribute it
     under certain conditions; type `show c' for details.
