@@ -62,6 +62,7 @@ import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
+import UIElements.JFXInfoDialog;
 import datatypes.CourseTableDataType;
 import datatypes.SmmdbApiDataType;
 import datatypes.UIROMDataType;
@@ -732,29 +733,13 @@ public class MainWindowController {
     }
     
     @FXML
-    void aboutBtnAction(){  	
-    	JFXDialogLayout content= new JFXDialogLayout();
-    	content.setHeading(new Text("cemu_UI"));
-    	content.setBody(new Text("cemu_UI by @Seil0 \nVersion: "+version+" ("+buildNumber+")  \""+versionName+"\" \nThis Application is made with free Software\nwww.kellerkinder.xyz"));
-    	content.setPrefSize(350, 170);
-    	StackPane stackPane = new StackPane();
-    	stackPane.autosize();
-    	JFXDialog dialog =new JFXDialog(stackPane, content, JFXDialog.DialogTransition.LEFT, true);
-    	JFXButton button=new JFXButton("Okay");
-    	button.setOnAction(new EventHandler<ActionEvent>(){
-    	    @Override
-    	    public void handle(ActionEvent event){
-    	        dialog.close();
-    	    }
-    	});
-    	button.setButtonType(com.jfoenix.controls.JFXButton.ButtonType.RAISED);
-    	button.setPrefHeight(32);
-    	button.setStyle(dialogBtnStyle);
-    	content.setActions(button);
-    	main.pane.getChildren().add(stackPane);
-    	AnchorPane.setTopAnchor(stackPane, (main.pane.getHeight()-content.getPrefHeight())/2);
-    	AnchorPane.setLeftAnchor(stackPane, (main.pane.getWidth()-content.getPrefWidth())/2);
-    	dialog.show();
+    void aboutBtnAction(){
+    	String headingText = "cemu_UI";
+    	String bodyText = "cemu_UI by @Seil0 \nVersion: " + version + " (" + buildNumber + ")  \"" + versionName + "\" \n"
+    					+ "This Application is made with free Software\n"
+    					+ "www.kellerkinder.xyz";
+    	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
+    	aboutDialog.show();
     }
 
     @FXML
