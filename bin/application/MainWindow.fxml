@@ -7,6 +7,7 @@
 <?import com.jfoenix.controls.JFXToggleButton?>
 <?import com.jfoenix.controls.JFXTreeTableView?>
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.image.ImageView?>
@@ -88,6 +89,8 @@
                   <Label fx:id="updateLbl" layoutX="10.0" layoutY="315.0" text="Updates" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="315.0" />
                   <JFXButton fx:id="updateBtn" layoutX="14.0" layoutY="335.0" onAction="#updateBtnAction" prefHeight="32.0" text="check now!" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="335.0" />
                   <JFXToggleButton fx:id="autoUpdateToggleBtn" layoutX="10.0" layoutY="372.0" onAction="#autoUpdateToggleBtnAction" text="check for updates on startup" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="372.0" />
+                  <ChoiceBox fx:id="branchChoisBox" layoutX="270.0" layoutY="339.0" prefWidth="150.0" AnchorPane.leftAnchor="270.0" AnchorPane.topAnchor="339.0" />
+                  <Label fx:id="branchLbl" layoutX="204.0" layoutY="337.0" prefHeight="32.0" text="Branch" AnchorPane.leftAnchor="204.0" AnchorPane.topAnchor="335.0" />
                </children>
             </AnchorPane>
          </content>

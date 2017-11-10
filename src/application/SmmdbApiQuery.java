@@ -38,7 +38,7 @@ import datatypes.SmmdbApiDataType;
 
 public class SmmdbApiQuery {
 	
-	private String URL = "http://smmdb.ddns.net/api/getcourses?format=json";
+	private String URL = "https://smmdb.ddns.net/api/getcourses?format=json";
 	private static final Logger LOGGER = LogManager.getLogger(SmmdbApiQuery.class.getName());
 
 	public SmmdbApiQuery() {

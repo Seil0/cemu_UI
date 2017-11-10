@@ -81,6 +81,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
@@ -170,6 +171,9 @@ public class MainWindowController {
     
     @FXML
     private JFXToggleButton fullscreenToggleBtn;
+    
+    @FXML
+    private ChoiceBox<String> branchChoisBox;
 
     @FXML
     private AnchorPane mainAnchorPane;
@@ -220,6 +224,9 @@ public class MainWindowController {
     private Label updateLbl;
     
     @FXML
+    private Label branchLbl;
+    
+    @FXML
     private Label cemuSettingsLbl;
     
     
@@ -251,6 +258,7 @@ public class MainWindowController {
     private boolean playTrue = false;
     private boolean smmdbTrue = false;
     private boolean autoUpdate = false;
+    private boolean useBeta = false;
     private boolean fullscreen;
     private boolean cloudSync;
     private String cloudService = ""; //set cloud provider (at the moment only GoogleDrive, Dropbox is planed)
@@ -280,6 +288,7 @@ public class MainWindowController {
 	private File configFileLinux = new File(dirLinux + "/config.xml");
 	File pictureCacheWin = new File(dirWin+"/picture_cache");
 	File pictureCacheLinux = new File(dirLinux+"/picture_cache");
+	private ObservableList<String> branches = FXCollections.observableArrayList("stable", "beta");
 	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2", "44fc5929");	//TODO add more IDs
 	private ObservableList<UIROMDataType> games = FXCollections.observableArrayList();
 	ObservableList<SmmdbApiDataType> courses = FXCollections.observableArrayList();
@@ -328,8 +337,14 @@ public class MainWindowController {
 		fullscreenToggleBtn.setSelected(isFullscreen());
 		cloudSyncToggleBtn.setSelected(isCloudSync());
 		autoUpdateToggleBtn.setSelected(isAutoUpdate());
-		updateBtn.setDisable(false);	// TODO
-		autoUpdateToggleBtn.setDisable(false);	// TODO
+		branchChoisBox.setItems(branches);
+		
+		if (isUseBeta()) {
+			branchChoisBox.getSelectionModel().select(1);
+		} else {
+			branchChoisBox.getSelectionModel().select(0);
+		}
+		
 		applyColor();
 		
 		//initialize courseTable
@@ -695,6 +710,18 @@ public class MainWindowController {
 		        }
 		    }
 		});
+		
+        branchChoisBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+        	@Override
+        	public void changed(ObservableValue<? extends Number> ov, Number value, Number new_value) {     		
+            	if (branchChoisBox.getItems().get((int) new_value).toString() == "beta") {
+					setUseBeta(true);
+				} else {
+					setUseBeta(false);
+				}
+            	saveSettings();
+            }
+          });
 
 		LOGGER.info("initializing Actions done!");
 	}
@@ -834,7 +861,7 @@ public class MainWindowController {
     
     @FXML
     void  updateBtnAction(ActionEvent event) {
-    	updateController = new UpdateController(this, buildNumber);
+    	updateController = new UpdateController(this, buildNumber, useBeta);
 		Thread updateThread = new Thread(updateController);
 		updateThread.setName("Updater");
 		updateThread.start();	
@@ -1310,7 +1337,7 @@ public class MainWindowController {
     	if(isAutoUpdate()){
     		try {
     			LOGGER.info("AutoUpdate: looking for updates on startup ...");
-    			updateController = new UpdateController(this, buildNumber);
+    			updateController = new UpdateController(this, buildNumber, useBeta);
     			Thread updateThread = new Thread(updateController);
     			updateThread.setName("Updater");
     			updateThread.start();
@@ -1547,6 +1574,7 @@ public class MainWindowController {
 			props.setProperty("fullscreen", String.valueOf(isFullscreen()));
 			props.setProperty("cloudSync", String.valueOf(isCloudSync()));
 			props.setProperty("autoUpdate", String.valueOf(isAutoUpdate()));
+			props.setProperty("useBeta", String.valueOf(isUseBeta()));
 			if (getCloudService() == null) {
 				props.setProperty("cloudService", "");
 			} else {
@@ -1624,7 +1652,13 @@ public class MainWindowController {
 				LOGGER.error("cloud not load autoUpdate", e);
 				setAutoUpdate(false);
 			}
-
+			
+			try {
+				setUseBeta(Boolean.parseBoolean(props.getProperty("useBeta")));
+			} catch (Exception e) {
+				LOGGER.error("cloud not load autoUpdate", e);
+				setUseBeta(false);
+			}
 			
 			try {
 				setCloudService(props.getProperty("cloudService"));
@@ -1842,6 +1876,14 @@ public class MainWindowController {
 
 	public void setAutoUpdate(boolean autoUpdate) {
 		this.autoUpdate = autoUpdate;
+	}
+
+	public boolean isUseBeta() {
+		return useBeta;
+	}
+
+	public void setUseBeta(boolean useBeta) {
+		this.useBeta = useBeta;
 	}
 
 	public String getGameExecutePath() {
