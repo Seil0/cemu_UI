@@ -1,3 +1,24 @@
+/**
+ * cemu_UI
+ * 
+ * Copyright 2017  <@Seil0>
+ * 
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1301, USA.
+ */
+
 package UIElements;
 
 import com.jfoenix.controls.JFXButton;
@@ -17,15 +38,24 @@ public class JFXInfoDialog {
 	private String bodyText;
 	private String dialogBtnStyle;
 	private int dialogWidth;
-	private int dialogHeigh;
+	private int dialogHeight;
 	private Pane pane;
 
-	public JFXInfoDialog(String headingText, String bodyText, String dialogBtnStyle, int dialogWidth, int dialogHeigh, Pane pane) {
+	/**
+	 * Creates a new JFoenix Dialog to show some information
+	 * @param headingText Heading Text, just the heading
+	 * @param bodyText body Text, all other text belongs here
+	 * @param dialogBtnStyle Style of the okay button
+	 * @param dialogWidth dialog width
+	 * @param dialogHeight dialog height
+	 * @param pane pane to which the dialog belongs
+	 */
+	public JFXInfoDialog(String headingText, String bodyText, String dialogBtnStyle, int dialogWidth, int dialogHeight, Pane pane) {
 		this.headingText = headingText;
 		this.bodyText = bodyText;
 		this.dialogBtnStyle = dialogBtnStyle;
 		this.dialogWidth = dialogWidth;
-		this.dialogHeigh = dialogHeigh;
+		this.dialogHeight = dialogHeight;
 		this.pane = pane;
 	}
 
@@ -33,7 +63,7 @@ public class JFXInfoDialog {
 		JFXDialogLayout content = new JFXDialogLayout();
 		content.setHeading(new Text(headingText));
 		content.setBody(new Text(bodyText));
-		content.setPrefSize(dialogWidth, dialogHeigh);
+		content.setPrefSize(dialogWidth, dialogHeight);
 		StackPane stackPane = new StackPane();
 		stackPane.autosize();
 		JFXDialog dialog = new JFXDialog(stackPane, content, JFXDialog.DialogTransition.LEFT, true);

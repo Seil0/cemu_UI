@@ -53,8 +53,6 @@ import org.apache.logging.log4j.Logger;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
@@ -63,6 +61,7 @@ import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
 import UIElements.JFXInfoDialog;
+import UIElements.JFXOkayCancelDialog;
 import datatypes.CourseTableDataType;
 import datatypes.SmmdbApiDataType;
 import datatypes.UIROMDataType;
@@ -97,7 +96,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -953,78 +951,45 @@ public class MainWindowController {
     	if(cloudSync) {
     		cloudSync = false;
     	} else {
+    		//TODO this new dialog needs testing!
     		
-        	JFXDialogLayout content= new JFXDialogLayout();
-        	content.setHeading(new Text("activate cloud savegame sync (beta)"));
-        	content.setBody(new Text("You just activate the cloud savegame sync function of cemu_UI, \nwhich is currently in beta. Are you sure you want to do this?"));
-        	StackPane stackPane = new StackPane();
-        	stackPane.autosize();
-        	JFXDialog betaDialog = new JFXDialog(stackPane, content, JFXDialog.DialogTransition.LEFT, true);
-        	JFXButton okayBtn = new JFXButton("Okay");
-        	okayBtn.setOnAction(new EventHandler<ActionEvent>(){
-        	    @Override
-        	    public void handle(ActionEvent event){
-        	    	cloudSync = true;
-    				//TODO rework for other cloud services
-    				cloudService = "GoogleDrive";
-    	    		if (main.cloudController.initializeConnection(getCloudService(), getCemuPath())) {
-        	    		main.cloudController.sync(getCloudService(), getCemuPath());
-        	        	saveSettings();
-    	    		} else {
-    	    			cloudSyncToggleBtn.setSelected(false);
-    	    			
-    	    	    	//cloud sync init error dialog
-    	    			JFXDialogLayout content= new JFXDialogLayout();
-    	    	    	content.setHeading(new Text("Error while initializing cloud sync!"));
-    	    	    	content.setBody(new Text("There was some truble initializing the cloud sync."
-    	    	    			+ "\nPlease upload the app.log (which can be found in the cemu_UI directory)"
-    	    	    			+ "\nto \"https://github.com/Seil0/cemu_UI/issues\" so we can fix this.")); 
-    	    	    	content.setPrefSize(450, 170);
-    	    	    	StackPane stackPane = new StackPane();
-    	    	    	stackPane.autosize();
-    	    	    	JFXDialog dialog =new JFXDialog(stackPane, content, JFXDialog.DialogTransition.LEFT, true);
-    	    	    	JFXButton button=new JFXButton("Okay");
-    	    	    	button.setOnAction(new EventHandler<ActionEvent>(){
-    	    	    	    @Override
-    	    	    	    public void handle(ActionEvent event){
-    	    	    	        dialog.close();
-    	    	    	    }
-    	    	    	});
-    	    	    	button.setButtonType(com.jfoenix.controls.JFXButton.ButtonType.RAISED);
-    	    	    	button.setPrefHeight(32);
-    	    	    	button.setStyle(dialogBtnStyle);
-    	    	    	content.setActions(button);
-    	    	    	main.pane.getChildren().add(stackPane);
-    	    	    	AnchorPane.setTopAnchor(stackPane, (main.pane.getHeight()-content.getPrefHeight())/2);
-    	    	    	AnchorPane.setLeftAnchor(stackPane, (main.pane.getWidth()-content.getPrefWidth())/2);
-    	    	    	dialog.show();
-    	    		}
-    	    		
-    	    		betaDialog.close();
-        	    }
-        	});
-        	JFXButton cancelBtn = new JFXButton("Cancel");
-        	cancelBtn.setOnAction(new EventHandler<ActionEvent>(){
-        	    @Override
-        	    public void handle(ActionEvent event){
-        	    	cloudSyncToggleBtn.setSelected(false);
-        	    	betaDialog.close();
-        	    }
-        	});
-        	Label placeholder = new Label();
-        	placeholder.setPrefSize(15, 10);
-        	okayBtn.setButtonType(com.jfoenix.controls.JFXButton.ButtonType.RAISED);
-        	cancelBtn.setButtonType(com.jfoenix.controls.JFXButton.ButtonType.RAISED);
-        	okayBtn.setPrefHeight(32);
-        	cancelBtn.setPrefHeight(32);
-        	okayBtn.setStyle(dialogBtnStyle);
-        	cancelBtn.setStyle(dialogBtnStyle);
-        	content.setActions(cancelBtn, placeholder, okayBtn);
-        	content.setPrefSize(419, 140);
-        	main.pane.getChildren().add(stackPane);
-        	AnchorPane.setTopAnchor(stackPane, (main.pane.getHeight()-content.getPrefHeight())/2);
-        	AnchorPane.setLeftAnchor(stackPane, (main.pane.getWidth()-content.getPrefWidth())/2);
-        	betaDialog.show();
+	    	String headingText = "activate cloud savegame sync (beta)";
+    	   	String bodyText = "You just activate the cloud savegame sync function of cemu_UI, "
+   							+ "\nwhich is currently in beta. Are you sure you want to do this?";
+	    	
+	    	EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>(){
+	    		 @Override
+	        	 public void handle(ActionEvent event){
+	    			cloudSync = true;
+	    			//TODO rework for other cloud services
+	    			cloudService = "GoogleDrive";
+	    	    	if (main.cloudController.initializeConnection(getCloudService(), getCemuPath())) {
+	        	    	main.cloudController.sync(getCloudService(), getCemuPath());
+	        	        saveSettings();
+	    	    	} else {
+	    	    		cloudSyncToggleBtn.setSelected(false);
+
+	    	    	   	//cloud sync init error dialog
+	    	    		String headingText = "Error while initializing cloud sync!";
+	    		    	String bodyText = "There was some truble adding your game."
+	    		    					+ "\nPlease upload the app.log (which can be found in the cemu_UI directory)"
+	    		    					+ "\nto \"https://github.com/Seil0/cemu_UI/issues\" so we can fix this.";
+	    	    	   	JFXInfoDialog cloudSyncErrorDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 450, 170, main.pane);
+	    	    	   	cloudSyncErrorDialog.show();		
+	    	    	}
+	    		 }
+	    	};
+	    	
+	    	EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>(){
+	    		 @Override
+	    		 public void handle(ActionEvent event){
+	    			 cloudSyncToggleBtn.setSelected(false);
+	    		 }
+	    	};
+	    	
+			JFXOkayCancelDialog cloudSyncErrorDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle,
+					419, 140, okayAction, cancelAction, main.pane);
+	    	cloudSyncErrorDialog.show();	
     	}
     }
     
@@ -1124,30 +1089,11 @@ public class MainWindowController {
 			LOGGER.info("No parameter set!");
 			
 			//addGame error dialog
-			JFXDialogLayout content= new JFXDialogLayout();
-	    	content.setHeading(new Text("Error while adding a new Game!"));
-	    	content.setBody(new Text("There was some truble adding your game."
-	    			+ "\nOne of the needed values was empty, please try again to add your game.")); 
-	    	content.setPrefSize(450, 170);
-	    	StackPane stackPane = new StackPane();
-	    	stackPane.autosize();
-	    	JFXDialog errorDialog =new JFXDialog(stackPane, content, JFXDialog.DialogTransition.LEFT, true);
-	    	JFXButton button=new JFXButton("Okay");
-	    	button.setOnAction(new EventHandler<ActionEvent>(){
-	    	    @Override
-	    	    public void handle(ActionEvent event){
-	    	    	errorDialog.close();
-	    	    }
-	    	});
-	    	button.setButtonType(com.jfoenix.controls.JFXButton.ButtonType.RAISED);
-	    	button.setPrefHeight(32);
-	    	button.setStyle(dialogBtnStyle);
-	    	content.setActions(button);
-	    	main.pane.getChildren().add(stackPane);
-	    	AnchorPane.setTopAnchor(stackPane, (main.pane.getHeight()-content.getPrefHeight())/2);
-	    	AnchorPane.setLeftAnchor(stackPane, (main.pane.getWidth()-content.getPrefWidth())/2);
-	    	errorDialog.show();
-			
+			String headingText = "Error while adding a new Game!";
+	    	String bodyText = "There was some truble adding your game."
+	    					+ "\nOne of the needed values was empty, please try again to add your game."; 
+	    	JFXInfoDialog addGameErrorDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 450, 170, main.pane);
+	    	addGameErrorDialog.show();
 		} else {
 			coverName = new File(coverPath).getName();
 			try	{
