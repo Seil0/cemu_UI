@@ -35,12 +35,12 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonValue;
 
-public class SmmdbApiQuery {
+public class SmmdbAPIController {
 	
 	private String URL = "https://smmdb.ddns.net/api/getcourses?format=json";
-	private static final Logger LOGGER = LogManager.getLogger(SmmdbApiQuery.class.getName());
+	private static final Logger LOGGER = LogManager.getLogger(SmmdbAPIController.class.getName());
 
-	public SmmdbApiQuery() {
+	public SmmdbAPIController() {
 		//Auto-generated constructor stub
 	}
 	

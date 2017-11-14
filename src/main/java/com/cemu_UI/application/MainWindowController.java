@@ -51,7 +51,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cemu_UI.controller.SmmdbApiQuery;
+import com.cemu_UI.controller.SmmdbAPIController;
 import com.cemu_UI.controller.UpdateController;
 import com.cemu_UI.controller.dbController;
 import com.cemu_UI.datatypes.CourseTableDataType;
@@ -255,7 +255,7 @@ public class MainWindowController {
     
     Main main;
     dbController dbController;
-    SmmdbApiQuery smmdbApiQuery;
+    SmmdbAPIController smmdbAPIController;
     playGame playGame;
     private UpdateController updateController;
     private boolean menuTrue = false;
@@ -325,7 +325,7 @@ public class MainWindowController {
 	public void setMain(Main main) {
 		this.main = main;
 		dbController = new dbController(this);
-		smmdbApiQuery = new SmmdbApiQuery();
+		smmdbAPIController = new SmmdbAPIController();
 	}
 	
 	void initUI() {
@@ -782,7 +782,7 @@ public class MainWindowController {
     		
     		//start query
         	courses.removeAll(courses);
-        	courses.addAll(smmdbApiQuery.startQuery());
+        	courses.addAll(smmdbAPIController.startQuery());
         	
         	//add query response to courseTreeTable
     		for(int i = 0; i < courses.size(); i++){
