@@ -275,8 +275,8 @@ public class MainWindowController {
     private String selectedGameTitleID;
     private String selectedGameTitle;
     private String id;
-    private String version = "0.2.0";
-    private String buildNumber = "053";
+    private String version = "0.2.1";
+    private String buildNumber = "055";
     private String versionName = "Puzzle Plank Galaxy";
     private int xPos = -200;
     private int yPos = 17;
@@ -957,9 +957,7 @@ public class MainWindowController {
     	if(cloudSync) {
     		cloudSync = false;
     	} else {
-    		//TODO this new dialog needs testing!
-    		
-	    	String headingText = "activate cloud savegame sync (beta)";
+    		String headingText = "activate cloud savegame sync (beta)";
     	   	String bodyText = "You just activate the cloud savegame sync function of cemu_UI, "
    							+ "\nwhich is currently in beta. Are you sure you want to do this?";
 	    	
