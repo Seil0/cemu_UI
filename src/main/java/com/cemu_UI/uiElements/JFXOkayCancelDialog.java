@@ -69,7 +69,7 @@ public class JFXOkayCancelDialog {
 	}
 	
 	public void show() {
-		JFXDialogLayout content= new JFXDialogLayout();
+		JFXDialogLayout content = new JFXDialogLayout();
     	content.setHeading(new Text(headingText));
     	content.setBody(new Text(bodyText));
     	StackPane stackPane = new StackPane();
