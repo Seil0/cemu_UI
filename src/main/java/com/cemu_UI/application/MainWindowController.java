@@ -1558,7 +1558,7 @@ public class MainWindowController {
 		timePlayedBtnTransition.play();
 	}
 	
-	void playBtnSlideOut(){
+	private void playBtnSlideOut(){
 		playTrue = false;
 		TranslateTransition playBtnTransition = new TranslateTransition(Duration.millis(300), playBtn);
 		playBtnTransition.setFromY(0);

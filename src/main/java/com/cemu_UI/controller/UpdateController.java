@@ -43,110 +43,112 @@ import com.eclipsesource.json.JsonValue;
 
 import javafx.application.Platform;
 
-public class UpdateController implements Runnable{
-	
+public class UpdateController implements Runnable {
+
 	private MainWindowController mainWindowController;
 	private String buildNumber;
 	private String apiOutput;
-	private String updateBuildNumber;	//tag_name from Github
-	private String browserDownloadUrl;	//update download link
+	private String updateBuildNumber; // tag_name from Github
+	private String browserDownloadUrl; // update download link
 	private String githubApiRelease = "https://api.github.com/repos/Seil0/cemu_UI/releases/latest";
 	private String githubApiBeta = "https://api.github.com/repos/Seil0/cemu_UI/releases";
 	private URL githubApiUrl;
 	private boolean useBeta;
 	private static final Logger LOGGER = LogManager.getLogger(UpdateController.class.getName());
-	
+
 	/**
-	 * updater for cemu_UI based on Project HomeFlix
-	 * checks for Updates and download it in case there is one
+	 * updater for cemu_UI based on Project HomeFlix checks for Updates and download
+	 * it in case there is one
 	 */
-	public UpdateController(MainWindowController mwc, String buildNumber, boolean useBeta){
+	public UpdateController(MainWindowController mwc, String buildNumber, boolean useBeta) {
 		mainWindowController = mwc;
 		this.buildNumber = buildNumber;
 		this.useBeta = useBeta;
 	}
-	
-	public void run(){
+
+	@Override
+	public void run() {
 		System.out.println("checking for updates ...");
 		Platform.runLater(() -> {
 			mainWindowController.getUpdateBtn().setText("checking for updates ...");
-         });
+		});
 
-        try {
-        	
-        	if (useBeta) {
-        		githubApiUrl = new URL(githubApiBeta);
+		try {
+
+			if (useBeta) {
+				githubApiUrl = new URL(githubApiBeta);
 			} else {
 				githubApiUrl = new URL(githubApiRelease);
 			}
-        	
-//			URL githubApiUrl = new URL(githubApiRelease);
-	        BufferedReader ina = new BufferedReader(new InputStreamReader(githubApiUrl.openStream()));
+
+			// URL githubApiUrl = new URL(githubApiRelease);
+			BufferedReader ina = new BufferedReader(new InputStreamReader(githubApiUrl.openStream()));
 			apiOutput = ina.readLine();
-	        ina.close();
+			ina.close();
 		} catch (IOException e) {
 			Platform.runLater(() -> {
 				LOGGER.error("could not check update version", e);
 			});
 		}
 
-        if (useBeta) {
-        	JsonArray objectArray = Json.parse("{\"items\": " + apiOutput + "}").asObject().get("items").asArray();
-        	JsonValue object = objectArray.get(0);
-        	JsonArray objectAssets = object.asObject().get("assets").asArray();
-        	
-    		updateBuildNumber = object.asObject().getString("tag_name", "");
-//        	updateName = object.asObject().getString("name", "");
-//        	updateChanges = object.asObject().getString("body", "");
+		if (useBeta) {
+			JsonArray objectArray = Json.parse("{\"items\": " + apiOutput + "}").asObject().get("items").asArray();
+			JsonValue object = objectArray.get(0);
+			JsonArray objectAssets = object.asObject().get("assets").asArray();
 
-        	for (JsonValue asset : objectAssets) {
-        		browserDownloadUrl = asset.asObject().getString("browser_download_url", "");
-        	}
+			updateBuildNumber = object.asObject().getString("tag_name", "");
+			// updateName = object.asObject().getString("name", "");
+			// updateChanges = object.asObject().getString("body", "");
+
+			for (JsonValue asset : objectAssets) {
+				browserDownloadUrl = asset.asObject().getString("browser_download_url", "");
+			}
 
 		} else {
-	    	JsonObject object = Json.parse(apiOutput).asObject();
-	    	JsonArray objectAssets = Json.parse(apiOutput).asObject().get("assets").asArray();
-	    	
-	    	updateBuildNumber = object.getString("tag_name", "");
-//	    	updateName = object.getString("name", "");
-//	    	updateChanges = object.getString("body", "");
-	    	for (JsonValue asset : objectAssets) {
-	    		browserDownloadUrl = asset.asObject().getString("browser_download_url", "");
-	    		
-	    	}
+			JsonObject object = Json.parse(apiOutput).asObject();
+			JsonArray objectAssets = Json.parse(apiOutput).asObject().get("assets").asArray();
+
+			updateBuildNumber = object.getString("tag_name", "");
+			// updateName = object.getString("name", "");
+			// updateChanges = object.getString("body", "");
+			for (JsonValue asset : objectAssets) {
+				browserDownloadUrl = asset.asObject().getString("browser_download_url", "");
+
+			}
 		}
 
-    	LOGGER.info("Build: "+buildNumber+", Update: "+updateBuildNumber);
-		
-		//Compares the program BuildNumber with the current BuildNumber if  program BuildNumber <  current BuildNumber then perform a update
+		LOGGER.info("Build: " + buildNumber + ", Update: " + updateBuildNumber);
+
+		// Compares the program BuildNumber with the current BuildNumber if program
+		// BuildNumber < current BuildNumber then perform a update
 		int iversion = Integer.parseInt(buildNumber);
 		int iaktVersion = Integer.parseInt(updateBuildNumber.replace(".", ""));
-		
-		if(iversion >= iaktVersion){
+
+		if (iversion >= iaktVersion) {
 			Platform.runLater(() -> {
 				mainWindowController.getUpdateBtn().setText("no update available");
-	         });
+			});
 			LOGGER.info("no update available");
-		}else{
+		} else {
 			Platform.runLater(() -> {
 				mainWindowController.getUpdateBtn().setText("update available");
-	         });
+			});
 			LOGGER.info("update available");
 			LOGGER.info("download link: " + browserDownloadUrl);
-			try {		
-				//open new Http connection, ProgressMonitorInputStream for downloading the data
+			try {
+				// open new Http connection, ProgressMonitorInputStream for downloading the data
 				HttpURLConnection conn = (HttpURLConnection) new URL(browserDownloadUrl).openConnection();
 				ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(null, "Downloading...", conn.getInputStream());
 				ProgressMonitor pm = pmis.getProgressMonitor();
-		        pm.setMillisToDecideToPopup(0);
-		        pm.setMillisToPopup(0);
-		        pm.setMinimum(0);// tell the progress bar that we start at the beginning of the stream
-		        pm.setMaximum(conn.getContentLength());// tell the progress bar the total number of bytes we are going to read.
-				FileUtils.copyInputStreamToFile(pmis, new File("cemu_UI_update.jar"));	//download update			
-				org.apache.commons.io.FileUtils.copyFile(new File("cemu_UI_update.jar"), new File("cemu_UI.jar"));	//TODO rename update to old name
-				org.apache.commons.io.FileUtils.deleteQuietly(new File("cemu_UI_update.jar"));	//delete update
-				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again
-				System.exit(0);	//finishes itself
+				pm.setMillisToDecideToPopup(0);
+				pm.setMillisToPopup(0);
+				pm.setMinimum(0);// tell the progress bar that we start at the beginning of the stream
+				pm.setMaximum(conn.getContentLength());// tell the progress bar the total number of bytes we are going to read.
+				FileUtils.copyInputStreamToFile(pmis, new File("cemu_UI_update.jar")); // download update
+				org.apache.commons.io.FileUtils.copyFile(new File("cemu_UI_update.jar"), new File("cemu_UI.jar")); // TODO rename update to old name
+				org.apache.commons.io.FileUtils.deleteQuietly(new File("cemu_UI_update.jar")); // delete update
+				Runtime.getRuntime().exec("java -jar cemu_UI.jar"); // start again
+				System.exit(0); // finishes itself
 			} catch (IOException e) {
 				Platform.runLater(() -> {
 					LOGGER.info("could not download update files", e);
@@ -155,4 +157,3 @@ public class UpdateController implements Runnable{
 		}
 	}
 }
-
