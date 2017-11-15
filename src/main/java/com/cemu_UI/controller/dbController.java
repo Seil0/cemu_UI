@@ -293,8 +293,8 @@ public class dbController {
 		}
 		return gameInfo;
 	}
-	
-	public void setGameInfo(String title, String titleID, String romPath, String coverPath){
+
+	public void setGameInfo(String title, String coverPath, String romPath, String titleID){
 		LOGGER.info("setting game info for titleID: "+titleID+" ..."); 
 		try { 
 			Statement stmt = connection.createStatement(); 

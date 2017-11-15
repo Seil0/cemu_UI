@@ -25,7 +25,6 @@ package com.cemu_UI.uiElements;
 import java.io.File;
 
 import com.cemu_UI.application.MainWindowController;
-import com.cemu_UI.datatypes.EditDataType;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
@@ -49,9 +48,13 @@ public class JFXEditGameDialog {
 	private String headingText;
 	private String bodyText;
 	private String dialogBtnStyle;
+	private String title = "";
+	private String coverPath = "";
+	private String romPath = "";
+	private String titleID = "";
 	private int dialogWidth;
 	private int dialogHeight;
-	private EditDataType gameData;
+	private int mode;
 	private Stage stage;
 	private Pane pane;
 	private MainWindowController mwc;
@@ -63,16 +66,18 @@ public class JFXEditGameDialog {
 	 * @param dialogBtnStyle Style of the okay button
 	 * @param dialogWidth dialog width
 	 * @param dialogHeight dialog height
+	 * @param mode set to 0 for add and 1 for edit mode
 	 * @param stage the primary stage
 	 * @param pane pane to which the dialog belongs
 	 */
 	public JFXEditGameDialog(String headingText, String bodyText, String dialogBtnStyle, int dialogWidth,
-			int dialogHeight, MainWindowController mwc, Stage stage, Pane pane) {
+			int dialogHeight, int mode, MainWindowController mwc, Stage stage, Pane pane) {
 		this.headingText = headingText;
 		this.bodyText = bodyText;
 		this.dialogBtnStyle = dialogBtnStyle;
 		this.dialogWidth = dialogWidth;
 		this.dialogHeight = dialogHeight;
+		this.mode = mode;
 		this.mwc = mwc;
 		this.stage = stage;
 		this.pane = pane;
@@ -96,35 +101,51 @@ public class JFXEditGameDialog {
     	TextField gameCoverTF = new TextField();
     	gameCoverTF.setPromptText("cover path");
     	
+    	if (mode == 1) {
+			gameTitleTF.setText(title);
+			gameTitleIDTF.setText(titleID);
+			romPathTF.setText(romPath);
+			gameCoverTF.setText(coverPath);
+			
+			gameTitleIDTF.setEditable(false);
+		}
+    	
     	JFXButton okayBtn = new JFXButton("Okay");
-    	okayBtn.setOnAction(new EventHandler<ActionEvent>() {
+		okayBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				System.out.println(romPathTF.getText());
-				System.out.println(gameCoverTF.getText());
-				System.out.println(gameTitleTF.getText());
-				System.out.println(gameTitleIDTF.getText());
-				if (romPathTF.getText().toString().length() == 0 || gameCoverTF.getText().toString().length() == 0 || 
-					gameTitleTF.getText().toString().length() == 0 || gameTitleIDTF.getText().toString().length() == 0) {
-					
-//					LOGGER.info("No parameter set!");
-					
-					//addGame error dialog
+				if (romPathTF.getText().toString().length() == 0 || gameCoverTF.getText().toString().length() == 0
+						|| gameTitleTF.getText().toString().length() == 0 || gameTitleIDTF.getText().toString().length() == 0) {
+
+					// LOGGER.info("No parameter set!");
+
+					// addGame error dialog
 					String headingTextError = "Error while adding a new Game!";
-			    	String bodyTextError = "There was some truble adding your game."
-			    						+ "\nOne of the needed values was empty, please try again to add your game."; 
-			    	JFXInfoDialog errorDialog = new JFXInfoDialog(headingTextError, bodyTextError, dialogBtnStyle, 350, 170, pane);
-			    	errorDialog.show();
+					String bodyTextError = "There was some truble adding your game."
+										 + "\nOne of the needed values was empty, please try again to add your game.";
+					JFXInfoDialog errorDialog = new JFXInfoDialog(headingTextError, bodyTextError, dialogBtnStyle, 350,170, pane);
+					errorDialog.show();
 				} else {
-					gameData.setRomPath(romPathTF.getText().toString());
-					gameData.setCoverPath(gameCoverTF.getText().toString());
-					gameData.setTitle(gameTitleTF.getText().toString());
-					gameData.setTitleID(gameTitleIDTF.getText().toString());
-					mwc.addBtnReturn(gameData);
-		    		dialog.close();
+					switch (mode) {
+					case 0:
+						// add-mode 	title, coverPath, romPath, titleID
+						mwc.addBtnReturn(gameTitleTF.getText().toString(), gameCoverTF.getText().toString(),
+										 romPathTF.getText().toString(), gameTitleIDTF.getText().toString());
+						dialog.close();
+						break;
+					case 1:
+						// edit mode
+						mwc.editBtnReturn(gameTitleTF.getText().toString(), gameCoverTF.getText().toString(),
+								 		  romPathTF.getText().toString(), gameTitleIDTF.getText().toString());
+						dialog.close();
+						break;
+					default:
+						dialog.close();
+						break;
+					}
 				}
 			}
-    	});	
+		});
     	okayBtn.setButtonType(com.jfoenix.controls.JFXButton.ButtonType.RAISED);
     	okayBtn.setPrefHeight(32);
     	okayBtn.setStyle(dialogBtnStyle);
@@ -193,8 +214,20 @@ public class JFXEditGameDialog {
     	AnchorPane.setLeftAnchor(stackPane, (pane.getWidth()-content.getPrefWidth())/2);
     	dialog.show();
 	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
 	
-	public EditDataType getGameData() {
-		return gameData;
+	public void setCoverPath(String coverPath) {
+		this.coverPath = coverPath;
+	}
+
+	public void setRomPath(String romPath) {
+		this.romPath = romPath;
+	}
+
+	public void setTitleID(String titleID) {
+		this.titleID = titleID;
 	}
 }

@@ -55,7 +55,6 @@ import com.cemu_UI.controller.SmmdbAPIController;
 import com.cemu_UI.controller.UpdateController;
 import com.cemu_UI.controller.dbController;
 import com.cemu_UI.datatypes.CourseTableDataType;
-import com.cemu_UI.datatypes.EditDataType;
 import com.cemu_UI.datatypes.SmmdbApiDataType;
 import com.cemu_UI.datatypes.UIROMDataType;
 import com.cemu_UI.uiElements.JFXEditGameDialog;
@@ -63,8 +62,6 @@ import com.cemu_UI.uiElements.JFXInfoDialog;
 import com.cemu_UI.uiElements.JFXOkayCancelDialog;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
-import com.jfoenix.controls.JFXDialog;
-import com.jfoenix.controls.JFXDialogLayout;
 import com.jfoenix.controls.JFXHamburger;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
@@ -75,7 +72,6 @@ import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
-import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -86,25 +82,19 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -113,7 +103,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import javafx.stage.DirectoryChooser;
-import javafx.stage.FileChooser;
 import javafx.util.Duration;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -260,6 +249,7 @@ public class MainWindowController {
     dbController dbController;
     SmmdbAPIController smmdbAPIController;
     playGame playGame;
+    private static MainWindowController MWC;
     private UpdateController updateController;
     private boolean menuTrue = false;
     private boolean settingsTrue = false;
@@ -279,7 +269,7 @@ public class MainWindowController {
     private String selectedGameTitle;
     private String id;
     private String version = "0.2.1";
-    private String buildNumber = "055";
+    private String buildNumber = "057";
     private String versionName = "Puzzle Plank Galaxy";
     private int xPos = -200;
     private int yPos = 17;
@@ -384,6 +374,7 @@ public class MainWindowController {
 	void initActions() {
 		LOGGER.info("initializing Actions ...");
 		
+		MWC = this;
 		burgerTask = new HamburgerBackArrowBasicTransition(menuHam);
 		menuHam.addEventHandler(MouseEvent.MOUSE_PRESSED, (e)->{
 			if (playTrue) {
@@ -417,103 +408,27 @@ public class MainWindowController {
             @Override
             public void handle(ActionEvent event) {
             	LOGGER.info("edit "+selectedGameTitleID);
-            	if(selectedGameTitleID == null){
+            	if (selectedGameTitleID == null) {
             		LOGGER.warn("trying to edit null! null is not valid!");
             		
             		String headingText = "edit game";
                 	String bodyText = "please select a game, \""+selectedGameTitleID+"\" is not a valid type!";
                 	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
                 	aboutDialog.show();
-            		
-//	            	Alert alert = new Alert(AlertType.WARNING);
-//	            	alert.setTitle("edit");
-//	            	alert.setHeaderText("cemu_UI");
-//	            	alert.setContentText("please select a game, \""+selectedGameTitleID+"\" is not a valid type");
-//	            	alert.initOwner(main.primaryStage);
-//	            	alert.showAndWait();
-            	}else{
+            	} else {
             		String[] gameInfo = dbController.getGameInfo(selectedGameTitleID);
-
-            		//new Dialog
-                	Dialog<Integer> dialog = new Dialog<>();
-                	dialog.setTitle("edit game");
-                	dialog.setHeaderText("You can edit the tile and rom/cover path.");
-
-                	// Set the button types.
-                	ButtonType okayBtn = new ButtonType("Okay", ButtonData.OK_DONE);
-                	dialog.getDialogPane().getButtonTypes().addAll(okayBtn, ButtonType.CANCEL);
-
-                	// Create gameTitle, titleID, gamePath and gameCover TextFields and Labels and two Btn for filechooser
-                	GridPane grid = new GridPane();
-                	grid.setHgap(10);
-                	grid.setVgap(10);
-                	grid.setPadding(new Insets(20, 150, 10, 10));
-
-                	TextField gameTitleTF = new TextField();
-                	gameTitleTF.setPromptText("game tile");
-                	TextField titleIDTF = new TextField();
-                	titleIDTF.setPromptText("title ID");
-                	TextField romPathTF = new TextField();
-                	romPathTF.setPromptText("ROM path");
-                	TextField gameCoverTF = new TextField();
-                	gameCoverTF.setPromptText("cover path");
-                	
-                	gameTitleTF.setText(gameInfo[0]);
-                	titleIDTF.setText(gameInfo[3]);
-                	romPathTF.setText(gameInfo[2]);
-                	gameCoverTF.setText(gameInfo[1]);
-                	
-                	titleIDTF.setEditable(false);
-                	
-                	Button selectPathBtn = new Button("select .rpx file");
-                	Button selectCoverBtn = new Button("select cover file");
-                	
-                	selectPathBtn.setPrefWidth(110);
-                	selectCoverBtn.setPrefWidth(110);
-                	
-                	selectPathBtn.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                        	FileChooser romDirectoryChooser = new FileChooser();
-                            File romDirectory =  romDirectoryChooser.showOpenDialog(main.primaryStage);
-                            romPathTF.setText(romDirectory.getAbsolutePath());
-                        }
-                	});
-                	
-                	selectCoverBtn.setOnAction(new EventHandler<ActionEvent>() {
-                        @Override
-                        public void handle(ActionEvent event) {
-                        	FileChooser coverDirectoryChooser = new FileChooser();
-                            File coverDirectory =  coverDirectoryChooser.showOpenDialog(main.primaryStage);
-                            gameCoverTF.setText(coverDirectory.getAbsolutePath());
-                        }
-                	});
-                	
-                	grid.add(new Label("game title:"), 0, 0);
-                	grid.add(gameTitleTF, 1, 0);
-                	grid.add(new Label("title id:"), 0, 1);
-                	grid.add(titleIDTF, 1, 1);
-                	grid.add(new Label("ROM path:"), 0, 2);
-                	grid.add(romPathTF, 1, 2);
-                	grid.add(selectPathBtn, 2, 2);
-                	grid.add(new Label("cover path:"), 0, 3);
-                	grid.add(gameCoverTF, 1, 3);
-                	grid.add(selectCoverBtn, 2, 3);
-
-                	dialog.getDialogPane().setContent(grid);
-
-                	Optional<Integer> result2 = dialog.showAndWait();
-                	if (result2.isPresent()){
-                		
-                		dbController.setGameInfo(gameTitleTF.getText(), gameInfo[3], romPathTF.getText(), gameCoverTF.getText());
-                		games.remove(selectedUIDataIndex);
-        				dbController.loadSingleRom(gameInfo[3]);
-        				refreshUIData();
-            	    	
-                		LOGGER.info("successfully edited \"" + gameInfo[0] + "\", new name is \"" + gameTitleTF.getText() + "\"");
-                	}
             		
-            		
+            		//new edit dialog
+                	String headingText = "activate cloud savegame sync (beta)";
+            	   	String bodyText = "You just activate the cloud savegame sync function of cemu_UI, "
+            							+ "\nwhich is currently in beta. Are you sure you want to do this?";
+            		JFXEditGameDialog editGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 350, 300,
+            										1, MWC, main.primaryStage, main.pane);
+            		editGameDialog.setTitle(gameInfo[0]);
+            		editGameDialog.setCoverPath(gameInfo[1]);
+            		editGameDialog.setRomPath(gameInfo[2]);
+            		editGameDialog.setTitleID(gameInfo[3]);
+            		editGameDialog.show();
             	}
             }
 		});
@@ -528,15 +443,7 @@ public class MainWindowController {
             		String headingText = "remove game";
                 	String bodyText = "please select a game, \""+selectedGameTitleID+"\" is not a valid type!";
                 	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
-                	aboutDialog.show();
-                	
-//                	Alert alert = new Alert(AlertType.WARNING);
-//                	alert.setTitle("remove");
-//                	alert.setHeaderText("cemu_UI");
-//                	alert.setContentText("please select a game, \""+selectedGameTitleID+"\" is not a valid type");
-//                	alert.initOwner(main.primaryStage);
-//                	alert.showAndWait();
-                	
+                	aboutDialog.show();     	
             	}
             	else{
             		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -568,22 +475,14 @@ public class MainWindowController {
             	String titleID = selectedGameTitleID;
             	String updatePath;
             	LOGGER.info("update: "+selectedGameTitleID);
-            	if(selectedGameTitleID == null){
+				if (selectedGameTitleID == null) {
             		LOGGER.warn("trying to update null! null is not valid!");
             		
             		String headingText = "update game";
                 	String bodyText = "please select a game, \""+selectedGameTitleID+"\" is not a valid type!";
                 	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
                 	aboutDialog.show();
-            		
-//	            	Alert alert = new Alert(AlertType.WARNING);
-//	            	alert.setTitle("edit");
-//	            	alert.setHeaderText("cemu_UI");
-//	            	alert.setContentText("please select a game, \""+selectedGameTitleID+"\" is not a valid type");
-//	            	alert.initOwner(main.primaryStage);
-//	            	alert.showAndWait();
-                	
-            	}else{
+				} else {
         			Alert updateAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
         			updateAlert.setTitle("cemu_UI");
         			updateAlert.setHeaderText("update "+selectedGameTitle);
@@ -591,7 +490,7 @@ public class MainWindowController {
         			updateAlert.initOwner(main.primaryStage);
 
         			Optional<ButtonType> result = updateAlert.showAndWait();
-        			if (result.get() == ButtonType.OK){
+        			if (result.get() == ButtonType.OK) {
         				DirectoryChooser directoryChooser = new DirectoryChooser();
         	            File selectedDirecroty =  directoryChooser.showDialog(main.primaryStage);
         	            updatePath = selectedDirecroty.getAbsolutePath();
@@ -603,7 +502,7 @@ public class MainWindowController {
             			LOGGER.info(updatePath);
             			LOGGER.info(destDir.toString());
 
-            			if(destDir.exists() != true){
+            			if (destDir.exists() != true) {
             				destDir.mkdir();
             			}
 
@@ -632,22 +531,14 @@ public class MainWindowController {
             	String dlcPath;
             	
             	LOGGER.info("add DLC: "+selectedGameTitleID);
-            	if(selectedGameTitleID == null){
+            	if (selectedGameTitleID == null) {
             		LOGGER.warn("trying to add a dlc to null! null is not valid!");
             		
             		String headingText = "add DLC";
                 	String bodyText = "please select a game, \""+selectedGameTitleID+"\" is not a valid type!";
                 	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
-                	aboutDialog.show();
-            		
-//	            	Alert alert = new Alert(AlertType.WARNING);
-//	            	alert.setTitle("add DLC");
-//	            	alert.setHeaderText("cemu_UI");
-//	            	alert.setContentText("please select a game, \""+selectedGameTitleID+"\" is not a valid type");
-//	            	alert.initOwner(main.primaryStage);
-//	            	alert.showAndWait();
-                	
-            	}else{
+                	aboutDialog.show();                	
+            	} else {
         			Alert updateAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
         			updateAlert.setTitle("cemu_UI");
         			updateAlert.setHeaderText("add a DLC to "+selectedGameTitle);
@@ -655,7 +546,7 @@ public class MainWindowController {
         			updateAlert.initOwner(main.primaryStage);
 
         			Optional<ButtonType> result = updateAlert.showAndWait();
-        			if (result.get() == ButtonType.OK){
+        			if (result.get() == ButtonType.OK) {
         				DirectoryChooser directoryChooser = new DirectoryChooser();
         	            File selectedDirecroty =  directoryChooser.showDialog(main.primaryStage);
         	            dlcPath = selectedDirecroty.getAbsolutePath();
@@ -667,7 +558,7 @@ public class MainWindowController {
             			LOGGER.info(dlcPath);
             			LOGGER.info(destDir.toString());
 
-            			if(destDir.exists() != true){
+            			if (destDir.exists() != true) {
             				destDir.mkdir();
             			}
 
@@ -1035,142 +926,19 @@ public class MainWindowController {
     
     @FXML
     void addBtnAction(ActionEvent event){
-//    	String romPath = "";
-//    	String coverPath = "";
-//    	String coverName = "";
-//    	String title = "";
-//    	String titleID = "";
-//    	File pictureCache;
-    	
-    	//TESTING AREA
-    	
     	String headingText = "activate cloud savegame sync (beta)";
 	   	String bodyText = "You just activate the cloud savegame sync function of cemu_UI, "
 							+ "\nwhich is currently in beta. Are you sure you want to do this?";
 		JFXEditGameDialog addGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 350, 300,
-										this, main.primaryStage, main.pane);
+										0, this, main.primaryStage, main.pane);
 		addGameDialog.show();
-		
-//    	//new Dialog
-//    	Dialog<Integer> dialog = new Dialog<>();
-//    	dialog.setTitle("add a new game");
-//    	dialog.setHeaderText("add a new game manually to cemu UI");
-//
-//    	// Set the button types.
-//    	ButtonType okayBtn = new ButtonType("Okay", ButtonData.OK_DONE);
-//    	dialog.getDialogPane().getButtonTypes().addAll(okayBtn, ButtonType.CANCEL);
-//
-//    	// Create gameTitle, titleID, gamePath and gameCover TextFields and Labels and two Btn for filechooser
-//    	GridPane grid = new GridPane();
-//    	grid.setHgap(10);
-//    	grid.setVgap(10);
-//    	grid.setPadding(new Insets(20, 150, 10, 10));
-//
-//    	TextField gameTitleTF = new TextField();
-//    	gameTitleTF.setPromptText("game tile");
-//    	TextField titleIDTF = new TextField();
-//    	titleIDTF.setPromptText("title ID");
-//    	TextField romPathTF = new TextField();
-//    	romPathTF.setPromptText("ROM path");
-//    	TextField gameCoverTF = new TextField();
-//    	gameCoverTF.setPromptText("cover path");
-//    	
-//    	Button selectPathBtn = new Button("select .rpx file");
-//    	Button selectCoverBtn = new Button("select cover file");
-//    	
-//    	selectPathBtn.setPrefWidth(110);
-//    	selectCoverBtn.setPrefWidth(110);
-//    	
-//    	selectPathBtn.setOnAction(new EventHandler<ActionEvent>() {
-//            @Override
-//            public void handle(ActionEvent event) {
-//            	FileChooser romDirectoryChooser = new FileChooser();
-//                File romDirectory =  romDirectoryChooser.showOpenDialog(main.primaryStage);
-//                romPathTF.setText(romDirectory.getAbsolutePath());
-//            }
-//    	});
-//    	
-//    	selectCoverBtn.setOnAction(new EventHandler<ActionEvent>() {
-//            @Override
-//            public void handle(ActionEvent event) {
-//            	FileChooser coverDirectoryChooser = new FileChooser();
-//                File coverDirectory =  coverDirectoryChooser.showOpenDialog(main.primaryStage);
-//                gameCoverTF.setText(coverDirectory.getAbsolutePath());
-//            }
-//    	});
-//    	
-//    	grid.add(new Label("game title:"), 0, 0);
-//    	grid.add(gameTitleTF, 1, 0);
-//    	grid.add(new Label("title id:"), 0, 1);
-//    	grid.add(titleIDTF, 1, 1);
-//    	grid.add(new Label("ROM path:"), 0, 2);
-//    	grid.add(romPathTF, 1, 2);
-//    	grid.add(selectPathBtn, 2, 2);
-//    	grid.add(new Label("cover path:"), 0, 3);
-//    	grid.add(gameCoverTF, 1, 3);
-//    	grid.add(selectCoverBtn, 2, 3);
-//
-//    	dialog.getDialogPane().setContent(grid);
-//
-//    	Optional<Integer> result2 = dialog.showAndWait();
-//    	if (result2.isPresent()){
-//	    	romPath = romPathTF.getText();
-//	    	coverPath = gameCoverTF.getText();
-//	    	title = gameTitleTF.getText();
-//	    	titleID = titleIDTF.getText();
-//	    	
-//	    	LOGGER.info("New game data \"" + title + "\", title-ID: " + titleID + "(not a bug!)");
-//    	}
-//
-//		/**
-//		 * if one parameter dosen't contain any value do not add the game
-//		 * else convert the cover to .png add copy it into the picture cache,
-//		 * then add the rom to the local_roms database
-//		 */
-//    	System.out.println(romPath.length());
-//		if (romPath.length() == 0 || coverPath.length() == 0 || title.length() == 0 || titleID.length() == 0) {
-//			LOGGER.info("No parameter set!");
-//			
-//			//addGame error dialog
-//			String headingTextError = "Error while adding a new Game!";
-//	    	String bodyTextError = "There was some truble adding your game."
-//	    						+ "\nOne of the needed values was empty, please try again to add your game."; 
-//	    	JFXInfoDialog errorDialog = new JFXInfoDialog(headingTextError, bodyTextError, dialogBtnStyle, 350, 170, main.pane);
-//	    	errorDialog.show();
-//
-//		} else {
-//			coverName = new File(coverPath).getName();
-//			try	{
-//				if (System.getProperty("os.name").equals("Linux")) {
-//					pictureCache = getPictureCacheLinux();
-//				} else {
-//					pictureCache = getPictureCacheWin();
-//				}
-//				
-//			    BufferedImage originalImage = ImageIO.read(new File(coverPath)); //load cover
-//			    int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
-//			    BufferedImage resizeImagePNG = resizeImage(originalImage, type, 400, 600);
-//			    ImageIO.write(resizeImagePNG, "png", new File(pictureCache+"\\"+coverName)); //save image to pictureCache
-//			    coverPath = pictureCache+"\\"+coverName;
-//			} catch (IOException e) {
-//				LOGGER.error("Ops something went wrong! Error while resizing cover.", e);
-//			}
-//			
-//			try {	
-//				dbController.addRom(title, coverPath, romPath, titleID, "", "", "", "0");
-//				dbController.loadSingleRom(titleID);
-//				refreshUIData();
-//			} catch (SQLException e) {
-//				LOGGER.error("Oops, something went wrong! Error while adding a game.", e);
-//			}
-//		}
     }
-
-    public void addBtnReturn(EditDataType gameData) {
-    	String romPath = gameData.getRomPath();
-    	String coverPath = gameData.getCoverPath();
-    	String title = gameData.getTitle();
-    	String titleID = gameData.getTitleID();
+    
+    /**
+     * process the returning data from the addGame dialog
+     * and add them to the database and the UI
+     */
+    public void addBtnReturn(String title, String coverPath, String romPath, String titleID) {
     	File pictureCache;
     	
     	/**
@@ -1186,7 +954,7 @@ public class MainWindowController {
 			String headingTextError = "Error while adding a new Game!";
 	    	String bodyTextError = "There was some truble adding your game."
 	    						+ "\nOne of the needed values was empty, please try again to add your game."; 
-	    	JFXInfoDialog errorDialog = new JFXInfoDialog(headingTextError, bodyTextError, dialogBtnStyle, 350, 170, main.pane);
+	    	JFXInfoDialog errorDialog = new JFXInfoDialog(headingTextError, bodyTextError, dialogBtnStyle, 350, 170, main.pane);	
 	    	errorDialog.show();
 
 		} else {
@@ -1210,11 +978,26 @@ public class MainWindowController {
 			try {	
 				dbController.addRom(title, coverPath, romPath, titleID, "", "", "", "0");
 				dbController.loadSingleRom(titleID);
+				if (menuTrue) { 
+					sideMenuSlideOut();
+					burgerTask.setRate(-1.0);
+					burgerTask.play();
+					menuTrue = false;
+				}
 				refreshUIData();
 			} catch (SQLException e) {
 				LOGGER.error("Oops, something went wrong! Error while adding a game.", e);
 			}
 		}
+    }
+
+    public void editBtnReturn(String title, String coverPath, String romPath, String titleID) {
+		dbController.setGameInfo(title, coverPath, romPath, titleID);
+		games.remove(selectedUIDataIndex);
+		dbController.loadSingleRom(titleID);
+		refreshUIData();
+    	
+		LOGGER.info("successfully edited " + titleID + ", new name is \"" + title + "\"");
     }
 
     /**
