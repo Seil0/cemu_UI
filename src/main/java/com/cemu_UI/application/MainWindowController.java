@@ -203,7 +203,7 @@ public class MainWindowController {
     private ImageView smmdbImageView;
     
     @FXML
-    private Label helpLabel;
+    private Label helpLbl;
     
     @FXML
     private Label cemu_UISettingsLbl;
@@ -226,6 +226,8 @@ public class MainWindowController {
     @FXML
     private Label cemuSettingsLbl;
     
+    @FXML
+    private Label licensesLbl;
     
     @FXML
     private JFXTreeTableView<CourseTableDataType> courseTreeTable = new JFXTreeTableView<CourseTableDataType>();
@@ -298,9 +300,9 @@ public class MainWindowController {
     private HamburgerBackArrowBasicTransition burgerTask;
     private MenuItem edit = new MenuItem("edit");
     private MenuItem remove = new MenuItem("remove");
-    private MenuItem update = new MenuItem("update");
+    private MenuItem addUpdate = new MenuItem("update");
     private MenuItem addDLC = new MenuItem("add DLC");
-	private ContextMenu gameContextMenu = new ContextMenu(edit, remove, update, addDLC);
+	private ContextMenu gameContextMenu = new ContextMenu(edit, remove, addUpdate, addDLC);
 	private Label lastGameLabel = new Label();
 	
 	private ImageView add_circle_black = new ImageView(new Image("icons/ic_add_circle_black_24dp_1x.png"));
@@ -469,7 +471,7 @@ public class MainWindowController {
             }
 		});
 		
-		update.setOnAction(new EventHandler<ActionEvent>() {
+		addUpdate.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
             	String titleID = selectedGameTitleID;
@@ -536,9 +538,49 @@ public class MainWindowController {
             		
             		String headingText = "add DLC";
                 	String bodyText = "please select a game, \""+selectedGameTitleID+"\" is not a valid type!";
-                	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
+                	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane); // TODO check if we can use a lower heigth
                 	aboutDialog.show();                	
             	} else {
+            		//TESTING TODO if this works we can use this for update too
+            		String headingText = "add a DLC to \"+selectedGameTitle";
+            		String bodyText = "pleas select the DLC root directory";
+            		EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>(){
+            			@Override
+       	    		 	public void handle(ActionEvent event){
+            				DirectoryChooser directoryChooser = new DirectoryChooser();
+            	            File selectedDirecroty =  directoryChooser.showDialog(main.primaryStage);
+            	            String dlcPath = selectedDirecroty.getAbsolutePath();
+                			String[] parts = titleID.split("-");	//split string into 2 parts at "-"
+                			
+                			File srcDir = new File(dlcPath);
+                			File destDir = new File(cemuPath+"\\mlc01\\usr\\title\\"+parts[0]+"\\"+parts[1]+"\\aoc");
+                			
+                			LOGGER.info(dlcPath);
+                			LOGGER.info(destDir.toString());
+
+                			if (destDir.exists() != true) {
+                				destDir.mkdir();
+                			}
+
+            	            try {
+            	            	LOGGER.info("copying files...");
+            	            	playBtn.setText("copying files...");
+            	            	playBtn.setDisable(true);
+    							FileUtils.copyDirectory(srcDir, destDir);	//TODO progress indicator
+    							playBtn.setText("play");
+    							playBtn.setDisable(false);
+    							LOGGER.info("copying files done!");
+    						} catch (IOException e) {
+    							e.printStackTrace();
+    						}
+       	    		 	}
+            		};
+            		
+            		JFXOkayCancelDialog updateGameDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
+            		updateGameDialog.setOkayAction(okayAction);
+            		
+            		
+            		// old dilaog (if testing works we can remove this)
         			Alert updateAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
         			updateAlert.setTitle("cemu_UI");
         			updateAlert.setHeaderText("add a DLC to "+selectedGameTitle);
@@ -623,7 +665,7 @@ public class MainWindowController {
 				}
 		 });
 		
-		helpLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+		helpLbl.setOnMouseClicked(new EventHandler<MouseEvent>() {
 		    @Override
 		    public void handle(MouseEvent mouseEvent) {
 		        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
@@ -647,6 +689,15 @@ public class MainWindowController {
             	saveSettings();
             }
           });
+        
+        licensesLbl.setOnMouseClicked(new EventHandler<MouseEvent>() {
+		    @Override
+		    public void handle(MouseEvent mouseEvent) {
+		        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
+		           // TODO show a new Dialog where you can see the different licenses of the libs and the cemu_UI license
+		        }
+		    }
+		});
 
 		LOGGER.info("initializing Actions done!");
 	}
@@ -661,8 +712,9 @@ public class MainWindowController {
     	String headingText = "cemu_UI";
     	String bodyText = "cemu_UI by @Seil0 \nVersion: " + version + " (" + buildNumber + ")  \"" + versionName + "\" \n"
     					+ "This Application is made with free Software\n"
+    					+ "and licensed under the terms of GNU GPL 3.\n\n"
     					+ "www.kellerkinder.xyz";
-    	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
+    	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 200, main.pane);
     	aboutDialog.show();
     }
 
@@ -913,7 +965,9 @@ public class MainWindowController {
 	    	};
 	    	
 			JFXOkayCancelDialog cloudSyncErrorDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle,
-					419, 140, okayAction, cancelAction, main.pane);
+					419, 140, main.pane);
+			cloudSyncErrorDialog.setOkayAction(okayAction);
+			cloudSyncErrorDialog.setCancelAction(cancelAction);
 	    	cloudSyncErrorDialog.show();	
     	}
     }

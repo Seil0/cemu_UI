@@ -41,8 +41,8 @@ public class JFXOkayCancelDialog {
 	private String dialogBtnStyle;
 	private int dialogWidth;
 	private int dialogHeight;
-	private EventHandler<ActionEvent> okayAction;
-	private EventHandler<ActionEvent> cancelAction;
+	private EventHandler<ActionEvent> okayAction = null;
+	private EventHandler<ActionEvent> cancelAction = null;
 	private Pane pane;
 	
 	/**
@@ -57,14 +57,14 @@ public class JFXOkayCancelDialog {
 	 * @param pane pane to which the dialog belongs
 	 */
 	public JFXOkayCancelDialog(String headingText, String bodyText, String dialogBtnStyle, int dialogWidth,
-			int dialogHeight, EventHandler<ActionEvent> okayAction, EventHandler<ActionEvent> cancelAction, Pane pane) {
+			int dialogHeight, Pane pane) {
 		this.headingText = headingText;
 		this.bodyText = bodyText;
 		this.dialogBtnStyle = dialogBtnStyle;
 		this.dialogWidth = dialogWidth;
 		this.dialogHeight = dialogHeight;
-		this.okayAction = okayAction;
-		this.cancelAction = cancelAction;
+//		this.okayAction = okayAction;
+//		this.cancelAction = cancelAction;
 		this.pane = pane;
 	}
 	
@@ -99,6 +99,22 @@ public class JFXOkayCancelDialog {
     	AnchorPane.setTopAnchor(stackPane, (pane.getHeight()-content.getPrefHeight())/2);
     	AnchorPane.setLeftAnchor(stackPane, (pane.getWidth()-content.getPrefWidth())/2);
     	dialog.show();
+	}
+
+	public EventHandler<ActionEvent> getOkayAction() {
+		return okayAction;
+	}
+
+	public void setOkayAction(EventHandler<ActionEvent> okayAction) {
+		this.okayAction = okayAction;
+	}
+
+	public EventHandler<ActionEvent> getCancelAction() {
+		return cancelAction;
+	}
+
+	public void setCancelAction(EventHandler<ActionEvent> cancelAction) {
+		this.cancelAction = cancelAction;
 	}
 
 }

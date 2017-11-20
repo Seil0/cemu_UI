@@ -61,10 +61,10 @@
             </JFXButton>
          </children>
       </VBox>
-      <ScrollPane fx:id="settingsScrollPane" style="-fx-background: white;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="175.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0">
+      <ScrollPane fx:id="settingsScrollPane" style="-fx-background: white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="175.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0">
          <content>
            		<!-- space between settings sections  35px, between sections elements (label + element) 20px, between label and element 3px(or more) -->
-            <AnchorPane fx:id="settingsAnchorPane" prefHeight="562.0" prefWidth="511.0" style="-fx-background-color: white;">
+            <AnchorPane fx:id="settingsAnchorPane" prefHeight="607.0" prefWidth="511.0" style="-fx-background-color: white;">
                <children>
                   <Label fx:id="cemuDirectoryLbl" layoutX="10.0" layoutY="39.0" text="Cemu Directory" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="39.0" />
                   <JFXTextField fx:id="cemuTextField" layoutX="10.0" layoutY="59.0" maxWidth="305.0" minWidth="305.0" onAction="#cemuTextFieldAction" prefHeight="32.0" prefWidth="305.0" promptText="cemu directory" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="59.0" />
@@ -72,7 +72,7 @@
                   <JFXButton fx:id="romTFBtn" layoutX="329.0" layoutY="131.0" onAction="#romTFBtnAction" prefHeight="32.0" text="choose directory" AnchorPane.leftAnchor="329.0" AnchorPane.topAnchor="131.0" />
                   <JFXButton fx:id="cemuTFBtn" layoutX="329.0" layoutY="59.0" onAction="#cemuTFBtnAction" prefHeight="32.0" text="choose directory" AnchorPane.leftAnchor="329.0" AnchorPane.topAnchor="59.0" />
                   <JFXColorPicker fx:id="colorPicker" layoutX="12.0" layoutY="207.0" onAction="#colorPickerAction" AnchorPane.leftAnchor="12.0" AnchorPane.topAnchor="207.0" />
-                  <JFXToggleButton fx:id="fullscreenToggleBtn" layoutX="16.0" layoutY="488.0" onAction="#fullscreenToggleBtnAction" text="start game in fullscreen" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="488.0" />
+                  <JFXToggleButton fx:id="fullscreenToggleBtn" layoutX="16.0" layoutY="488.0" onAction="#fullscreenToggleBtnAction" text="start game in fullscreen" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="488.0" />
                   <Label fx:id="romDirectoryLbl" layoutX="10.0" layoutY="111.0" text="Rom Directory" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="111.0" />
                   <Label fx:id="mainColorLbl" layoutX="10.0" layoutY="183.0" text="main Color" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="183.0" />
                   <Label fx:id="cemuSettingsLbl" layoutX="16.0" layoutY="450.0" text="Cemu Settings" AnchorPane.leftAnchor="16.0" AnchorPane.topAnchor="465.0">
@@ -91,6 +91,7 @@
                   <JFXToggleButton fx:id="autoUpdateToggleBtn" layoutX="10.0" layoutY="372.0" onAction="#autoUpdateToggleBtnAction" text="check for updates on startup" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="372.0" />
                   <ChoiceBox fx:id="branchChoisBox" layoutX="270.0" layoutY="339.0" prefWidth="150.0" AnchorPane.leftAnchor="270.0" AnchorPane.topAnchor="339.0" />
                   <Label fx:id="branchLbl" layoutX="204.0" layoutY="337.0" prefHeight="32.0" text="Branch" AnchorPane.leftAnchor="204.0" AnchorPane.topAnchor="335.0" />
+                  <Label fx:id="licensesLbl" layoutX="18.0" layoutY="576.0" text="Licenses" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" />
                </children>
             </AnchorPane>
          </content>
@@ -109,7 +110,7 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </JFXButton>
-            <Label fx:id="helpLabel" layoutX="436.0" layoutY="538.0" prefHeight="17.0" prefWidth="267.0" text="please help me improving this! click me!">
+            <Label fx:id="helpLbl" layoutX="436.0" layoutY="538.0" prefHeight="17.0" prefWidth="267.0" text="please help me improving this! click me!">
                <font>
                   <Font size="14.0" />
                </font>
