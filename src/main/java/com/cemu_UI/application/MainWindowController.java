@@ -694,7 +694,17 @@ public class MainWindowController {
 		    @Override
 		    public void handle(MouseEvent mouseEvent) {
 		        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
-		           // TODO show a new Dialog where you can see the different licenses of the libs and the cemu_UI license
+		        	String headingText = "cemu_UI";
+		        	String bodyText = "cemu_UI is licensed under the terms of GNU GPL 3.\n\n"
+		        					+ "JFoenix, Apache License 2.0\n"
+		        					+ "minimal-json, MIT License\n"
+		        					+ "sqlite-jdbc, Apache License 2.0\n"
+		        					+ "Apache Commons IO, Apache License 2.0\n"
+		        					+ "Apache Commons Logging, Apache License 2.0\n"
+		        					+ "Apache Commons Codec, Apache License 2.0\n"
+		        					+ "Apache Log4j 2, Apache License 2.0\n";
+		        	JFXInfoDialog licenseDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 275, main.pane);
+		        	licenseDialog.show(); 	
 		        }
 		    }
 		});

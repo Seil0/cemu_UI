@@ -61,7 +61,7 @@
             </JFXButton>
          </children>
       </VBox>
-      <ScrollPane fx:id="settingsScrollPane" style="-fx-background: white;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="175.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0">
+      <ScrollPane fx:id="settingsScrollPane" style="-fx-background: white;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="175.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0">
          <content>
            		<!-- space between settings sections  35px, between sections elements (label + element) 20px, between label and element 3px(or more) -->
             <AnchorPane fx:id="settingsAnchorPane" prefHeight="607.0" prefWidth="511.0" style="-fx-background-color: white;">
