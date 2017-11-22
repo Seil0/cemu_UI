@@ -474,54 +474,62 @@ public class MainWindowController {
 		addUpdate.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-            	String titleID = selectedGameTitleID;
-            	String updatePath;
             	LOGGER.info("update: "+selectedGameTitleID);
 				if (selectedGameTitleID == null) {
             		LOGGER.warn("trying to update null! null is not valid!");
-            		
             		String headingText = "update game";
-                	String bodyText = "please select a game, \""+selectedGameTitleID+"\" is not a valid type!";
-                	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
-                	aboutDialog.show();
+                	String bodyText = "please select a game,\n"
+                					+ "\""+selectedGameTitleID+"\" is not a valid type!";
+                	JFXInfoDialog updateGameErrorDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
+                	updateGameErrorDialog.show();
 				} else {
-        			Alert updateAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
-        			updateAlert.setTitle("cemu_UI");
-        			updateAlert.setHeaderText("update "+selectedGameTitle);
-        			updateAlert.setContentText("pleas select the update root directory");
-        			updateAlert.initOwner(main.primaryStage);
+					String headingText = "update \"" + selectedGameTitle + "\"";
+            		String bodyText = "pleas select the update root directory";
+            		EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>(){
+            			@Override
+       	    		 	public void handle(ActionEvent event){
+            				DirectoryChooser directoryChooser = new DirectoryChooser();
+	        	            File selectedDirecroty =  directoryChooser.showDialog(main.primaryStage);
+	        	            String updatePath = selectedDirecroty.getAbsolutePath();
+	            			String[] parts = selectedGameTitleID.split("-");	//split string into 2 parts at "-"
+	            			
+	            			File srcDir = new File(updatePath);
+	            			File destDir;
+	            			if (System.getProperty("os.name").equals("Linux")) {
+                				destDir = new File(cemuPath+"/mlc01/usr/title/"+parts[0]+"/"+parts[1]);
+                			} else {
+                				destDir = new File(cemuPath+"\\mlc01\\usr\\title\\"+parts[0]+"\\"+parts[1]);
+                			}
+	
+	            			// if directory doesn't exist create it
+	            			if (destDir.exists() != true) {
+	            				destDir.mkdir();
+	            			}
 
-        			Optional<ButtonType> result = updateAlert.showAndWait();
-        			if (result.get() == ButtonType.OK) {
-        				DirectoryChooser directoryChooser = new DirectoryChooser();
-        	            File selectedDirecroty =  directoryChooser.showDialog(main.primaryStage);
-        	            updatePath = selectedDirecroty.getAbsolutePath();
-            			String[] parts = titleID.split("-");	//split string into 2 parts at "-"
-            			
-            			File srcDir = new File(updatePath);
-            			File destDir = new File(cemuPath+"\\mlc01\\usr\\title\\"+parts[0]+"\\"+parts[1]);
-            			
-            			LOGGER.info(updatePath);
-            			LOGGER.info(destDir.toString());
-
-            			if (destDir.exists() != true) {
-            				destDir.mkdir();
+	        	            try {
+	        	            	LOGGER.info("copying the content of " + updatePath + " to " + destDir.toString());
+	        	            	playBtn.setText("updating...");
+	        	            	playBtn.setDisable(true);
+								FileUtils.copyDirectory(srcDir, destDir);	//TODO progress indicator
+								playBtn.setText("play");
+								playBtn.setDisable(false);
+								LOGGER.info("copying files done!");
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
             			}
-
-        	            try {
-        	            	LOGGER.info("copying files...");
-        	            	playBtn.setText("updating...");
-        	            	playBtn.setDisable(true);
-							FileUtils.copyDirectory(srcDir, destDir);	//TODO progress indicator
-							playBtn.setText("play");
-							playBtn.setDisable(false);
-							LOGGER.info("copying files done!");
-						} catch (IOException e) {
-							e.printStackTrace();
+            		};
+					
+            		EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent event) {
+							
 						}
-        			} else {
-        				updatePath = null;
-        			}
+					};
+            		
+					JFXOkayCancelDialog updateGameDialog = new JFXOkayCancelDialog(headingText, bodyText,
+							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.pane);
+					updateGameDialog.show();
             	}
             }
 		});
@@ -529,20 +537,17 @@ public class MainWindowController {
 		addDLC.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-             	String titleID = selectedGameTitleID;
-            	String dlcPath;
-            	
             	LOGGER.info("add DLC: "+selectedGameTitleID);
+            	
             	if (selectedGameTitleID == null) {
             		LOGGER.warn("trying to add a dlc to null! null is not valid!");
-            		
             		String headingText = "add DLC";
-                	String bodyText = "please select a game, \""+selectedGameTitleID+"\" is not a valid type!";
-                	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane); // TODO check if we can use a lower heigth
-                	aboutDialog.show();                	
-            	} else {
-            		//TESTING TODO if this works we can use this for update too
-            		String headingText = "add a DLC to \"+selectedGameTitle";
+                	String bodyText = "please select a game,\n"
+                					+ "\"" + selectedGameTitleID + "\" is not a valid type!";
+                	JFXInfoDialog addDLCErrorDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
+                	addDLCErrorDialog.show();                	
+            	} else {   		
+            		String headingText = "add a DLC to \"" + selectedGameTitle + "\"";
             		String bodyText = "pleas select the DLC root directory";
             		EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>(){
             			@Override
@@ -550,20 +555,22 @@ public class MainWindowController {
             				DirectoryChooser directoryChooser = new DirectoryChooser();
             	            File selectedDirecroty =  directoryChooser.showDialog(main.primaryStage);
             	            String dlcPath = selectedDirecroty.getAbsolutePath();
-                			String[] parts = titleID.split("-");	//split string into 2 parts at "-"
-                			
+                			String[] parts = selectedGameTitleID.split("-");	//split string into 2 parts at "-"
                 			File srcDir = new File(dlcPath);
-                			File destDir = new File(cemuPath+"\\mlc01\\usr\\title\\"+parts[0]+"\\"+parts[1]+"\\aoc");
+                        	File destDir;
+                			if (System.getProperty("os.name").equals("Linux")) {
+                				destDir = new File(cemuPath+"/mlc01/usr/title/"+parts[0]+"/"+parts[1]+"/aoc");
+                			} else {
+                				destDir = new File(cemuPath+"\\mlc01\\usr\\title\\"+parts[0]+"\\"+parts[1]+"\\aoc");
+                			}
                 			
-                			LOGGER.info(dlcPath);
-                			LOGGER.info(destDir.toString());
-
+                			// if directory doesn't exist create it
                 			if (destDir.exists() != true) {
                 				destDir.mkdir();
                 			}
 
             	            try {
-            	            	LOGGER.info("copying files...");
+            	            	LOGGER.info("copying the content of " + dlcPath + " to " + destDir.toString());
             	            	playBtn.setText("copying files...");
             	            	playBtn.setDisable(true);
     							FileUtils.copyDirectory(srcDir, destDir);	//TODO progress indicator
@@ -576,48 +583,16 @@ public class MainWindowController {
        	    		 	}
             		};
             		
-            		JFXOkayCancelDialog updateGameDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
-            		updateGameDialog.setOkayAction(okayAction);
-            		
-            		
-            		// old dilaog (if testing works we can remove this)
-        			Alert updateAlert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
-        			updateAlert.setTitle("cemu_UI");
-        			updateAlert.setHeaderText("add a DLC to "+selectedGameTitle);
-        			updateAlert.setContentText("pleas select the DLC root directory");
-        			updateAlert.initOwner(main.primaryStage);
-
-        			Optional<ButtonType> result = updateAlert.showAndWait();
-        			if (result.get() == ButtonType.OK) {
-        				DirectoryChooser directoryChooser = new DirectoryChooser();
-        	            File selectedDirecroty =  directoryChooser.showDialog(main.primaryStage);
-        	            dlcPath = selectedDirecroty.getAbsolutePath();
-            			String[] parts = titleID.split("-");	//split string into 2 parts at "-"
-            			
-            			File srcDir = new File(dlcPath);
-            			File destDir = new File(cemuPath+"\\mlc01\\usr\\title\\"+parts[0]+"\\"+parts[1]+"\\aoc");
-            			
-            			LOGGER.info(dlcPath);
-            			LOGGER.info(destDir.toString());
-
-            			if (destDir.exists() != true) {
-            				destDir.mkdir();
-            			}
-
-        	            try {
-        	            	LOGGER.info("copying files...");
-        	            	playBtn.setText("copying files...");
-        	            	playBtn.setDisable(true);
-							FileUtils.copyDirectory(srcDir, destDir);	//TODO progress indicator
-							playBtn.setText("play");
-							playBtn.setDisable(false);
-							LOGGER.info("copying files done!");
-						} catch (IOException e) {
-							e.printStackTrace();
+					EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent event) {
+							
 						}
-        			} else {
-        				dlcPath = null;
-        			}
+					};
+            		
+					JFXOkayCancelDialog addDLCDialog = new JFXOkayCancelDialog(headingText, bodyText,
+							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.pane);
+					addDLCDialog.show();
             	}
 		     }
 		});
@@ -975,9 +950,7 @@ public class MainWindowController {
 	    	};
 	    	
 			JFXOkayCancelDialog cloudSyncErrorDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle,
-					419, 140, main.pane);
-			cloudSyncErrorDialog.setOkayAction(okayAction);
-			cloudSyncErrorDialog.setCancelAction(cancelAction);
+					419, 140, okayAction, cancelAction, main.pane);
 	    	cloudSyncErrorDialog.show();	
     	}
     }
