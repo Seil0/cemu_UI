@@ -275,7 +275,7 @@ public class MainWindowController {
 	private int oldXPosHelper;
 	private int selectedUIDataIndex;
 	private int selected;
-    private double windowWidth;
+	private double windowWidth;
 	private double windowHeight;
 	private DirectoryChooser directoryChooser = new DirectoryChooser();
 	private File dirWin = new File(System.getProperty("user.home") + "/Documents/cemu_UI");
