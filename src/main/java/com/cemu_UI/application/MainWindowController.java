@@ -40,7 +40,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Optional;
 import java.util.Properties;
 
 import javax.imageio.ImageIO;
@@ -80,9 +79,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Label;
@@ -407,125 +403,96 @@ public class MainWindowController {
 		});
 		
 		edit.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {     	
-            	try {
-                	LOGGER.info("edit "+selectedGameTitleID);
-            		String[] gameInfo = dbController.getGameInfo(selectedGameTitleID);
-            		
-            		//new edit dialog
-                	String headingText = "edit a game";
-            	   	String bodyText = "You can edit the tile and rom/cover path.";
-            		JFXEditGameDialog editGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 350, 300,
-            										1, MWC, main.primaryStage, main.pane);
-            		editGameDialog.setTitle(gameInfo[0]);
-            		editGameDialog.setCoverPath(gameInfo[1]);
-            		editGameDialog.setRomPath(gameInfo[2]);
-            		editGameDialog.setTitleID(gameInfo[3]);
-            		editGameDialog.show();
+			@Override
+			public void handle(ActionEvent event) {
+				try {
+					LOGGER.info("edit " + selectedGameTitleID);
+					String[] gameInfo = dbController.getGameInfo(selectedGameTitleID);
+
+					// new edit dialog
+					String headingText = "edit a game";
+					String bodyText = "You can edit the tile and rom/cover path.";
+					JFXEditGameDialog editGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 450,
+							300, 1, MWC, main.primaryStage, main.pane);
+					editGameDialog.setTitle(gameInfo[0]);
+					editGameDialog.setCoverPath(gameInfo[1]);
+					editGameDialog.setRomPath(gameInfo[2]);
+					editGameDialog.setTitleID(gameInfo[3]);
+					editGameDialog.show();
 				} catch (Exception e) {
 					LOGGER.warn("trying to edit " + selectedGameTitleID + ",which is not a valid type!", e);
 				}
-            	
-//            	if (selectedGameTitleID == null) {
-//            		LOGGER.warn("trying to edit null! null is not valid!");
-//            		
-//            		String headingText = "edit game";
-//                	String bodyText = "please select a game, \""+selectedGameTitleID+"\" is not a valid type!";
-//                	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
-//                	aboutDialog.show();
-//            	} else {
-//            		String[] gameInfo = dbController.getGameInfo(selectedGameTitleID);
-//            		
-//            		//new edit dialog
-//                	String headingText = "edit a game";
-//            	   	String bodyText = "You can edit the tile and rom/cover path.";
-//            		JFXEditGameDialog editGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 350, 300,
-//            										1, MWC, main.primaryStage, main.pane);
-//            		editGameDialog.setTitle(gameInfo[0]);
-//            		editGameDialog.setCoverPath(gameInfo[1]);
-//            		editGameDialog.setRomPath(gameInfo[2]);
-//            		editGameDialog.setTitleID(gameInfo[3]);
-//            		editGameDialog.show();
-//            	}
-            }
+			}
 		});
 		
 		remove.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
-            public void handle(ActionEvent event) {
-				LOGGER.info("remove "+selectedGameTitleID);
-            	if(selectedGameTitleID == null){
-            		LOGGER.warn("trying to remove null! null is not valid!");
-
-            		String headingText = "remove game";
-                	String bodyText = "please select a game, \""+selectedGameTitleID+"\" is not a valid type!";
-                	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
-                	aboutDialog.show();     	
-            	}
-            	else{
-            		Alert alert = new Alert(AlertType.CONFIRMATION);
-                	alert.setTitle("remove");
-                	alert.setHeaderText("cemu_UI");
-                	alert.setContentText("Are you sure you want to delete "+selectedGameTitle+" ?");
-                	alert.initOwner(main.primaryStage);
-                	
-                	Optional<ButtonType> result = alert.showAndWait();
-        			if (result.get() == ButtonType.OK){
-    					try {
-    						// remove game from database
-    						games.remove(selectedUIDataIndex);
-							dbController.removeRom(selectedGameTitleID);
-							
-    						// refresh all games at gamesAnchorPane (UI)
-    						refreshUIData();  						
-						} catch (Exception e) {
-							LOGGER.error("error!",e);
+            public void handle(ActionEvent event) {		
+				try {
+					LOGGER.info("remove " + selectedGameTitle + "(" + selectedGameTitleID + ")");
+					String headingText = "remove \"" + selectedGameTitle + "\"";
+					String bodyText = "Are you sure you want to delete " + selectedGameTitle + " ?";
+					EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent event) {
+							try {
+								games.remove(selectedUIDataIndex); // remove game form games-list
+								dbController.removeRom(selectedGameTitleID); // remove game from database
+								refreshUIData(); // refresh all games at gamesAnchorPane (UI)
+							} catch (Exception e) {
+								LOGGER.error("error while removing ROM from database!", e);
+							}
 						}
-        			}
-            	}
+					};
+
+					EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent event) {
+							// do nothing
+						}
+					};
+
+					JFXOkayCancelDialog removeGameDialog = new JFXOkayCancelDialog(headingText, bodyText,
+							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.pane);
+					removeGameDialog.show();
+				} catch (Exception e) {
+					LOGGER.error("error while removing " + selectedGameTitle + "(" + selectedGameTitleID + ")", e);
+				}
             }
 		});
 		
 		addUpdate.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-            	LOGGER.info("update: "+selectedGameTitleID);
-				if (selectedGameTitleID == null) {
-            		LOGGER.warn("trying to update null! null is not valid!");
-            		String headingText = "update game";
-                	String bodyText = "please select a game,\n"
-                					+ "\""+selectedGameTitleID+"\" is not a valid type!";
-                	JFXInfoDialog updateGameErrorDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
-                	updateGameErrorDialog.show();
-				} else {
+			@Override
+			public void handle(ActionEvent event) {
+				try {
+					LOGGER.info("update: " + selectedGameTitleID);
 					String headingText = "update \"" + selectedGameTitle + "\"";
-            		String bodyText = "pleas select the update root directory";
-            		EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>(){
-            			@Override
-       	    		 	public void handle(ActionEvent event){
-            				DirectoryChooser directoryChooser = new DirectoryChooser();
-	        	            File selectedDirecroty =  directoryChooser.showDialog(main.primaryStage);
-	        	            String updatePath = selectedDirecroty.getAbsolutePath();
+					String bodyText = "pleas select the update root directory";
+					EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent event) {
+							DirectoryChooser directoryChooser = new DirectoryChooser();
+							File selectedDirecroty = directoryChooser.showDialog(main.primaryStage);
+							String updatePath = selectedDirecroty.getAbsolutePath();
 							String[] parts = selectedGameTitleID.split("-"); // split string into 2 parts at "-"
-	            			
-	            			File srcDir = new File(updatePath);
-	            			File destDir;
-	            			if (System.getProperty("os.name").equals("Linux")) {
-                				destDir = new File(cemuPath+"/mlc01/usr/title/"+parts[0]+"/"+parts[1]);
-                			} else {
-                				destDir = new File(cemuPath+"\\mlc01\\usr\\title\\"+parts[0]+"\\"+parts[1]);
-                			}
-	
-	            			// if directory doesn't exist create it
-	            			if (destDir.exists() != true) {
-	            				destDir.mkdir();
-	            			}
+							File srcDir = new File(updatePath);
+							File destDir;
 
-	        	            try {
-	        	            	LOGGER.info("copying the content of " + updatePath + " to " + destDir.toString());
-	        	            	playBtn.setText("updating...");
-	        	            	playBtn.setDisable(true);
+							if (System.getProperty("os.name").equals("Linux")) {
+								destDir = new File(cemuPath + "/mlc01/usr/title/" + parts[0] + "/" + parts[1]);
+							} else {
+								destDir = new File(cemuPath + "\\mlc01\\usr\\title\\" + parts[0] + "\\" + parts[1]);
+							}
+
+							// if directory doesn't exist create it
+							if (destDir.exists() != true) {
+								destDir.mkdir();
+							}
+
+							try {
+								LOGGER.info("copying the content of " + updatePath + " to " + destDir.toString());
+								playBtn.setText("updating...");
+								playBtn.setDisable(true);
 								FileUtils.copyDirectory(srcDir, destDir); // TODO progress indicator
 								playBtn.setText("play");
 								playBtn.setDisable(false);
@@ -533,153 +500,151 @@ public class MainWindowController {
 							} catch (IOException e) {
 								e.printStackTrace();
 							}
-            			}
-            		};
-					
-            		EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>() {
-						@Override
-						public void handle(ActionEvent event) {
-							
 						}
 					};
-            		
-					JFXOkayCancelDialog updateGameDialog = new JFXOkayCancelDialog(headingText, bodyText,
-							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.pane);
-					updateGameDialog.show();
-            	}
-            }
-		});
-		
-		addDLC.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-            	LOGGER.info("add DLC: "+selectedGameTitleID);
-            	
-            	if (selectedGameTitleID == null) {
-            		LOGGER.warn("trying to add a dlc to null! null is not valid!");
-            		String headingText = "add DLC";
-                	String bodyText = "please select a game,\n"
-                					+ "\"" + selectedGameTitleID + "\" is not a valid type!";
-                	JFXInfoDialog addDLCErrorDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
-                	addDLCErrorDialog.show();                	
-            	} else {   		
-            		String headingText = "add a DLC to \"" + selectedGameTitle + "\"";
-            		String bodyText = "pleas select the DLC root directory";
-            		EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>(){
-            			@Override
-       	    		 	public void handle(ActionEvent event){
-            				DirectoryChooser directoryChooser = new DirectoryChooser();
-            	            File selectedDirecroty =  directoryChooser.showDialog(main.primaryStage);
-            	            String dlcPath = selectedDirecroty.getAbsolutePath();
-                			String[] parts = selectedGameTitleID.split("-");	// split string into 2 parts at "-"
-                			File srcDir = new File(dlcPath);
-                        	File destDir;
-                			if (System.getProperty("os.name").equals("Linux")) {
-                				destDir = new File(cemuPath+"/mlc01/usr/title/"+parts[0]+"/"+parts[1]+"/aoc");
-                			} else {
-                				destDir = new File(cemuPath+"\\mlc01\\usr\\title\\"+parts[0]+"\\"+parts[1]+"\\aoc");
-                			}
-                			
-                			// if directory doesn't exist create it
-                			if (destDir.exists() != true) {
-                				destDir.mkdir();
-                			}
 
-            	            try {
-            	            	LOGGER.info("copying the content of " + dlcPath + " to " + destDir.toString());
-            	            	playBtn.setText("copying files...");
-            	            	playBtn.setDisable(true);
-    							FileUtils.copyDirectory(srcDir, destDir);	// TODO progress indicator
-    							playBtn.setText("play");
-    							playBtn.setDisable(false);
-    							LOGGER.info("copying files done!");
-    						} catch (IOException e) {
-    							e.printStackTrace();
-    						}
-       	    		 	}
-            		};
-            		
 					EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
-							
+							// do nothing
 						}
 					};
-            		
-					JFXOkayCancelDialog addDLCDialog = new JFXOkayCancelDialog(headingText, bodyText,
+
+					JFXOkayCancelDialog updateGameDialog = new JFXOkayCancelDialog(headingText, bodyText,
 							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.pane);
+					updateGameDialog.show();
+				} catch (Exception e) {
+					LOGGER.warn("trying to update " + selectedGameTitleID + ",which is not a valid type!", e);
+				}
+			}
+		});
+		
+		addDLC.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				try {
+					LOGGER.info("add DLC: " + selectedGameTitleID);
+					String headingText = "add a DLC to \"" + selectedGameTitle + "\"";
+					String bodyText = "pleas select the DLC root directory";
+					EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent event) {
+							DirectoryChooser directoryChooser = new DirectoryChooser();
+							File selectedDirecroty = directoryChooser.showDialog(main.primaryStage);
+							String dlcPath = selectedDirecroty.getAbsolutePath();
+							String[] parts = selectedGameTitleID.split("-"); // split string into 2 parts at "-"
+							File srcDir = new File(dlcPath);
+							File destDir;
+							if (System.getProperty("os.name").equals("Linux")) {
+								destDir = new File(cemuPath + "/mlc01/usr/title/" + parts[0] + "/" + parts[1] + "/aoc");
+							} else {
+								destDir = new File(
+										cemuPath + "\\mlc01\\usr\\title\\" + parts[0] + "\\" + parts[1] + "\\aoc");
+							}
+
+							// if directory doesn't exist create it
+							if (destDir.exists() != true) {
+								destDir.mkdir();
+							}
+
+							try {
+								LOGGER.info("copying the content of " + dlcPath + " to " + destDir.toString());
+								playBtn.setText("copying files...");
+								playBtn.setDisable(true);
+								FileUtils.copyDirectory(srcDir, destDir); // TODO progress indicator
+								playBtn.setText("play");
+								playBtn.setDisable(false);
+								LOGGER.info("copying files done!");
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					};
+
+					EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent event) {
+							// do nothing
+						}
+					};
+
+					JFXOkayCancelDialog addDLCDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle,
+							350, 170, okayAction, cancelAction, main.pane);
 					addDLCDialog.show();
-            	}
-		     }
+				} catch (Exception e) {
+					LOGGER.warn("trying to add a dlc to " + selectedGameTitleID + ",which is not a valid type!", e);
+				}
+			}
 		});
             
 		gamesAnchorPane.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-		     @Override
-		     public void handle(MouseEvent event) {
-		    	 if (playTrue) {
-			    	 playBtnSlideOut();
+			@Override
+			public void handle(MouseEvent event) {
+				if (playTrue) {
+					playBtnSlideOut();
 				}
-		     }
+			}
 		});
 		
 		topHBox.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
-		     @Override
-		     public void handle(MouseEvent event) {
-		    	 if (playTrue) {
-			    	 playBtnSlideOut();
+			@Override
+			public void handle(MouseEvent event) {
+				if (playTrue) {
+					playBtnSlideOut();
 				}
-		     }
+			}
 		});
 		
 		// Change-listener for TreeTable
-		courseTreeTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Object>() {	
-				@Override
-				public void changed(ObservableValue<?> observable, Object oldVal, Object newVal){
-					selected = courseTreeTable.getSelectionModel().getSelectedIndex(); //get selected item
-					
-					// FIXME if a item is selected and you change the sorting,you can't select a new item
-					id = idColumn.getCellData(selected); // get name of selected item
+		courseTreeTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Object>() {
+			@Override
+			public void changed(ObservableValue<?> observable, Object oldVal, Object newVal) {
+				selected = courseTreeTable.getSelectionModel().getSelectedIndex(); // get selected item
 
-					for (int i = 0; i < courses.size(); i++) {
-						if (courses.get(i).getId() == id) {	
-							try {
-								URL url = new URL("https://smmdb.ddns.net/courseimg/" + id + "_full?v=1");
-								Image image = new Image(url.toURI().toString());
-								smmdbImageView.setImage(image);
-							} catch (MalformedURLException | URISyntaxException e) {
-								e.printStackTrace();
-								smmdbImageView.setImage(close_black);
-							}
-							addCourseDescription(courses.get(i));
+				// FIXME if a item is selected and you change the sorting,you can't select a new
+				// item
+				id = idColumn.getCellData(selected); // get name of selected item
+
+				for (int i = 0; i < courses.size(); i++) {
+					if (courses.get(i).getId() == id) {
+						try {
+							URL url = new URL("https://smmdb.ddns.net/courseimg/" + id + "_full?v=1");
+							Image image = new Image(url.toURI().toString());
+							smmdbImageView.setImage(image);
+						} catch (MalformedURLException | URISyntaxException e) {
+							e.printStackTrace();
+							smmdbImageView.setImage(close_black);
 						}
-					}	
+						addCourseDescription(courses.get(i));
+					}
 				}
-		 });
+			}
+		});
 		
 		helpLbl.setOnMouseClicked(new EventHandler<MouseEvent>() {
-		    @Override
-		    public void handle(MouseEvent mouseEvent) {
-		        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
-		            try {
+			@Override
+			public void handle(MouseEvent mouseEvent) {
+				if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
+					try {
 						Desktop.getDesktop().browse(new URI("https://github.com/Seil0/cemu_UI/issues/3"));
 					} catch (IOException | URISyntaxException e) {
 						e.printStackTrace();
 					}
-		        }
-		    }
+				}
+			}
 		});
-		
-        branchChoisBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
-        	@Override
-        	public void changed(ObservableValue<? extends Number> ov, Number value, Number new_value) {     		
-            	if (branchChoisBox.getItems().get((int) new_value).toString() == "beta") {
+
+		branchChoisBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> ov, Number value, Number new_value) {
+				if (branchChoisBox.getItems().get((int) new_value).toString() == "beta") {
 					setUseBeta(true);
 				} else {
 					setUseBeta(false);
 				}
-            	saveSettings();
-            }
-          });
+				saveSettings();
+			}
+		});
         
         licensesLbl.setOnMouseClicked(new EventHandler<MouseEvent>() {
 		    @Override
@@ -703,13 +668,13 @@ public class MainWindowController {
 		LOGGER.info("initializing Actions done!");
 	}
     
-    @FXML
-    void detailsSlideoutBtnAction(ActionEvent event){
-    	playBtnSlideOut();
-    }
+	@FXML
+	void detailsSlideoutBtnAction(ActionEvent event) {
+		playBtnSlideOut();
+	}
     
     @FXML
-    void aboutBtnAction(){
+    void aboutBtnAction() {
     	String headingText = "cemu_UI";
     	String bodyText = "cemu_UI by @Seil0 \nVersion: " + version + " (" + buildNumber + ")  \"" + versionName + "\" \n"
     					+ "This Application is made with free Software\n"
@@ -719,127 +684,128 @@ public class MainWindowController {
     	aboutDialog.show();
     }
 
-    @FXML
-    void settingsBtnAction(ActionEvent event) {
-    	if (smmdbTrue) {
-    		smmdbAnchorPane.setVisible(false);
-    		smmdbTrue = false;
-    	}
-    	if (settingsTrue) {
-    		settingsScrollPane.setVisible(false);
-      		settingsTrue = false;
-    		saveSettings();
-    	} else {
-    		settingsScrollPane.setVisible(true);
-    		settingsTrue = true;
-    	}
-    }
+	@FXML
+	void settingsBtnAction(ActionEvent event) {
+		if (smmdbTrue) {
+			smmdbAnchorPane.setVisible(false);
+			smmdbTrue = false;
+		}
+		if (settingsTrue) {
+			settingsScrollPane.setVisible(false);
+			settingsTrue = false;
+			saveSettings();
+		} else {
+			settingsScrollPane.setVisible(true);
+			settingsTrue = true;
+		}
+	}
     
-    @FXML
-    void reloadRomsBtnAction() throws IOException{
-    	reloadRomsBtn.setText("reloading...");
-    	dbController.loadRomDirectory(getRomPath()); // TODO own thread
-    	Runtime.getRuntime().exec("java -jar cemu_UI.jar");	// start again (preventing Bugs)
-		System.exit(0);	// finishes itself
-    }
+	@FXML
+	void reloadRomsBtnAction() throws IOException {
+		reloadRomsBtn.setText("reloading...");
+		dbController.loadRomDirectory(getRomPath()); // TODO own thread
+		Runtime.getRuntime().exec("java -jar cemu_UI.jar"); // start again (preventing Bugs)
+		System.exit(0); // finishes itself
+	}
     
-    @FXML
-    void smmdbBtnAction() {
-    	// show smmdbAnchorPane
-    	if (smmdbTrue) {
-    		smmdbAnchorPane.setVisible(false);
-    		smmdbTrue = false;
-    	} else {
-    		smmdbAnchorPane.setVisible(true);
-    		smmdbTrue = true;
-    		
+	@FXML
+	void smmdbBtnAction() {
+		// show smmdbAnchorPane
+		if (smmdbTrue) {
+			smmdbAnchorPane.setVisible(false);
+			smmdbTrue = false;
+		} else {
+			smmdbAnchorPane.setVisible(true);
+			smmdbTrue = true;
+
 			// start query
-        	courses.removeAll(courses);
-        	courses.addAll(smmdbAPIController.startQuery());
-        	
-        	// add query response to courseTreeTable
-    		for(int i = 0; i < courses.size(); i++){
-    			CourseTableDataType helpCourse = new CourseTableDataType(courses.get(i).getTitle(),  courses.get(i).getId(),
-    																	 courses.get(i).getTime(), courses.get(i).getStars());
-    			
-    			root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse));	// add data to root-node
-    		}
-    	}
-    }
+			courses.removeAll(courses);
+			courses.addAll(smmdbAPIController.startQuery());
+
+			// add query response to courseTreeTable
+			for (int i = 0; i < courses.size(); i++) {
+				CourseTableDataType helpCourse = new CourseTableDataType(courses.get(i).getTitle(),
+						courses.get(i).getId(), courses.get(i).getTime(), courses.get(i).getStars());
+
+				root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse)); // add data to root-node
+			}
+		}
+	}
     	
-    @FXML
-    void playBtnAction(ActionEvent event) throws InterruptedException, IOException{
-    	dbController.setLastPlayed(selectedGameTitleID);
-    	playGame = new playGame(this,dbController);
-    	
-    	playGame.start();
-    }
+	@FXML
+	void playBtnAction(ActionEvent event) throws InterruptedException, IOException {
+		dbController.setLastPlayed(selectedGameTitleID);
+		playGame = new playGame(this, dbController);
+
+		playGame.start();
+	}
+
+	@FXML
+	void totalPlaytimeBtnAction(ActionEvent event) {
+
+	}
+
+	@FXML
+	void lastTimePlayedBtnAction(ActionEvent event) {
+
+	}
     
-    @FXML
-    void totalPlaytimeBtnAction(ActionEvent event){
-    	
-    }
-    
-    @FXML
-    void lastTimePlayedBtnAction(ActionEvent event){
-    	
-    }
-    
-    @FXML
-    void cemuTFBtnAction(ActionEvent event) {
-    	File cemuDirectory = directoryChooser.showDialog(main.primaryStage);
-        if(cemuDirectory == null){
-        	LOGGER.info("No Directory selected");
-        }else{
-        	setCemuPath(cemuDirectory.getAbsolutePath());
-        	saveSettings();
-        	cemuTextField.setText(getCemuPath());
+	@FXML
+	void cemuTFBtnAction(ActionEvent event) {
+		File cemuDirectory = directoryChooser.showDialog(main.primaryStage);
+		if (cemuDirectory == null) {
+			LOGGER.info("No Directory selected");
+		} else {
+			setCemuPath(cemuDirectory.getAbsolutePath());
+			saveSettings();
+			cemuTextField.setText(getCemuPath());
 			try {
-				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	// start again
-				System.exit(0);	//finishes itself
+				Runtime.getRuntime().exec("java -jar cemu_UI.jar"); // start again
+				System.exit(0); // finishes itself
 			} catch (IOException e) {
 				LOGGER.error("an error occurred", e);
 			}
-        }
-    }
+		}
+	}
     
-    @FXML
-    void romTFBtnAction(ActionEvent event) {
-    	File romDirectory = directoryChooser.showDialog(main.primaryStage); 
-        if(romDirectory == null){
-        	LOGGER.info("No Directory selected");
-        }else{
-        	setRomPath(romDirectory.getAbsolutePath());
-        	saveSettings();
-        	cemuTextField.setText(getCemuPath());
+	@FXML
+	void romTFBtnAction(ActionEvent event) {
+		File romDirectory = directoryChooser.showDialog(main.primaryStage);
+		if (romDirectory == null) {
+			LOGGER.info("No Directory selected");
+		} else {
+			setRomPath(romDirectory.getAbsolutePath());
+			saveSettings();
+			cemuTextField.setText(getCemuPath());
 			try {
-				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	// start again
-				System.exit(0);	// finishes itself
+				Runtime.getRuntime().exec("java -jar cemu_UI.jar"); // start again
+				System.exit(0); // finishes itself
 			} catch (IOException e) {
 				LOGGER.error("an error occurred", e);
 			}
-        }
-    }
+		}
+	}
     
-    @FXML
-    void  updateBtnAction(ActionEvent event) {
-    	updateController = new UpdateController(this, buildNumber, useBeta);
+	@FXML
+	void updateBtnAction(ActionEvent event) {
+		updateController = new UpdateController(this, buildNumber, useBeta);
 		Thread updateThread = new Thread(updateController);
 		updateThread.setName("Updater");
-		updateThread.start();	
+		updateThread.start();
+	}
+    
+	@FXML
+	void autoUpdateToggleBtnAction(ActionEvent event) {
+		if (isAutoUpdate()) {
+			setAutoUpdate(false);
+		} else {
+			setAutoUpdate(true);
+		}
+		saveSettings();
 	}
     
     @FXML
-    void  autoUpdateToggleBtnAction(ActionEvent event) {
-    	if(isAutoUpdate()){
-    		setAutoUpdate(false);
-    	}else{
-    		setAutoUpdate(true);
-    	}
-		saveSettings();	}
-    
-    @FXML
-    void smmdbDownloadBtnAction(ActionEvent event){
+    void smmdbDownloadBtnAction(ActionEvent event) {
     	String downloadUrl = "http://smmdb.ddns.net/api/downloadcourse?id=" + id + "&type=zip";
     	String downloadFileURL = getCemuPath() + "/" + id + ".zip";	// getCemuPath() + "/" + smmID + "/" + id + ".rar"
     	String outputFile = getCemuPath() + "/";
@@ -903,30 +869,30 @@ public class MainWindowController {
 		}
     }
     
-    @FXML
-    void cemuTextFieldAction(ActionEvent event){
-    	setCemuPath(cemuTextField.getText());
+	@FXML
+	void cemuTextFieldAction(ActionEvent event) {
+		setCemuPath(cemuTextField.getText());
 		saveSettings();
-    }
+	}
     
-    @FXML
-    void romTextFieldAction(ActionEvent event){
-    	setRomPath(romTextField.getText());
+	@FXML
+	void romTextFieldAction(ActionEvent event) {
+		setRomPath(romTextField.getText());
 		saveSettings();
-    }
+	}
+    
+	@FXML
+	void fullscreenToggleBtnAction(ActionEvent event) {
+		if (fullscreen) {
+			fullscreen = false;
+		} else {
+			fullscreen = true;
+		}
+		saveSettings();
+	}
     
     @FXML
-    void fullscreenToggleBtnAction(ActionEvent event){
-    	if(fullscreen){
-    		fullscreen = false;
-    	}else{
-    		fullscreen = true;
-    	}
-    	saveSettings();
-    }
-    
-    @FXML
-    void cloudSyncToggleBtnAction(ActionEvent event){
+    void cloudSyncToggleBtnAction(ActionEvent event) {
     	if(cloudSync) {
     		cloudSync = false;
     	} else {
@@ -971,20 +937,20 @@ public class MainWindowController {
     	}
     }
     
-    @FXML
-    void colorPickerAction(ActionEvent event){
-    	editColor(colorPicker.getValue().toString());
-    	applyColor();
-    }
+	@FXML
+	void colorPickerAction(ActionEvent event) {
+		editColor(colorPicker.getValue().toString());
+		applyColor();
+	}
     
-    @FXML
-    void addBtnAction(ActionEvent event){
-    	String headingText = "add a new game to cemu_UI";
-	   	String bodyText = "";
-		JFXEditGameDialog addGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 450, 300,
-										0, this, main.primaryStage, main.pane);
+	@FXML
+	void addBtnAction(ActionEvent event) {
+		String headingText = "add a new game to cemu_UI";
+		String bodyText = "";
+		JFXEditGameDialog addGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 450, 300, 0,
+				this, main.primaryStage, main.pane);
 		addGameDialog.show();
-    }
+	}
     
     /**
      * process the returning data from the addGame dialog
@@ -1027,10 +993,10 @@ public class MainWindowController {
 				LOGGER.error("Ops something went wrong! Error while resizing cover.", e);
 			}
 			
-			try {	
+			try {
 				dbController.addRom(title, coverPath, romPath, titleID, "", "", "", "0");
 				dbController.loadSingleRom(titleID);
-				if (menuTrue) { 
+				if (menuTrue) {
 					sideMenuSlideOut();
 					burgerTask.setRate(-1.0);
 					burgerTask.play();
@@ -1043,14 +1009,14 @@ public class MainWindowController {
 		}
     }
 
-    public void editBtnReturn(String title, String coverPath, String romPath, String titleID) {
+	public void editBtnReturn(String title, String coverPath, String romPath, String titleID) {
 		dbController.setGameInfo(title, coverPath, romPath, titleID);
 		games.remove(selectedUIDataIndex);
 		dbController.loadSingleRom(titleID);
 		refreshUIData();
-    	
+
 		LOGGER.info("successfully edited " + titleID + ", new name is \"" + title + "\"");
-    }
+	}
 
     /**
      * add game to games (ArrayList) and initialize all needed actions (start, time stamps, titleID)
@@ -1156,12 +1122,12 @@ public class MainWindowController {
     	games.add(uiROMElement);
     }
     
-    //add all games saved in games(ArrayList) to gamesAnchorPane
-    void addUIData() {
-    	for(int i=0; i<games.size(); i++){
-    		gamesAnchorPane.getChildren().add(games.get(i).getVBox());
-    	}
-    }
+	// add all games saved in games(ArrayList) to gamesAnchorPane
+	void addUIData() {
+		for (int i = 0; i < games.size(); i++) {
+			gamesAnchorPane.getChildren().add(games.get(i).getVBox());
+		}
+	}
     
     //remove all games from gamesAnchorPane and add them afterwards
     void refreshUIData() {
@@ -1182,45 +1148,45 @@ public class MainWindowController {
 		}
     }
     
-    void refreshplayBtnPosition() {
-    	double width;
-    	
-    	if (mainAnchorPane.getWidth() < 10) {
-    		width = mainAnchorPane.getPrefWidth();
-    	} else {
-    		width = mainAnchorPane.getWidth();
-    	}
-    	playBtn.setLayoutX((width/2)-50);
-    	totalPlaytimeBtn.setLayoutX((width/2)-50-20.5-100);
-    	lastTimePlayedBtn.setLayoutX((width/2)+50+20.5);
-    }
+	void refreshplayBtnPosition() {
+		double width;
+
+		if (mainAnchorPane.getWidth() < 10) {
+			width = mainAnchorPane.getPrefWidth();
+		} else {
+			width = mainAnchorPane.getWidth();
+		}
+		playBtn.setLayoutX((width / 2) - 50);
+		totalPlaytimeBtn.setLayoutX((width / 2) - 50 - 20.5 - 100);
+		lastTimePlayedBtn.setLayoutX((width / 2) + 50 + 20.5);
+	}
+
+	void checkAutoUpdate() {
+
+		if (isAutoUpdate()) {
+			try {
+				LOGGER.info("AutoUpdate: looking for updates on startup ...");
+				updateController = new UpdateController(this, buildNumber, useBeta);
+				Thread updateThread = new Thread(updateController);
+				updateThread.setName("Updater");
+				updateThread.start();
+				updateThread.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
     
-    void checkAutoUpdate() {
-    	
-    	if(isAutoUpdate()){
-    		try {
-    			LOGGER.info("AutoUpdate: looking for updates on startup ...");
-    			updateController = new UpdateController(this, buildNumber, useBeta);
-    			Thread updateThread = new Thread(updateController);
-    			updateThread.setName("Updater");
-    			updateThread.start();
-     			updateThread.join();
- 			} catch (InterruptedException e) {
- 				e.printStackTrace();
- 			}
-    	}
-    }
-    
-    private void addCourseDescription(SmmdbApiDataType course) {
-    	String courseTheme;
-    	String gameStyle;
-    	String difficulty;
-    	String autoscroll;
-    	smmdbTextFlow.getChildren().remove(0, smmdbTextFlow.getChildren().size());
-    	nameText.clear();
-    	courseText.clear();
-    	
-    	switch (course.getCourseTheme()) {
+	private void addCourseDescription(SmmdbApiDataType course) {
+		String courseTheme;
+		String gameStyle;
+		String difficulty;
+		String autoscroll;
+		smmdbTextFlow.getChildren().remove(0, smmdbTextFlow.getChildren().size());
+		nameText.clear();
+		courseText.clear();
+
+		switch (course.getCourseTheme()) {
 		case 0:
 			courseTheme = "Ground";
 			break;
@@ -1243,8 +1209,8 @@ public class MainWindowController {
 			courseTheme = "notset";
 			break;
 		}
-    	
-    	switch (course.getGameStyle()) {
+
+		switch (course.getGameStyle()) {
 		case 0:
 			gameStyle = "SMB";
 			break;
@@ -1262,7 +1228,7 @@ public class MainWindowController {
 			break;
 		}
 
-    	switch (course.getDifficulty()) {
+		switch (course.getDifficulty()) {
 		case 0:
 			difficulty = "Easy";
 			break;
@@ -1282,8 +1248,8 @@ public class MainWindowController {
 			difficulty = "notset";
 			break;
 		}
-    	
-    	switch (course.getAutoScroll()) {
+
+		switch (course.getAutoScroll()) {
 		case 0:
 			autoscroll = "disabled";
 			break;
@@ -1300,36 +1266,36 @@ public class MainWindowController {
 			autoscroll = "notset";
 			break;
 		}
-    	
-    	nameText.add(0, new Text("title" + ": "));
-    	nameText.add(1, new Text("owner" + ": "));
-    	nameText.add(2, new Text("Course-Theme" + ": "));
-    	nameText.add(3, new Text("Game-Style" + ": "));
-    	nameText.add(4, new Text("difficulty" + ": "));
-    	nameText.add(5, new Text("Auto-Scroll" + ": "));
-    	nameText.add(6, new Text("Time" + ": "));
-    	nameText.add(7, new Text("lastmodified" + ": "));
-    	nameText.add(8, new Text("uploaded" + ": "));
-    	nameText.add(9, new Text("nintendoid" + ": "));
-    	
-    	courseText.add(0, new Text(course.getTitle() + "\n"));
-    	courseText.add(1, new Text(course.getOwner() + "\n"));
-    	courseText.add(2, new Text(courseTheme + "\n"));
-    	courseText.add(3, new Text(gameStyle + "\n"));
-    	courseText.add(4, new Text(difficulty + "\n"));
-    	courseText.add(5, new Text(autoscroll + "\n"));
-    	courseText.add(6, new Text(course.getTime() + "\n"));
-    	courseText.add(7, new Text(new java.util.Date((long)course.getLastmodified()*1000) + "\n"));
-    	courseText.add(8, new Text(new java.util.Date((long)course.getUploaded()*1000) + "\n"));
-    	courseText.add(9, new Text(course.getNintendoid() + "\n"));
-    	
-    	for(int i=0; i<nameText.size(); i++){
-			nameText.get(i).setFont(Font.font ("System", FontWeight.BOLD, 14));
-			courseText.get(i).setFont(Font.font ("System", 14));
-			smmdbTextFlow.getChildren().addAll(nameText.get(i),courseText.get(i));
+
+		nameText.add(0, new Text("title" + ": "));
+		nameText.add(1, new Text("owner" + ": "));
+		nameText.add(2, new Text("Course-Theme" + ": "));
+		nameText.add(3, new Text("Game-Style" + ": "));
+		nameText.add(4, new Text("difficulty" + ": "));
+		nameText.add(5, new Text("Auto-Scroll" + ": "));
+		nameText.add(6, new Text("Time" + ": "));
+		nameText.add(7, new Text("lastmodified" + ": "));
+		nameText.add(8, new Text("uploaded" + ": "));
+		nameText.add(9, new Text("nintendoid" + ": "));
+
+		courseText.add(0, new Text(course.getTitle() + "\n"));
+		courseText.add(1, new Text(course.getOwner() + "\n"));
+		courseText.add(2, new Text(courseTheme + "\n"));
+		courseText.add(3, new Text(gameStyle + "\n"));
+		courseText.add(4, new Text(difficulty + "\n"));
+		courseText.add(5, new Text(autoscroll + "\n"));
+		courseText.add(6, new Text(course.getTime() + "\n"));
+		courseText.add(7, new Text(new java.util.Date((long) course.getLastmodified() * 1000) + "\n"));
+		courseText.add(8, new Text(new java.util.Date((long) course.getUploaded() * 1000) + "\n"));
+		courseText.add(9, new Text(course.getNintendoid() + "\n"));
+
+		for (int i = 0; i < nameText.size(); i++) {
+			nameText.get(i).setFont(Font.font("System", FontWeight.BOLD, 14));
+			courseText.get(i).setFont(Font.font("System", 14));
+			smmdbTextFlow.getChildren().addAll(nameText.get(i), courseText.get(i));
 		}
 
-    }
+	}
 
     /**
      * xPosHelper based on window width = -24(Windows)/-36(Linux)
@@ -1357,11 +1323,8 @@ public class MainWindowController {
     		xPosHelper++;
     	}
     	
-    	// TODO needs testing
-    	System.out.println("Breit: " + main.pane.getWidth());
-    	System.out.println("Breit2: " + mainAnchorPane.getWidth());
-    	System.out.println("Breite3: " + main.scene.getWidth());
-    	System.out.println("Breite4: " + main.primaryStage.getWidth());
+//    	System.out.println("Breit: " + main.pane.getWidth());
+//    	System.out.println("Breit2: " + mainAnchorPane.getWidth());
 //    	System.out.println("xPosHelper: " + xPosHelper);
 //    	System.out.println("yPos: " + yPos);
 //    	System.out.println("xPos: " + xPos);
@@ -1379,9 +1342,9 @@ public class MainWindowController {
 		cemuTextField.setFocusColor(Color.valueOf(getColor()));
 		romTextField.setFocusColor(Color.valueOf(getColor()));
 		
-		if(icolor.compareTo(ccolor) == -1){
+		if (icolor.compareTo(ccolor) == -1) {
 			dialogBtnStyle = btnStyleWhite;
-			
+
 			aboutBtn.setStyle("-fx-text-fill: WHITE;");
 			settingsBtn.setStyle("-fx-text-fill: WHITE;");
 			addBtn.setStyle("-fx-text-fill: WHITE;");
@@ -1399,11 +1362,11 @@ public class MainWindowController {
 			addBtn.setGraphic(add_circle_white);
 			reloadRomsBtn.setGraphic(cached_white);
 			smmdbBtn.setGraphic(smmdb_white);
-			
+
 			menuHam.getStyleClass().add("jfx-hamburgerW");
-		}else{
+		} else {
 			dialogBtnStyle = btnStyleBlack;
-			
+
 			aboutBtn.setStyle("-fx-text-fill: BLACK;");
 			settingsBtn.setStyle("-fx-text-fill: BLACK;");
 			addBtn.setStyle("-fx-text-fill: BLACK;");
@@ -1415,20 +1378,20 @@ public class MainWindowController {
 			updateBtn.setStyle(btnStyleBlack);
 			smmdbDownloadBtn.setStyle(btnStyleBlack);
 			playBtn.setStyle(btnStyleBlack);
-			
+
 			aboutBtn.setGraphic(info_black);
 			settingsBtn.setGraphic(settings_black);
 			addBtn.setGraphic(add_circle_black);
 			reloadRomsBtn.setGraphic(cached_black);
 			smmdbBtn.setGraphic(smmdb_black);
-			
+
 			menuHam.getStyleClass().add("jfx-hamburgerB");
 		}
 
-		for(int i=0; i<games.size(); i++){
+		for (int i = 0; i < games.size(); i++) {
 			games.get(i).getButton().setRipplerFill(Paint.valueOf(getColor()));
 		}
-    }
+	}
 		
     public void saveSettings(){
     	LOGGER.info("saving Settings ...");
