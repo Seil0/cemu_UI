@@ -104,207 +104,207 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 
 public class MainWindowController {
-    
-    @FXML
-    private JFXButton aboutBtn;
 
-    @FXML
-    private JFXButton settingsBtn;
-    
-    @FXML
-    private JFXButton addBtn;
-    
-    @FXML
-    private JFXButton reloadRomsBtn;
-    
-    @FXML
-    private JFXButton smmdbBtn;
-    
-    @FXML
-    private JFXButton cemuTFBtn;
-    
-    @FXML
-    private JFXButton romTFBtn;
-    
-    @FXML
-    private JFXButton updateBtn;
-    
-    @FXML
-    private JFXButton smmdbDownloadBtn;
-    
-    @FXML
-    private JFXButton playBtn;
-    
-    @FXML
-    private JFXButton lastTimePlayedBtn;
-    
-    @FXML
-    JFXButton totalPlaytimeBtn;
-    
-    @FXML
-    private JFXHamburger menuHam;
-    
-    @FXML
-    private JFXTextField cemuTextField;
-    
-    @FXML
-    private JFXTextField romTextField;
-    
-    @FXML
-    private TextFlow smmdbTextFlow;
-    
-    @FXML
-    private JFXColorPicker colorPicker;  
-    
-    @FXML
-    private JFXToggleButton cloudSyncToggleBtn;
-    
-    @FXML
-    private JFXToggleButton autoUpdateToggleBtn;
-    
-    @FXML
-    private JFXToggleButton fullscreenToggleBtn;
-    
-    @FXML
-    private ChoiceBox<String> branchChoisBox;
+	@FXML
+	private JFXButton aboutBtn;
 
-    @FXML
-    private AnchorPane mainAnchorPane;
-    
-    @FXML
-    private AnchorPane gamesAnchorPane;
-    
-    @FXML
-    private AnchorPane settingsAnchorPane;
-    
-    @FXML
-    private AnchorPane smmdbAnchorPane;
-    
-    @FXML
-    private ScrollPane mainScrollPane;
-    
-    @FXML
-    private ScrollPane settingsScrollPane;
-    
-    @FXML
-    private ScrollPane smmdbScrollPane;
-    
-    @FXML
-    private VBox sideMenuVBox;
-    
-    @FXML
-    private HBox topHBox;
-    
-    @FXML
-    private ImageView smmdbImageView;
-    
-    @FXML
-    private Label helpLbl;
-    
-    @FXML
-    private Label cemu_UISettingsLbl;
-    
-    @FXML
-    private Label cemuDirectoryLbl;
-    
-    @FXML
-    private Label romDirectoryLbl;
-    
-    @FXML
-    private Label mainColorLbl;
-    
-    @FXML
-    private Label updateLbl;
-    
-    @FXML
-    private Label branchLbl;
-    
-    @FXML
-    private Label cemuSettingsLbl;
-    
-    @FXML
-    private Label licensesLbl;
-    
-    @FXML
-    private JFXTreeTableView<CourseTableDataType> courseTreeTable = new JFXTreeTableView<CourseTableDataType>();
-    
-    @FXML
-    TreeItem<CourseTableDataType> root = new TreeItem<>(new CourseTableDataType("","",0,0));
-    
-    @FXML
-    private JFXTreeTableColumn<CourseTableDataType, String> titleColumn = new JFXTreeTableColumn<>("title");
-    
-    @FXML
-    private JFXTreeTableColumn<CourseTableDataType, String> idColumn = new JFXTreeTableColumn<>("id");
-    
-    @FXML
-    private JFXTreeTableColumn<CourseTableDataType, Integer> starsColumn = new JFXTreeTableColumn<>("stars");
-    
-    @FXML
-    private JFXTreeTableColumn<CourseTableDataType, Integer> timeColumn = new JFXTreeTableColumn<>("time");
-    
-    Main main;
-    dbController dbController;
-    SmmdbAPIController smmdbAPIController;
-    playGame playGame;
-    private static MainWindowController MWC;
-    private UpdateController updateController;
-    private boolean menuTrue = false;
-    private boolean settingsTrue = false;
-    private boolean playTrue = false;
-    private boolean smmdbTrue = false;
-    private boolean autoUpdate = false;
-    private boolean useBeta = false;
-    private boolean fullscreen;
-    private boolean cloudSync;
-    private String cloudService = ""; // set cloud provider (at the moment only GoogleDrive, Dropbox is planed)
-    private String cemuPath;
-    private String romPath;
-    private String gameExecutePath;
-    private String color;
-    private String dialogBtnStyle;
-    private String selectedGameTitleID;
-    private String selectedGameTitle;
-    private String id;
-    private String version = "0.2.1";
-    private String buildNumber = "057";
-    private String versionName = "Puzzle Plank Galaxy";
-    private int xPos = -200;
-    private int yPos = 17;
-    private int xPosHelper;
-    private int oldXPosHelper;
-    private int selectedUIDataIndex;
-    private int selected;
+	@FXML
+	private JFXButton settingsBtn;
+
+	@FXML
+	private JFXButton addBtn;
+
+	@FXML
+	private JFXButton reloadRomsBtn;
+
+	@FXML
+	private JFXButton smmdbBtn;
+
+	@FXML
+	private JFXButton cemuTFBtn;
+
+	@FXML
+	private JFXButton romTFBtn;
+
+	@FXML
+	private JFXButton updateBtn;
+
+	@FXML
+	private JFXButton smmdbDownloadBtn;
+
+	@FXML
+	private JFXButton playBtn;
+
+	@FXML
+	private JFXButton lastTimePlayedBtn;
+
+	@FXML
+	JFXButton totalPlaytimeBtn;
+
+	@FXML
+	private JFXHamburger menuHam;
+
+	@FXML
+	private JFXTextField cemuTextField;
+
+	@FXML
+	private JFXTextField romTextField;
+
+	@FXML
+	private TextFlow smmdbTextFlow;
+
+	@FXML
+	private JFXColorPicker colorPicker;
+
+	@FXML
+	private JFXToggleButton cloudSyncToggleBtn;
+
+	@FXML
+	private JFXToggleButton autoUpdateToggleBtn;
+
+	@FXML
+	private JFXToggleButton fullscreenToggleBtn;
+
+	@FXML
+	private ChoiceBox<String> branchChoisBox;
+
+	@FXML
+	private AnchorPane mainAnchorPane;
+
+	@FXML
+	private AnchorPane gamesAnchorPane;
+
+	@FXML
+	private AnchorPane settingsAnchorPane;
+
+	@FXML
+	private AnchorPane smmdbAnchorPane;
+
+	@FXML
+	private ScrollPane mainScrollPane;
+
+	@FXML
+	private ScrollPane settingsScrollPane;
+
+	@FXML
+	private ScrollPane smmdbScrollPane;
+
+	@FXML
+	private VBox sideMenuVBox;
+
+	@FXML
+	private HBox topHBox;
+
+	@FXML
+	private ImageView smmdbImageView;
+
+	@FXML
+	private Label helpLbl;
+
+	@FXML
+	private Label cemu_UISettingsLbl;
+
+	@FXML
+	private Label cemuDirectoryLbl;
+
+	@FXML
+	private Label romDirectoryLbl;
+
+	@FXML
+	private Label mainColorLbl;
+
+	@FXML
+	private Label updateLbl;
+
+	@FXML
+	private Label branchLbl;
+
+	@FXML
+	private Label cemuSettingsLbl;
+
+	@FXML
+	private Label licensesLbl;
+
+	@FXML
+	private JFXTreeTableView<CourseTableDataType> courseTreeTable = new JFXTreeTableView<CourseTableDataType>();
+
+	@FXML
+	TreeItem<CourseTableDataType> root = new TreeItem<>(new CourseTableDataType("", "", 0, 0));
+
+	@FXML
+	private JFXTreeTableColumn<CourseTableDataType, String> titleColumn = new JFXTreeTableColumn<>("title");
+
+	@FXML
+	private JFXTreeTableColumn<CourseTableDataType, String> idColumn = new JFXTreeTableColumn<>("id");
+
+	@FXML
+	private JFXTreeTableColumn<CourseTableDataType, Integer> starsColumn = new JFXTreeTableColumn<>("stars");
+
+	@FXML
+	private JFXTreeTableColumn<CourseTableDataType, Integer> timeColumn = new JFXTreeTableColumn<>("time");
+
+	Main main;
+	dbController dbController;
+	SmmdbAPIController smmdbAPIController;
+	playGame playGame;
+	private static MainWindowController MWC;
+	private UpdateController updateController;
+	private boolean menuTrue = false;
+	private boolean settingsTrue = false;
+	private boolean playTrue = false;
+	private boolean smmdbTrue = false;
+	private boolean autoUpdate = false;
+	private boolean useBeta = false;
+	private boolean fullscreen;
+	private boolean cloudSync;
+	private String cloudService = ""; // set cloud provider (at the moment only GoogleDrive, Dropbox is planed)
+	private String cemuPath;
+	private String romPath;
+	private String gameExecutePath;
+	private String color;
+	private String dialogBtnStyle;
+	private String selectedGameTitleID;
+	private String selectedGameTitle;
+	private String id;
+	private String version = "0.2.1";
+	private String buildNumber = "057";
+	private String versionName = "Puzzle Plank Galaxy";
+	private int xPos = -200;
+	private int yPos = 17;
+	private int xPosHelper;
+	private int oldXPosHelper;
+	private int selectedUIDataIndex;
+	private int selected;
     private double windowWidth;
-    private double windowHeight;
+	private double windowHeight;
 	private DirectoryChooser directoryChooser = new DirectoryChooser();
 	private File dirWin = new File(System.getProperty("user.home") + "/Documents/cemu_UI");
 	private File dirLinux = new File(System.getProperty("user.home") + "/cemu_UI");
 	private File configFileWin = new File(dirWin + "/config.xml");
 	private File configFileLinux = new File(dirLinux + "/config.xml");
-	private File pictureCacheWin = new File(dirWin+"/picture_cache");
-	private File pictureCacheLinux = new File(dirLinux+"/picture_cache");
+	private File pictureCacheWin = new File(dirWin + "/picture_cache");
+	private File pictureCacheLinux = new File(dirLinux + "/picture_cache");
 	private ObservableList<String> branches = FXCollections.observableArrayList("stable", "beta");
-	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2", "44fc5929");	// TODO add more IDs
+	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2", "44fc5929"); // TODO add more IDs
 	private ObservableList<UIROMDataType> games = FXCollections.observableArrayList();
 	ObservableList<SmmdbApiDataType> courses = FXCollections.observableArrayList();
 	ArrayList<Text> courseText = new ArrayList<Text>();
 	ArrayList<Text> nameText = new ArrayList<Text>();
-    Properties props = new Properties();
-    Properties gameProps = new Properties();
-    private static final Logger LOGGER = LogManager.getLogger(MainWindowController.class.getName());
-    private HamburgerBackArrowBasicTransition burgerTask;
-    private MenuItem edit = new MenuItem("edit");
-    private MenuItem remove = new MenuItem("remove");
-    private MenuItem addUpdate = new MenuItem("update");
-    private MenuItem addDLC = new MenuItem("add DLC");
+	Properties props = new Properties();
+	Properties gameProps = new Properties();
+	private static final Logger LOGGER = LogManager.getLogger(MainWindowController.class.getName());
+	private HamburgerBackArrowBasicTransition burgerTask;
+	private MenuItem edit = new MenuItem("edit");
+	private MenuItem remove = new MenuItem("remove");
+	private MenuItem addUpdate = new MenuItem("update");
+	private MenuItem addDLC = new MenuItem("add DLC");
 	private ContextMenu gameContextMenu = new ContextMenu(edit, remove, addUpdate, addDLC);
 	private Label lastGameLabel = new Label();
-	
+
 	private ImageView add_circle_black = new ImageView(new Image("icons/ic_add_circle_black_24dp_1x.png"));
 	private ImageView info_black = new ImageView(new Image("icons/ic_info_black_24dp_1x.png"));
 	private ImageView settings_black = new ImageView(new Image("icons/ic_settings_black_24dp_1x.png"));
-	private ImageView cached_black = new ImageView(new Image("icons/ic_cached_black_24dp_1x.png"));	
+	private ImageView cached_black = new ImageView(new Image("icons/ic_cached_black_24dp_1x.png"));
 	private ImageView smmdb_black = new ImageView(new Image("icons/ic_get_app_black_24dp_1x.png"));
 	private ImageView add_circle_white = new ImageView(new Image("icons/ic_add_circle_white_24dp_1x.png"));
 	private ImageView info_white = new ImageView(new Image("icons/ic_info_white_24dp_1x.png"));
@@ -312,7 +312,7 @@ public class MainWindowController {
 	private ImageView cached_white = new ImageView(new Image("icons/ic_cached_white_24dp_1x.png"));
 	private ImageView smmdb_white = new ImageView(new Image("icons/ic_get_app_white_24dp_1x.png"));
 	private Image close_black = new Image("icons/close_black_2048x2048.png");
-    
+
 	public void setMain(Main main) {
 		this.main = main;
 		dbController = new dbController(this);
