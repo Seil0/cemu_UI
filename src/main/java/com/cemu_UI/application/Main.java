@@ -52,12 +52,12 @@ import javafx.scene.layout.AnchorPane;
 public class Main extends Application {
 	
 	Stage primaryStage;
-	public MainWindowController mainWindowController; //TODO find a better way
+	public MainWindowController mainWindowController; // TODO find a better way
 	CloudController cloudController;
 	AnchorPane pane;
-	private Scene scene;
-	private String dirWin = System.getProperty("user.home") + "/Documents/cemu_UI";	//Windows: C:/Users/"User"/Documents/cemu_UI
-	private String dirLinux = System.getProperty("user.home") + "/cemu_UI";	//Linux: /home/"User"/cemu_UI
+	Scene scene;	// TODO make private
+	private String dirWin = System.getProperty("user.home") + "/Documents/cemu_UI";	// Windows: C:/Users/"User"/Documents/cemu_UI
+	private String dirLinux = System.getProperty("user.home") + "/cemu_UI";	// Linux: /home/"User"/cemu_UI
 	private String gamesDBdownloadURL = "https://github.com/Seil0/cemu_UI/raw/master/downloadContent/games.db";
 	private File directory;
 	private File configFile;
@@ -89,10 +89,10 @@ public class Main extends Application {
 			primaryStage.setTitle("cemu_UI");
 //			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/resources/Homeflix_Icon_64x64.png"))); //adds application icon
 
-			mainWindowController = loader.getController();	//Link of FXMLController and controller class
-			mainWindowController.setMain(this);	//call setMain
+			mainWindowController = loader.getController();	// Link of FXMLController and controller class
+			mainWindowController.setMain(this);	// call setMain
 			
-			//get os and the right paths
+			// get OS and the specific paths
 			if (System.getProperty("os.name").equals("Linux")) {
 				directory = new File(dirLinux);
 				configFile = new File(dirLinux + "/config.xml");
@@ -107,8 +107,8 @@ public class Main extends Application {
 				pictureCache= new File(dirWin+"/picture_cache");
 			}
 			
-			//startup checks
-			//check if client_secret.jason is present
+			// startup checks
+			// check if client_secret.jason is present
 			if (Main.class.getResourceAsStream("/client_secret.json") == null) {
 				LOGGER.error("client_secret is missing!!!!!");
 				
@@ -156,7 +156,7 @@ public class Main extends Application {
 				}
 			}
 			
-			//loading settings and initialize UI, dbController.main() loads all databases
+			// loading settings and initialize UI, dbController.main() loads all databases
 			mainWindowController.loadSettings();
 			mainWindowController.checkAutoUpdate();
 			mainWindowController.initActions();
@@ -168,17 +168,17 @@ public class Main extends Application {
 			}			
 			mainWindowController.addUIData();
 			
-			scene = new Scene(pane);	//create new scene, append pane to scene
+			scene = new Scene(pane); // create new scene, append pane to scene
 			scene.getStylesheets().add(Main.class.getResource("/css/MainWindows.css").toExternalForm());
-			primaryStage.setScene(scene);	//append scene to stage
-			primaryStage.show();	//show stage
+			primaryStage.setScene(scene); // append scene to stage
+			primaryStage.show(); // show stage
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 	}
 	
 	private void firstStart(){
-		Alert alert = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
+		Alert alert = new Alert(AlertType.CONFIRMATION); // new alert with file-chooser
 		alert.setTitle("cemu_UI");
 		alert.setHeaderText("cemu installation");
 		alert.setContentText("please select your cemu installation");
@@ -193,7 +193,7 @@ public class Main extends Application {
 			mainWindowController.setCemuPath(null);
 		}
 		
-		Alert alert2 = new Alert(AlertType.CONFIRMATION);	//new alert with file-chooser
+		Alert alert2 = new Alert(AlertType.CONFIRMATION); // new alert with file-chooser
 		alert2.setTitle("cemu_UI");
 		alert2.setHeaderText("rom directory");
 		alert2.setContentText("please select your rom directory");
@@ -213,8 +213,8 @@ public class Main extends Application {
 		final ChangeListener<Number> widthListener = new ChangeListener<Number>() {
 
 			final Timer timer = new Timer();
-			TimerTask saveTask = null; //task to execute save operation
-			final long delayTime = 500; //delay until the window size is saved, if the window is resized earlier it will be killed, default is 500ms
+			TimerTask saveTask = null; // task to execute save operation
+			final long delayTime = 500; // delay until the window size is saved, if the window is resized earlier it will be killed, default is 500ms
 			
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, final Number newValue) {
@@ -222,12 +222,12 @@ public class Main extends Application {
 
 				mainWindowController.refreshplayBtnPosition();
 				
-				//call only if there is enough space for a new row
+				// call only if there is enough space for a new row
 				if (mainWindowController.getOldXPosHelper() != xPosHelperMax) {
 					mainWindowController.refreshUIData();
 				}
 				
-				//if saveTask is already running kill it
+				// if saveTask is already running kill it
 				if (saveTask != null) saveTask.cancel();
 
 				saveTask = new TimerTask() {
@@ -243,8 +243,8 @@ public class Main extends Application {
 		final ChangeListener<Number> heightListener = new ChangeListener<Number>() {
 			
 			final Timer timer = new Timer();
-			TimerTask saveTask = null; //task to execute save operation
-			final long delayTime = 500; //delay until the window size is saved, if the window is resized earlier it will be killed, default is 500ms
+			TimerTask saveTask = null; // task to execute save operation
+			final long delayTime = 500; // delay until the window size is saved, if the window is resized earlier it will be killed, default is 500ms
 			
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, final Number newValue) {
@@ -278,14 +278,14 @@ public class Main extends Application {
 		    }
 		};
 		
-		//add listener to primaryStage
+		// add listener to primaryStage
 		primaryStage.widthProperty().addListener(widthListener);
 		primaryStage.heightProperty().addListener(heightListener);
 		primaryStage.maximizedProperty().addListener(maximizeListener);
 	}
 	
 	public static void main(String[] args) {
-		//delete old log file and create new
+		// delete old log file and create new
 		if(System.getProperty("os.name").equals("Linux")){
 			System.setProperty("logFilename", System.getProperty("user.home") + "/cemu_UI/app.log");
 			File logFile = new File(System.getProperty("user.home") + "/cemu_UI/app.log");

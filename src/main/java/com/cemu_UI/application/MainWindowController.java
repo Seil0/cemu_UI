@@ -261,7 +261,7 @@ public class MainWindowController {
     private boolean useBeta = false;
     private boolean fullscreen;
     private boolean cloudSync;
-    private String cloudService = ""; //set cloud provider (at the moment only GoogleDrive, Dropbox is planed)
+    private String cloudService = ""; // set cloud provider (at the moment only GoogleDrive, Dropbox is planed)
     private String cemuPath;
     private String romPath;
     private String gameExecutePath;
@@ -289,7 +289,7 @@ public class MainWindowController {
 	private File pictureCacheWin = new File(dirWin+"/picture_cache");
 	private File pictureCacheLinux = new File(dirLinux+"/picture_cache");
 	private ObservableList<String> branches = FXCollections.observableArrayList("stable", "beta");
-	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2", "44fc5929");	//TODO add more IDs
+	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2", "44fc5929");	// TODO add more IDs
 	private ObservableList<UIROMDataType> games = FXCollections.observableArrayList();
 	ObservableList<SmmdbApiDataType> courses = FXCollections.observableArrayList();
 	ArrayList<Text> courseText = new ArrayList<Text>();
@@ -347,7 +347,7 @@ public class MainWindowController {
 		
 		applyColor();
 		
-		//initialize courseTable
+		// initialize courseTable
 		titleColumn.setPrefWidth(160);
 		timeColumn.setPrefWidth(127);
 		starsColumn.setPrefWidth(100);
@@ -365,7 +365,7 @@ public class MainWindowController {
 		courseTreeTable.getColumns().add(timeColumn);
 		courseTreeTable.getColumns().add(starsColumn);
 		courseTreeTable.getColumns().add(idColumn);
-		courseTreeTable.getColumns().get(3).setVisible(false); //hide idColumn (important)
+		courseTreeTable.getColumns().get(3).setVisible(false); // the idColumn should not bee displayed
 		
 		LOGGER.info("initializing UI done");
 	}
@@ -408,22 +408,14 @@ public class MainWindowController {
 		
 		edit.setOnAction(new EventHandler<ActionEvent>() {
             @Override
-            public void handle(ActionEvent event) {
-            	LOGGER.info("edit "+selectedGameTitleID);
-            	if (selectedGameTitleID == null) {
-            		LOGGER.warn("trying to edit null! null is not valid!");
-            		
-            		String headingText = "edit game";
-                	String bodyText = "please select a game, \""+selectedGameTitleID+"\" is not a valid type!";
-                	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
-                	aboutDialog.show();
-            	} else {
+            public void handle(ActionEvent event) {     	
+            	try {
+                	LOGGER.info("edit "+selectedGameTitleID);
             		String[] gameInfo = dbController.getGameInfo(selectedGameTitleID);
             		
             		//new edit dialog
-                	String headingText = "activate cloud savegame sync (beta)";
-            	   	String bodyText = "You just activate the cloud savegame sync function of cemu_UI, "
-            							+ "\nwhich is currently in beta. Are you sure you want to do this?";
+                	String headingText = "edit a game";
+            	   	String bodyText = "You can edit the tile and rom/cover path.";
             		JFXEditGameDialog editGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 350, 300,
             										1, MWC, main.primaryStage, main.pane);
             		editGameDialog.setTitle(gameInfo[0]);
@@ -431,7 +423,31 @@ public class MainWindowController {
             		editGameDialog.setRomPath(gameInfo[2]);
             		editGameDialog.setTitleID(gameInfo[3]);
             		editGameDialog.show();
-            	}
+				} catch (Exception e) {
+					LOGGER.warn("trying to edit " + selectedGameTitleID + ",which is not a valid type!", e);
+				}
+            	
+//            	if (selectedGameTitleID == null) {
+//            		LOGGER.warn("trying to edit null! null is not valid!");
+//            		
+//            		String headingText = "edit game";
+//                	String bodyText = "please select a game, \""+selectedGameTitleID+"\" is not a valid type!";
+//                	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 170, main.pane);
+//                	aboutDialog.show();
+//            	} else {
+//            		String[] gameInfo = dbController.getGameInfo(selectedGameTitleID);
+//            		
+//            		//new edit dialog
+//                	String headingText = "edit a game";
+//            	   	String bodyText = "You can edit the tile and rom/cover path.";
+//            		JFXEditGameDialog editGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 350, 300,
+//            										1, MWC, main.primaryStage, main.pane);
+//            		editGameDialog.setTitle(gameInfo[0]);
+//            		editGameDialog.setCoverPath(gameInfo[1]);
+//            		editGameDialog.setRomPath(gameInfo[2]);
+//            		editGameDialog.setTitleID(gameInfo[3]);
+//            		editGameDialog.show();
+//            	}
             }
 		});
 		
@@ -457,11 +473,11 @@ public class MainWindowController {
                 	Optional<ButtonType> result = alert.showAndWait();
         			if (result.get() == ButtonType.OK){
     					try {
-    						//remove game from database
+    						// remove game from database
     						games.remove(selectedUIDataIndex);
 							dbController.removeRom(selectedGameTitleID);
 							
-    						//refresh all games at gamesAnchorPane (UI)
+    						// refresh all games at gamesAnchorPane (UI)
     						refreshUIData();  						
 						} catch (Exception e) {
 							LOGGER.error("error!",e);
@@ -491,7 +507,7 @@ public class MainWindowController {
             				DirectoryChooser directoryChooser = new DirectoryChooser();
 	        	            File selectedDirecroty =  directoryChooser.showDialog(main.primaryStage);
 	        	            String updatePath = selectedDirecroty.getAbsolutePath();
-	            			String[] parts = selectedGameTitleID.split("-");	//split string into 2 parts at "-"
+							String[] parts = selectedGameTitleID.split("-"); // split string into 2 parts at "-"
 	            			
 	            			File srcDir = new File(updatePath);
 	            			File destDir;
@@ -510,7 +526,7 @@ public class MainWindowController {
 	        	            	LOGGER.info("copying the content of " + updatePath + " to " + destDir.toString());
 	        	            	playBtn.setText("updating...");
 	        	            	playBtn.setDisable(true);
-								FileUtils.copyDirectory(srcDir, destDir);	//TODO progress indicator
+								FileUtils.copyDirectory(srcDir, destDir); // TODO progress indicator
 								playBtn.setText("play");
 								playBtn.setDisable(false);
 								LOGGER.info("copying files done!");
@@ -555,7 +571,7 @@ public class MainWindowController {
             				DirectoryChooser directoryChooser = new DirectoryChooser();
             	            File selectedDirecroty =  directoryChooser.showDialog(main.primaryStage);
             	            String dlcPath = selectedDirecroty.getAbsolutePath();
-                			String[] parts = selectedGameTitleID.split("-");	//split string into 2 parts at "-"
+                			String[] parts = selectedGameTitleID.split("-");	// split string into 2 parts at "-"
                 			File srcDir = new File(dlcPath);
                         	File destDir;
                 			if (System.getProperty("os.name").equals("Linux")) {
@@ -573,7 +589,7 @@ public class MainWindowController {
             	            	LOGGER.info("copying the content of " + dlcPath + " to " + destDir.toString());
             	            	playBtn.setText("copying files...");
             	            	playBtn.setDisable(true);
-    							FileUtils.copyDirectory(srcDir, destDir);	//TODO progress indicator
+    							FileUtils.copyDirectory(srcDir, destDir);	// TODO progress indicator
     							playBtn.setText("play");
     							playBtn.setDisable(false);
     							LOGGER.info("copying files done!");
@@ -615,14 +631,14 @@ public class MainWindowController {
 		     }
 		});
 		
-		//Change-listener for TreeTable
+		// Change-listener for TreeTable
 		courseTreeTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Object>() {	
 				@Override
 				public void changed(ObservableValue<?> observable, Object oldVal, Object newVal){
 					selected = courseTreeTable.getSelectionModel().getSelectedIndex(); //get selected item
 					
-					//FIXME if a item is selected and you change the sorting,you can't select a new item
-					id = idColumn.getCellData(selected); //get name of selected item
+					// FIXME if a item is selected and you change the sorting,you can't select a new item
+					id = idColumn.getCellData(selected); // get name of selected item
 
 					for (int i = 0; i < courses.size(); i++) {
 						if (courses.get(i).getId() == id) {	
@@ -722,14 +738,14 @@ public class MainWindowController {
     @FXML
     void reloadRomsBtnAction() throws IOException{
     	reloadRomsBtn.setText("reloading...");
-    	dbController.loadRomDirectory(getRomPath()); //TODO own thread
-    	Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
-		System.exit(0);	//finishes itself
+    	dbController.loadRomDirectory(getRomPath()); // TODO own thread
+    	Runtime.getRuntime().exec("java -jar cemu_UI.jar");	// start again (preventing Bugs)
+		System.exit(0);	// finishes itself
     }
     
     @FXML
     void smmdbBtnAction() {
-    	//show smmdbAnchorPane
+    	// show smmdbAnchorPane
     	if (smmdbTrue) {
     		smmdbAnchorPane.setVisible(false);
     		smmdbTrue = false;
@@ -737,16 +753,16 @@ public class MainWindowController {
     		smmdbAnchorPane.setVisible(true);
     		smmdbTrue = true;
     		
-    		//start query
+			// start query
         	courses.removeAll(courses);
         	courses.addAll(smmdbAPIController.startQuery());
         	
-        	//add query response to courseTreeTable
+        	// add query response to courseTreeTable
     		for(int i = 0; i < courses.size(); i++){
     			CourseTableDataType helpCourse = new CourseTableDataType(courses.get(i).getTitle(),  courses.get(i).getId(),
     																	 courses.get(i).getTime(), courses.get(i).getStars());
     			
-    			root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse));	//add data to root-node
+    			root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse));	// add data to root-node
     		}
     	}
     }
@@ -779,7 +795,7 @@ public class MainWindowController {
         	saveSettings();
         	cemuTextField.setText(getCemuPath());
 			try {
-				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again
+				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	// start again
 				System.exit(0);	//finishes itself
 			} catch (IOException e) {
 				LOGGER.error("an error occurred", e);
@@ -797,8 +813,8 @@ public class MainWindowController {
         	saveSettings();
         	cemuTextField.setText(getCemuPath());
 			try {
-				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again
-				System.exit(0);	//finishes itself
+				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	// start again
+				System.exit(0);	// finishes itself
 			} catch (IOException e) {
 				LOGGER.error("an error occurred", e);
 			}
@@ -825,7 +841,7 @@ public class MainWindowController {
     @FXML
     void smmdbDownloadBtnAction(ActionEvent event){
     	String downloadUrl = "http://smmdb.ddns.net/api/downloadcourse?id=" + id + "&type=zip";
-    	String downloadFileURL = getCemuPath() + "/" + id + ".zip";	//getCemuPath() + "/" + smmID + "/" + id + ".rar"
+    	String downloadFileURL = getCemuPath() + "/" + id + ".zip";	// getCemuPath() + "/" + smmID + "/" + id + ".rar"
     	String outputFile = getCemuPath() + "/";
     	
     	try {
@@ -836,7 +852,7 @@ public class MainWindowController {
 	        pm.setMillisToPopup(0);
 	        pm.setMinimum(0);	// tell the progress bar that we start at the beginning of the stream
 	        pm.setMaximum(conn.getContentLength());	// tell the progress bar the total number of bytes we are going to read.
-			FileUtils.copyInputStreamToFile(pmis, new File(downloadFileURL));	//download file  + "/mlc01/emulatorSave"
+			FileUtils.copyInputStreamToFile(pmis, new File(downloadFileURL));	// download file  + "/mlc01/emulatorSave"
 			pmis.close();
 			LOGGER.info("downloaded successfull");
 
@@ -853,7 +869,7 @@ public class MainWindowController {
 				if (smmDirectory.exists()) {
 					File[] courses = smmDirectory.listFiles(File::isDirectory);
 
-					//get all existing courses in smm directory, new name is highest number +1
+					// get all existing courses in smm directory, new name is highest number +1
 					for (int j = 0; j < courses.length; j++) {
 						int courseNumber = Integer.parseInt(courses[j].getName().substring(6));
 						if (courseNumber > highestCourseNumber) {
@@ -873,7 +889,7 @@ public class MainWindowController {
 				ZipFile zipFile = new ZipFile(source);
 			    zipFile.extractAll(destination);
 			    
-			    //rename zipfile
+			    // rename zip-file
 			    File course = new File(destination + "/course000");
 			    course.renameTo( new File(destination + "/" + courseName));
 			    LOGGER.info("Added new course: " + courseName + ", full path is: " + destination + "/" + courseName);
@@ -963,10 +979,9 @@ public class MainWindowController {
     
     @FXML
     void addBtnAction(ActionEvent event){
-    	String headingText = "activate cloud savegame sync (beta)";
-	   	String bodyText = "You just activate the cloud savegame sync function of cemu_UI, "
-							+ "\nwhich is currently in beta. Are you sure you want to do this?";
-		JFXEditGameDialog addGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 350, 300,
+    	String headingText = "add a new game to cemu_UI";
+	   	String bodyText = "";
+		JFXEditGameDialog addGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 450, 300,
 										0, this, main.primaryStage, main.pane);
 		addGameDialog.show();
     }
@@ -1108,8 +1123,10 @@ public class MainWindowController {
 					}
 				}
 
-				// setting total playtime, if total playtime > 60 minutes, format is "x hours x minutes" (x h x min),
-				// else only minutes are showed
+				/**
+				 * setting total playtime, if total playtime > 60 minutes, format is "x hours x
+				 * minutes" (x h x min), else only minutes are showed
+				 */
 				if (Integer.parseInt(dbController.getTotalPlaytime(titleID)) > 60) {
 					int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTotalPlaytime(titleID)) / 60);
 					int minutesPlayed = Integer.parseInt(dbController.getTotalPlaytime(titleID)) - 60 * hoursPlayed;
@@ -1340,8 +1357,11 @@ public class MainWindowController {
     		xPosHelper++;
     	}
     	
-//    	System.out.println("Breit: " + main.pane.getWidth());
-//    	System.out.println("Breit2: " + mainAnchorPane.getWidth());
+    	// TODO needs testing
+    	System.out.println("Breit: " + main.pane.getWidth());
+    	System.out.println("Breit2: " + mainAnchorPane.getWidth());
+    	System.out.println("Breite3: " + main.scene.getWidth());
+    	System.out.println("Breite4: " + main.primaryStage.getWidth());
 //    	System.out.println("xPosHelper: " + xPosHelper);
 //    	System.out.println("yPos: " + yPos);
 //    	System.out.println("xPos: " + xPos);
