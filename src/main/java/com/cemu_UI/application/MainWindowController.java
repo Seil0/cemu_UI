@@ -41,7 +41,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Properties;
-
 import javax.imageio.ImageIO;
 import javax.swing.ProgressMonitor;
 import javax.swing.ProgressMonitorInputStream;
@@ -391,7 +390,6 @@ public class MainWindowController {
 			}
 			if (settingsTrue) {
 				settingsScrollPane.setVisible(false);
-//				setPath(tfPath.getText());
 				saveSettings();
 				settingsTrue = false;
 			}
@@ -650,6 +648,7 @@ public class MainWindowController {
 		    @Override
 		    public void handle(MouseEvent mouseEvent) {
 		        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
+		        	
 		        	String headingText = "cemu_UI";
 		        	String bodyText = "cemu_UI is licensed under the terms of GNU GPL 3.\n\n"
 		        					+ "JFoenix, Apache License 2.0\n"
@@ -659,8 +658,24 @@ public class MainWindowController {
 		        					+ "Apache Commons Logging, Apache License 2.0\n"
 		        					+ "Apache Commons Codec, Apache License 2.0\n"
 		        					+ "Apache Log4j 2, Apache License 2.0\n";
-		        	JFXInfoDialog licenseDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 275, main.pane);
-		        	licenseDialog.show(); 	
+		        	
+		        	EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent event) {
+							// do nothing
+						}
+					};
+					EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent event) {
+							// show licenses
+						}
+					};
+		        	
+					JFXOkayCancelDialog licenseOverviewDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle,
+							350, 275, okayAction, cancelAction, main.pane);
+					licenseOverviewDialog.setCancelText("show licenses");
+					licenseOverviewDialog.show(); 	
 		        }
 		    }
 		});
