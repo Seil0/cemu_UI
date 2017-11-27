@@ -48,7 +48,6 @@ import javax.swing.ProgressMonitorInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import com.cemu_UI.controller.SmmdbAPIController;
 import com.cemu_UI.controller.UpdateController;
 import com.cemu_UI.controller.dbController;
@@ -61,6 +60,7 @@ import com.cemu_UI.uiElements.JFXOkayCancelDialog;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
 import com.jfoenix.controls.JFXHamburger;
+import com.jfoenix.controls.JFXSpinner;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
 import com.jfoenix.controls.JFXTreeTableColumn;
@@ -70,6 +70,7 @@ import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 import javafx.animation.FadeTransition;
 import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -318,7 +319,21 @@ public class MainWindowController {
 		smmdbAPIController = new SmmdbAPIController();
 	}
 	
-	void initUI() {
+	/**
+	 * initialize the MainWindowController
+	 * loadSettings, checkAutoUpdate, initUI and initActions
+	 */
+	void init() {
+		loadSettings();
+		checkAutoUpdate();
+		initUI();
+		initActions();
+	}
+	
+	/**
+	 * initialize all variable UI parameters and elements
+	 */
+	private void initUI() {
 		LOGGER.info("initializing UI ...");
 		
 		if (getWindowWidth() > 100 && getWindowHeight() > 100) {
@@ -368,7 +383,7 @@ public class MainWindowController {
 	/**
 	 * initialize all actions not initialized by a own method
 	 */
-	void initActions() {
+	private void initActions() {
 		LOGGER.info("initializing Actions ...");
 		
 		MWC = this;
@@ -435,7 +450,7 @@ public class MainWindowController {
 						public void handle(ActionEvent event) {
 							try {
 								games.remove(selectedUIDataIndex); // remove game form games-list
-								dbController.removeRom(selectedGameTitleID); // remove game from database
+								dbController.removeGame(selectedGameTitleID); // remove game from database
 								refreshUIData(); // refresh all games at gamesAnchorPane (UI)
 							} catch (Exception e) {
 								LOGGER.error("error while removing ROM from database!", e);
@@ -717,10 +732,31 @@ public class MainWindowController {
     
 	@FXML
 	void reloadRomsBtnAction() throws IOException {
-		reloadRomsBtn.setText("reloading...");
-		dbController.loadRomDirectory(getRomPath()); // TODO own thread
-		Runtime.getRuntime().exec("java -jar cemu_UI.jar"); // start again (preventing Bugs)
-		System.exit(0); // finishes itself
+		
+		//TODO needs testing
+		JFXSpinner spinner = new JFXSpinner();
+		spinner.setPrefSize(30, 30);
+		main.pane.getChildren().add(spinner);
+		AnchorPane.setTopAnchor(spinner, (main.pane.getHeight()-spinner.getPrefHeight())/2);
+    	AnchorPane.setLeftAnchor(spinner, (main.pane.getWidth()-spinner.getPrefWidth())/2);
+    	
+    	Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				dbController.loadRomDirectory(getRomPath()); // reload the rom directory
+				refreshUIData(); // refresh the list of games displayed on screen
+				
+				Platform.runLater(() -> {
+					main.pane.getChildren().remove(spinner);
+                });
+			}
+		});
+		thread.start();
+		
+//		reloadRomsBtn.setText("reloading...");
+//		dbController.loadRomDirectory(getRomPath());
+//		Runtime.getRuntime().exec("java -jar cemu_UI.jar"); // start again (preventing Bugs)
+//		System.exit(0); // finishes itself
 	}
     
 	@FXML
@@ -1009,8 +1045,8 @@ public class MainWindowController {
 			}
 			
 			try {
-				dbController.addRom(title, coverPath, romPath, titleID, "", "", "", "0");
-				dbController.loadSingleRom(titleID);
+				dbController.addGame(title, coverPath, romPath, titleID, "", "", "", "0");
+				dbController.loadSingleGame(titleID);
 				if (menuTrue) {
 					sideMenuSlideOut();
 					burgerTask.setRate(-1.0);
@@ -1027,7 +1063,7 @@ public class MainWindowController {
 	public void editBtnReturn(String title, String coverPath, String romPath, String titleID) {
 		dbController.setGameInfo(title, coverPath, romPath, titleID);
 		games.remove(selectedUIDataIndex);
-		dbController.loadSingleRom(titleID);
+		dbController.loadSingleGame(titleID);
 		refreshUIData();
 
 		LOGGER.info("successfully edited " + titleID + ", new name is \"" + title + "\"");
@@ -1038,7 +1074,7 @@ public class MainWindowController {
      * @param title : game title
      * @param coverPath : path to cover (cache)
      * @param romPath : path to ROM file (.rpx)
-     * @param titleID : ROM ID
+     * @param titleID : game ID
      */
     public void addGame(String title, String coverPath, String romPath, String titleID){
     	VBox VBox = new VBox();
@@ -1176,7 +1212,7 @@ public class MainWindowController {
 		lastTimePlayedBtn.setLayoutX((width / 2) + 50 + 20.5);
 	}
 
-	void checkAutoUpdate() {
+	private void checkAutoUpdate() {
 
 		if (isAutoUpdate()) {
 			try {
@@ -1444,7 +1480,7 @@ public class MainWindowController {
      * loading saved settings from the config.xml file
      * if a value is not present, default is used instead
      */
-    void loadSettings(){
+    private void loadSettings(){
     	LOGGER.info("loading settings ...");
 		InputStream inputStream;
 		try {

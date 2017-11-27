@@ -85,7 +85,6 @@ public class Main extends Application {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(ClassLoader.getSystemResource("fxml/MainWindow.fxml"));
 			pane = (AnchorPane) loader.load();
-//			primaryStage.setResizable(false);
 			primaryStage.setTitle("cemu_UI");
 //			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/resources/Homeflix_Icon_64x64.png"))); //adds application icon
 
@@ -157,10 +156,11 @@ public class Main extends Application {
 			}
 			
 			// loading settings and initialize UI, dbController.main() loads all databases
-			mainWindowController.loadSettings();
-			mainWindowController.checkAutoUpdate();
-			mainWindowController.initActions();
-			mainWindowController.initUI();
+			mainWindowController.init();
+//			mainWindowController.loadSettings();
+//			mainWindowController.checkAutoUpdate();
+//			mainWindowController.initActions();
+//			mainWindowController.initUI();
 			mainWindowController.dbController.main();
 			if(mainWindowController.isCloudSync()) {
 				cloudController.initializeConnection(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
