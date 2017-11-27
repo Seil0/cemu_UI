@@ -106,7 +106,7 @@ public class CloudController {
 			@Override
 			public void run() {
             	Platform.runLater(() -> {
-        			mwc.getPlayBtn().setText("syncing...");
+        			mwc.getPlayBtn().setText("syncing..."); // FIXME we get a NullPointerException here, because playBtn dosen't exist
                  });
             	LOGGER.info("starting synchronization in new thread ...");
             	
@@ -121,9 +121,9 @@ public class CloudController {
         			
         		}
         		Platform.runLater(() -> {
-            		mwc.getPlayBtn().setText("play");
+            		mwc.getPlayBtn().setText("play"); // FIXME we get a NullPointerException here, because playBtn dosen't exist
+            		mwc.saveSettings();
                  });
-        		mwc.saveSettings();
         		LOGGER.info("synchronization successful!");
             }
         });

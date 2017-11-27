@@ -733,7 +733,6 @@ public class MainWindowController {
 	@FXML
 	void reloadRomsBtnAction() throws IOException {
 		
-		//TODO needs testing
 		JFXSpinner spinner = new JFXSpinner();
 		spinner.setPrefSize(30, 30);
 		main.pane.getChildren().add(spinner);
@@ -744,19 +743,14 @@ public class MainWindowController {
 			@Override
 			public void run() {
 				dbController.loadRomDirectory(getRomPath()); // reload the rom directory
-				refreshUIData(); // refresh the list of games displayed on screen
 				
 				Platform.runLater(() -> {
+					refreshUIData(); // refresh the list of games displayed on screen
 					main.pane.getChildren().remove(spinner);
                 });
 			}
 		});
 		thread.start();
-		
-//		reloadRomsBtn.setText("reloading...");
-//		dbController.loadRomDirectory(getRomPath());
-//		Runtime.getRuntime().exec("java -jar cemu_UI.jar"); // start again (preventing Bugs)
-//		System.exit(0); // finishes itself
 	}
     
 	@FXML
