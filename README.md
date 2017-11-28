@@ -17,7 +17,7 @@ If you want to use the cloud sync function read the [wiki](https://github.com/Se
 * launch Games
 * Time played in total
 * last time played
-* easyer way to add updates & DLCs (only adding not downloading!)
+* add updates and dlcs easier (only adding not downloading!)
 * automatic rom detection (only .rpx files with a app.xml)
 * customisable UI
 * [sync savegames via google drive](https://github.com/Seil0/cemu_UI/wiki)
