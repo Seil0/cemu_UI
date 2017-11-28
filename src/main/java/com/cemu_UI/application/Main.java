@@ -157,10 +157,6 @@ public class Main extends Application {
 			
 			// loading settings and initialize UI, dbController.main() loads all databases
 			mainWindowController.init();
-//			mainWindowController.loadSettings();
-//			mainWindowController.checkAutoUpdate();
-//			mainWindowController.initActions();
-//			mainWindowController.initUI();
 			mainWindowController.dbController.main();
 			if(mainWindowController.isCloudSync()) {
 				cloudController.initializeConnection(mainWindowController.getCloudService(), mainWindowController.getCemuPath());

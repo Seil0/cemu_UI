@@ -22,6 +22,7 @@ public class AppTest extends TestCase {
 		super(testName);
 	}
 
+	@SuppressWarnings("unused")
 	private void testClientsSecret() {
 		File client_secret = new File("/client_secret.json");
 		Assert.assertTrue(client_secret.exists());
