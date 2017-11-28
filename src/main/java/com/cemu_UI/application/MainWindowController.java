@@ -67,8 +67,6 @@ import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
-import javafx.animation.FadeTransition;
-import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
@@ -735,6 +733,7 @@ public class MainWindowController {
 		
 		JFXSpinner spinner = new JFXSpinner();
 		spinner.setPrefSize(30, 30);
+		spinner.setStyle(" -fx-background-color: #f4f4f4;");
 		main.pane.getChildren().add(spinner);
 		AnchorPane.setTopAnchor(spinner, (main.pane.getHeight()-spinner.getPrefHeight())/2);
     	AnchorPane.setLeftAnchor(spinner, (main.pane.getWidth()-spinner.getPrefWidth())/2);
@@ -1571,34 +1570,19 @@ public class MainWindowController {
     
     private void sideMenuSlideIn(){
 		sideMenuVBox.setVisible(true);
-		//fade in from 40% to 100% opacity in 400ms
-		FadeTransition fadeTransition = new FadeTransition(Duration.millis(400), sideMenuVBox);
-		fadeTransition.setFromValue(0.4);
-		fadeTransition.setToValue(1.0);
 		//slide in in 400ms
 		TranslateTransition translateTransition = new TranslateTransition(Duration.millis(400), sideMenuVBox);
 		translateTransition.setFromX(-175);
 		translateTransition.setToX(0);
-		//in case both animations are used (add (fadeTransition, translateTransition) in the second line under this command)    
-		ParallelTransition parallelTransition = new ParallelTransition();
-		parallelTransition.getChildren().addAll(translateTransition);//(fadeTransition, translateTransition);
-		parallelTransition.play();
+		translateTransition.play();
 	}
 	
 	private void sideMenuSlideOut(){
-//		sideMenuVBox.setVisible(false);
-		//fade out from 100% to 40% opacity in 400ms
-		FadeTransition fadeTransition = new FadeTransition(Duration.millis(400), sideMenuVBox);
-		fadeTransition.setFromValue(1.0);
-		fadeTransition.setToValue(0.4);
 		//slide out in 400ms
 		TranslateTransition translateTransition = new TranslateTransition(Duration.millis(400), sideMenuVBox);
 		translateTransition.setFromX(0);
 		translateTransition.setToX(-175);
-		//in case both animations are used (add (fadeTransition, translateTransition) in the second line under this command)	    
-		ParallelTransition parallelTransition = new ParallelTransition();
-		parallelTransition.getChildren().addAll(translateTransition);//(fadeTransition, translateTransition);
-		parallelTransition.play();
+		translateTransition.play();
 	}
 	
 	private void playBtnSlideIn(){
@@ -1608,17 +1592,17 @@ public class MainWindowController {
 		playTrue = true;
 		
 		TranslateTransition playBtnTransition = new TranslateTransition(Duration.millis(300), playBtn);
-		playBtnTransition.setFromY(55);
+		playBtnTransition.setFromY(56);
 		playBtnTransition.setToY(0);
 		playBtnTransition.play();
 		
 		TranslateTransition lastTimePlayedBtnTransition = new TranslateTransition(Duration.millis(300), lastTimePlayedBtn);
-		lastTimePlayedBtnTransition.setFromY(55);
+		lastTimePlayedBtnTransition.setFromY(56);
 		lastTimePlayedBtnTransition.setToY(0);
 		lastTimePlayedBtnTransition.play();
 		
 		TranslateTransition timePlayedBtnTransition = new TranslateTransition(Duration.millis(300), totalPlaytimeBtn);
-		timePlayedBtnTransition.setFromY(55);
+		timePlayedBtnTransition.setFromY(56);
 		timePlayedBtnTransition.setToY(0);
 		timePlayedBtnTransition.play();
 	}

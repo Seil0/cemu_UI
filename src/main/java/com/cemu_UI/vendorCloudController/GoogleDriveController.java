@@ -104,12 +104,14 @@ public class GoogleDriveController {
 	     InputStream in = getClass().getClassLoader().getResourceAsStream("client_secret.json");
 	     GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
-		 //FIXME Linux fails to open a new browser window, application crashes, maybe a kde only bug
-	     // Build flow and trigger user authorization request.
+		 //FIXME Linux fails to open a new browser window, application crashes 
+	     // see: https://github.com/Seil0/cemu_UI/issues/10
+	     // Build flow and trigger user authorization request.  
 	     GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
 	    		 .setDataStoreFactory(DATA_STORE_FACTORY)
 	             .setAccessType("offline")
 	             .build();
+	     
 	     Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
 	     LOGGER.info("Credentials saved to " + DATA_STORE_DIR.getAbsolutePath());
 	     return credential;
