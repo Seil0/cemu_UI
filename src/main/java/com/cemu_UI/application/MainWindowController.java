@@ -24,11 +24,13 @@ package com.cemu_UI.application;
 import java.awt.Desktop;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -41,6 +43,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Properties;
+
 import javax.imageio.ImageIO;
 import javax.swing.ProgressMonitor;
 import javax.swing.ProgressMonitorInputStream;
@@ -48,6 +51,7 @@ import javax.swing.ProgressMonitorInputStream;
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import com.cemu_UI.controller.SmmdbAPIController;
 import com.cemu_UI.controller.UpdateController;
 import com.cemu_UI.controller.dbController;
@@ -57,6 +61,7 @@ import com.cemu_UI.datatypes.UIROMDataType;
 import com.cemu_UI.uiElements.JFXEditGameDialog;
 import com.cemu_UI.uiElements.JFXInfoDialog;
 import com.cemu_UI.uiElements.JFXOkayCancelDialog;
+import com.cemu_UI.uiElements.JFXTestAreaInfoDialog;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
 import com.jfoenix.controls.JFXHamburger;
@@ -681,7 +686,27 @@ public class MainWindowController {
 					EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
-							// show licenses
+							String headingText = "cemu_UI";
+							String bodyText = "";
+
+							try {
+								BufferedReader licenseBR = new BufferedReader(
+										new InputStreamReader(getClass().getResourceAsStream("/licenses/licenses_show.txt")));
+								String currentLine;
+								
+								
+								while ((currentLine = licenseBR.readLine()) != null) {
+									bodyText = bodyText + currentLine + "\n";	
+								}
+								
+								licenseBR.close();
+							} catch (IOException e) {
+								LOGGER.error("Cloud not read the license file!", e);
+							}
+							
+							JFXTestAreaInfoDialog licenseDialog = new JFXTestAreaInfoDialog(headingText, bodyText,
+									dialogBtnStyle, 510, 450, main.pane);
+							licenseDialog.show();
 						}
 					};
 		        	
