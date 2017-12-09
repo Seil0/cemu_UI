@@ -61,7 +61,7 @@ import com.cemu_UI.datatypes.UIROMDataType;
 import com.cemu_UI.uiElements.JFXEditGameDialog;
 import com.cemu_UI.uiElements.JFXInfoDialog;
 import com.cemu_UI.uiElements.JFXOkayCancelDialog;
-import com.cemu_UI.uiElements.JFXTestAreaInfoDialog;
+import com.cemu_UI.uiElements.JFXTextAreaInfoDialog;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
 import com.jfoenix.controls.JFXHamburger;
@@ -270,7 +270,7 @@ public class MainWindowController {
 	private String selectedGameTitle;
 	private String id;
 	private String version = "0.2.1";
-	private String buildNumber = "057";
+	private String buildNumber = "059";
 	private String versionName = "Puzzle Plank Galaxy";
 	private int xPos = -200;
 	private int yPos = 17;
@@ -704,7 +704,7 @@ public class MainWindowController {
 								LOGGER.error("Cloud not read the license file!", e);
 							}
 							
-							JFXTestAreaInfoDialog licenseDialog = new JFXTestAreaInfoDialog(headingText, bodyText,
+							JFXTextAreaInfoDialog licenseDialog = new JFXTextAreaInfoDialog(headingText, bodyText,
 									dialogBtnStyle, 510, 450, main.pane);
 							licenseDialog.show();
 						}
