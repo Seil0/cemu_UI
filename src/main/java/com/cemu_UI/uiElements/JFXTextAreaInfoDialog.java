@@ -33,7 +33,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 
-public class JFXTestAreaInfoDialog {
+public class JFXTextAreaInfoDialog {
 	
 	private String headingText;
 	private String bodyText;
@@ -51,7 +51,7 @@ public class JFXTestAreaInfoDialog {
 	 * @param dialogHeight dialog height
 	 * @param pane pane to which the dialog belongs
 	 */
-	public JFXTestAreaInfoDialog(String headingText, String bodyText, String dialogBtnStyle, int dialogWidth, int dialogHeight, Pane pane) {
+	public JFXTextAreaInfoDialog(String headingText, String bodyText, String dialogBtnStyle, int dialogWidth, int dialogHeight, Pane pane) {
 		this.headingText = headingText;
 		this.bodyText = bodyText;
 		this.dialogBtnStyle = dialogBtnStyle;
