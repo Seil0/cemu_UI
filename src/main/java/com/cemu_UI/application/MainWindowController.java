@@ -975,21 +975,30 @@ public class MainWindowController {
 	    			cloudSync = true;
 	    			//TODO rework for other cloud services
 	    			cloudService = "GoogleDrive";
+	    			
+	    			// start cloud sync in new thread			
+	    			Thread thread = new Thread(new Runnable() {
+		    			@Override
+						public void run() {
+		    				
+		    				if (main.cloudController.initializeConnection(getCloudService(), getCemuPath())) {
+			        	    	main.cloudController.sync(getCloudService(), getCemuPath());
+			        	        saveSettings();
+			    	    	} else {
+			    	    		cloudSyncToggleBtn.setSelected(false);
 
-	    	    	if (main.cloudController.initializeConnection(getCloudService(), getCemuPath())) {
-	        	    	main.cloudController.sync(getCloudService(), getCemuPath());
-	        	        saveSettings();
-	    	    	} else {
-	    	    		cloudSyncToggleBtn.setSelected(false);
-
-	    	    	   	//cloud sync init error dialog
-	    	    		String headingText = "Error while initializing cloud sync!";
-	    		    	String bodyText = "There was some truble adding your game."
-	    		    					+ "\nPlease upload the app.log (which can be found in the cemu_UI directory)"
-	    		    					+ "\nto \"https://github.com/Seil0/cemu_UI/issues\" so we can fix this.";
-	    	    	   	JFXInfoDialog cloudSyncErrorDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 450, 170, main.pane);
-	    	    	   	cloudSyncErrorDialog.show();		
-	    	    	}
+			    	    	   	//cloud sync init error dialog
+			    	    		String headingText = "Error while initializing cloud sync!";
+			    		    	String bodyText = "There was some truble adding your game."
+			    		    					+ "\nPlease upload the app.log (which can be found in the cemu_UI directory)"
+			    		    					+ "\nto \"https://github.com/Seil0/cemu_UI/issues\" so we can fix this.";
+			    	    	   	JFXInfoDialog cloudSyncErrorDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 450, 170, main.pane);
+			    	    	   	cloudSyncErrorDialog.show();		
+			    	    	}
+		    				
+		    			}
+		    		});
+		    		thread.start();	
 	    		 }
 	    	};
 	    	

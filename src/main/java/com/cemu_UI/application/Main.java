@@ -71,7 +71,6 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		try {
 			this.primaryStage = primaryStage;
-			cloudController = new CloudController(mainWindowController);
 			mainWindow();
 			initActions();
 		} catch (Exception e) {
@@ -90,6 +89,7 @@ public class Main extends Application {
 
 			mainWindowController = loader.getController();	// Link of FXMLController and controller class
 			mainWindowController.setMain(this);	// call setMain
+			cloudController = new CloudController(mainWindowController); // call cloudController constructor
 			
 			// get OS and the specific paths
 			if (System.getProperty("os.name").equals("Linux")) {
@@ -158,6 +158,7 @@ public class Main extends Application {
 			// loading settings and initialize UI, dbController.main() loads all databases
 			mainWindowController.init();
 			mainWindowController.dbController.main();
+			// if cloud sync is activated start sync
 			if(mainWindowController.isCloudSync()) {
 				cloudController.initializeConnection(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
 				cloudController.stratupCheck(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
