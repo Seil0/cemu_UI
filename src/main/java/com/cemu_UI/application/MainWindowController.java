@@ -787,17 +787,32 @@ public class MainWindowController {
 			smmdbAnchorPane.setVisible(true);
 			smmdbTrue = true;
 
-			// start query
-			courses.removeAll(courses);
-			courses.addAll(smmdbAPIController.startQuery());
+			// start query in new thread		
+			Thread thread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					Platform.runLater(() -> {
+						smmdbDownloadBtn.setText("loading ...");
+						smmdbDownloadBtn.setDisable(true);
+						root.getChildren().remove(0,root.getChildren().size());
+	                });
+					courses.removeAll(courses); // remove existing courses
+					courses.addAll(smmdbAPIController.startQuery()); // start query
 
-			// add query response to courseTreeTable
-			for (int i = 0; i < courses.size(); i++) {
-				CourseTableDataType helpCourse = new CourseTableDataType(courses.get(i).getTitle(),
-						courses.get(i).getId(), courses.get(i).getTime(), courses.get(i).getStars());
+					// add query response to courseTreeTable
+					for (int i = 0; i < courses.size(); i++) {
+						CourseTableDataType helpCourse = new CourseTableDataType(courses.get(i).getTitle(),
+								courses.get(i).getId(), courses.get(i).getTime(), courses.get(i).getStars());
 
-				root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse)); // add data to root-node
-			}
+						Platform.runLater(() -> {
+							root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse)); // add data to root-node
+							smmdbDownloadBtn.setText("Download");
+							smmdbDownloadBtn.setDisable(false);
+		                });
+					}
+				}
+			});
+			thread.start();
 		}
 	}
     	
@@ -880,6 +895,7 @@ public class MainWindowController {
     	String outputFile = getCemuPath() + "/";
     	
     	try {
+    		LOGGER.info("beginning download ...");
 			HttpURLConnection conn = (HttpURLConnection) new URL(downloadUrl).openConnection();
 			ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(null, "Downloading...", conn.getInputStream());
 			ProgressMonitor pm = pmis.getProgressMonitor();
@@ -914,22 +930,23 @@ public class MainWindowController {
 					
 					String number = "000" + (highestCourseNumber +1);
 					courseName = "course" + number.substring(number.length() -3, number.length());
-					File courseDirectory = new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(i) + "/");
-					
+					File courseDirectory = new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(i) + "/");		
 					destination = courseDirectory.getPath();
-				}	
+				}
 			}
 
-			try {			
-				ZipFile zipFile = new ZipFile(source);
-			    zipFile.extractAll(destination);
-			    
-			    // rename zip-file
-			    File course = new File(destination + "/course000");
-			    course.renameTo( new File(destination + "/" + courseName));
-			    LOGGER.info("Added new course: " + courseName + ", full path is: " + destination + "/" + courseName);
-			} catch (ZipException e) {
-			    LOGGER.error("an error occurred during unziping the file!", e);
+			if (destination != null) {
+				try {			
+					ZipFile zipFile = new ZipFile(source);
+				    zipFile.extractAll(destination);
+				    
+				    // rename zip-file
+				    File course = new File(destination + "/course000");
+				    course.renameTo( new File(destination + "/" + courseName));
+				    LOGGER.info("Added new course: " + courseName + ", full path is: " + destination + "/" + courseName);
+				} catch (ZipException e) {
+				    LOGGER.error("an error occurred during unziping the file!", e);
+				}
 			}
 			
 			downloadFile.delete();		

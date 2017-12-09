@@ -115,6 +115,7 @@ public class dbController {
 		LOGGER.info("games database loaded successfull");
 	}
 	
+
 	/**
 	 * creating the local_roms table in localRoms.db
 	 * if the table has no entries, call loadRomDirectory
