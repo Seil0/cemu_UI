@@ -650,33 +650,25 @@ public class MainWindowController {
 			public void changed(ObservableValue<?> observable, Object oldVal, Object newVal) {
 				selected = courseTreeTable.getSelectionModel().getSelectedIndex(); // get selected item
 
-				// FIXME if a item is selected and you change the sorting,you can't select a new
-				// item
+				// FIXME if a item is selected and you change the sorting,you can't select a new item
 				id = idColumn.getCellData(selected); // get name of selected item
 
 				for (int i = 0; i < courses.size(); i++) {
 					if (courses.get(i).getId() == id) {
 						try {
-							
 							URL url = new URL("https://smmdb.ddns.net/courseimg/" + id + "_full?v=1");
-							Image image = new Image(url.toURI().toString());
+							Image sourceImage = new Image(url.toURI().toString());
 							
-							System.out.println("Bild Höhe: " + image.getHeight() + ",Breite: " + image.getWidth());
-							System.out.println("Imageview Höhe: " + smmdbImageView.getFitHeight() + ",Breite: " + smmdbImageView.getFitWidth());
+							// scale image to 142px
+							double scalefactor = 142 / sourceImage.getHeight(); // calculate scaling factor
+							int nWidth = (int) Math.rint(scalefactor * sourceImage.getWidth());
+							int nHeight = (int) Math.rint(scalefactor * sourceImage.getHeight());
+							Image scaledImage = new Image(url.toURI().toString(), nWidth, nHeight, false, true); // generate a scaled image
 							
-							// scale image to 148px Height
-							double scalefactor = 148 / image.getHeight();					
-							System.out.println("Skalierung: " + scalefactor);
-							
-							int nWidth = (int) Math.rint(scalefactor * image.getWidth());
-							int nHeight = (int) Math.rint(scalefactor * image.getHeight());
-							
-							System.out.println("Bild NEU Höhe: " + nHeight + ",Breite: " + nWidth);
-							
-							smmdbImageView.setFitWidth(image.getWidth()); // set ImageView width to the image width 
-							smmdbImageView.setImage(image);
+							smmdbImageView.setFitWidth(scaledImage.getWidth()); // set ImageView width to the image width 
+							smmdbImageView.setImage(scaledImage); // set imageview to image
 						} catch (MalformedURLException | URISyntaxException e) {
-							e.printStackTrace();
+							LOGGER.warn("There was either a problem or no image!", e);
 							smmdbImageView.setImage(close_black);
 						}
 						addCourseDescription(courses.get(i));
@@ -689,11 +681,17 @@ public class MainWindowController {
 			@Override
 			public void handle(MouseEvent mouseEvent) {
 				if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
-					try {
-						Desktop.getDesktop().browse(new URI("https://github.com/Seil0/cemu_UI/issues/3"));
-					} catch (IOException | URISyntaxException e) {
-						e.printStackTrace();
-					}
+					Thread thread = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								Desktop.getDesktop().browse(new URI("https://github.com/Seil0/cemu_UI/issues/3"));
+							} catch (IOException | URISyntaxException e) {
+								e.printStackTrace();
+							}
+						}
+					});
+					thread.start();
 				}
 			}
 		});
