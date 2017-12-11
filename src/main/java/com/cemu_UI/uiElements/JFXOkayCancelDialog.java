@@ -39,6 +39,8 @@ public class JFXOkayCancelDialog {
 	private String headingText;
 	private String bodyText;
 	private String dialogBtnStyle;
+	private String okayText = "okay";
+	private String cancelText = "cancel";
 	private int dialogWidth;
 	private int dialogHeight;
 	private EventHandler<ActionEvent> okayAction;
@@ -75,19 +77,19 @@ public class JFXOkayCancelDialog {
     	StackPane stackPane = new StackPane();
     	stackPane.autosize();
     	JFXDialog dialog = new JFXDialog(stackPane, content, JFXDialog.DialogTransition.LEFT, true);
-    	JFXButton okayBtn = new JFXButton("Okay");
-    	okayBtn.addEventHandler(ActionEvent.ACTION, okayAction);
+    	JFXButton okayBtn = new JFXButton(okayText);
     	okayBtn.addEventHandler(ActionEvent.ACTION, (e)-> {
     		dialog.close();
     	});
+    	okayBtn.addEventHandler(ActionEvent.ACTION, okayAction);
     	okayBtn.setButtonType(com.jfoenix.controls.JFXButton.ButtonType.RAISED);
     	okayBtn.setPrefHeight(32);
     	okayBtn.setStyle(dialogBtnStyle);
-    	JFXButton cancelBtn = new JFXButton("Cancel");
-    	cancelBtn.addEventHandler(ActionEvent.ACTION, cancelAction);
+    	JFXButton cancelBtn = new JFXButton(cancelText);
     	cancelBtn.addEventHandler(ActionEvent.ACTION, (e)-> {
     		dialog.close();
     	});
+    	cancelBtn.addEventHandler(ActionEvent.ACTION, cancelAction);
     	cancelBtn.setButtonType(com.jfoenix.controls.JFXButton.ButtonType.RAISED);
     	cancelBtn.setPrefHeight(32);
     	cancelBtn.setStyle(dialogBtnStyle);
@@ -99,6 +101,22 @@ public class JFXOkayCancelDialog {
     	AnchorPane.setTopAnchor(stackPane, (pane.getHeight()-content.getPrefHeight())/2);
     	AnchorPane.setLeftAnchor(stackPane, (pane.getWidth()-content.getPrefWidth())/2);
     	dialog.show();
+	}
+
+	public String getOkayText() {
+		return okayText;
+	}
+
+	public void setOkayText(String okayText) {
+		this.okayText = okayText;
+	}
+
+	public String getCancelText() {
+		return cancelText;
+	}
+
+	public void setCancelText(String cancelText) {
+		this.cancelText = cancelText;
 	}
 
 	public EventHandler<ActionEvent> getOkayAction() {

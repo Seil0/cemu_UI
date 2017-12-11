@@ -63,6 +63,7 @@ public class SmmdbAPIController {
 		} catch (IOException e) {
 			LOGGER.error("error while making api request or reading response");
 			LOGGER.error("response from " + URL + " was: " + output, e);
+			return course;
 		}
         
         String apiOutput = "{ \"courses\": " + output + "}";

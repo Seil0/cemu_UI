@@ -55,7 +55,7 @@ public class dbController {
 	
 	private MainWindowController mainWindowController;
 	private ArrayList<String> entries = new ArrayList<>();
-	private String DB_PATH;
+	private String DB_PATH_localRoms;
 	private String DB_PATH_games;
 	private Connection connection = null;
 	private Connection connectionGames = null;
@@ -66,20 +66,25 @@ public class dbController {
 		loadRomDatabase();
 		loadGamesDatabase();
 		createRomDatabase();
-		loadAllRoms();
+		loadAllGames();
 		checkRemoveEntry();
 		LOGGER.info("<==========finished loading sql==========>");
 	}
 	
+	/**
+	 * set the path to the localRoms.db file and initialize the connection
+	 * 
+	 * TODO this should be called LocalGames
+	 */
 	private void loadRomDatabase(){
 		if (System.getProperty("os.name").equals("Linux")) {
-			DB_PATH = System.getProperty("user.home") + "/cemu_UI/localRoms.db";
+			DB_PATH_localRoms = System.getProperty("user.home") + "/cemu_UI/localRoms.db";
 		}else{
-			DB_PATH = System.getProperty("user.home") + "\\Documents\\cemu_UI" + "\\" + "localRoms.db";
+			DB_PATH_localRoms = System.getProperty("user.home") + "\\Documents\\cemu_UI" + "\\" + "localRoms.db";
 		}
 		try {
 			// create a database connection
-			connection = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
+			connection = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH_localRoms);
 			connection.setAutoCommit(false);	//AutoCommit to false -> manual commit is active
 		} catch (SQLException e) {
 			// if the error message is "out of memory", it probably means no database file is found
@@ -89,28 +94,35 @@ public class dbController {
 	}
 	
 	/**
-	 * this method is used to load the games database with additional informations about a game
-	 * it is used if a new game is added (automatic or manual)
+	 * set the path to the localRoms.db file and initialize the connection
+	 * 
+	 * games.dbcontains a reverence list to for the automatic detection mode
+	 * TODO this should be called ReferenceGameList the games table should be called reference_games
 	 */
-	private void loadGamesDatabase(){
+	private void loadGamesDatabase() {
 		if (System.getProperty("os.name").equals("Linux")) {
 			DB_PATH_games = System.getProperty("user.home") + "/cemu_UI/games.db";
-		}else{
+		} else {
 			DB_PATH_games = System.getProperty("user.home") + "\\Documents\\cemu_UI" + "\\" + "games.db";
 		}
 		try {
 			// create a database connection
 			connectionGames = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH_games);
-			connectionGames.setAutoCommit(false);	//AutoCommit to false -> manual commit is active
+			connectionGames.setAutoCommit(false); // AutoCommit to false -> manual commit is active
 		} catch (SQLException e) {
-			// if the error message is "out of memory", it probably means no database file is found
 			LOGGER.error("error while loading the games database", e);
 		}
 		LOGGER.info("games database loaded successfull");
 	}
 	
-	//creating database, if database has 0 entries search for all .rpx files in the roms directory and add them
-	void createRomDatabase() { 
+
+	/**
+	 * creating the local_roms table in localRoms.db
+	 * if the table has no entries, call loadRomDirectory
+	 * 
+	 * TODO the local_roms table should be called local_games
+	 */
+	void createRomDatabase() {
 		try {
 			Statement stmt = connection.createStatement();
 			stmt.executeUpdate("create table if not exists local_roms (title, coverPath, romPath, titleID, productCode, region, lastPlayed, timePlayed)");
@@ -119,24 +131,25 @@ public class dbController {
 		} catch (SQLException e) {
 			LOGGER.error("error while creating ROM database", e);
 		}
-		
-		try { 
-			Statement stmt = connection.createStatement(); 
-			ResultSet rs = stmt.executeQuery("SELECT * FROM local_roms"); 
-			while (rs.next()) { 
+
+		try {
+			Statement stmt = connection.createStatement();
+			ResultSet rs = stmt.executeQuery("SELECT * FROM local_roms");
+			while (rs.next()) {
 				entries.add(rs.getString(2));
 			}
 			stmt.close();
 			rs.close();
-		}catch (SQLException e){
+		} catch (SQLException e) {
 			LOGGER.error("error while loading ROMs from ROM database, local_roms table", e);
 		}
-		if(entries.size() == 0){
+		if (entries.size() == 0) {
 			loadRomDirectory(mainWindowController.getRomPath());
 		}
 	}
 
-	public void addRom(String title, String coverPath, String romPath, String titleID, String productCode, String region, String lastPlayed, String timePlayed) throws SQLException{
+	// add a Ggame to the database
+	public void addGame(String title, String coverPath, String romPath, String titleID, String productCode, String region, String lastPlayed, String timePlayed) throws SQLException{
 		Statement stmt = connection.createStatement();
 		stmt.executeUpdate("insert into local_roms values ('"+title+"','"+coverPath+"','"+romPath+"','"+titleID+"',"
 				+ "'"+productCode+"','"+region+"','"+lastPlayed+"','"+timePlayed+"')");
@@ -145,7 +158,7 @@ public class dbController {
 		LOGGER.info("added \""+title+"\" to ROM database");
 	}
 	
-	public void removeRom(String titleID) throws SQLException{
+	public void removeGame(String titleID) throws SQLException{
 		Statement stmt = connection.createStatement();
 		stmt.executeUpdate("delete from local_roms where titleID = '"+titleID+"'");
 		connection.commit();
@@ -154,8 +167,8 @@ public class dbController {
 	}
 	
 	//load all ROMs on startup to the mainWindowController
-	void loadAllRoms(){
-		LOGGER.info("loading all rom's on startup into the mainWindowController ...");
+	void loadAllGames(){
+		LOGGER.info("loading all games on startup into the mainWindowController ...");
 		try { 
 			Statement stmt = connection.createStatement(); 
 			ResultSet rs = stmt.executeQuery("SELECT * FROM local_roms"); 
@@ -165,13 +178,13 @@ public class dbController {
 			stmt.close();
 			rs.close();
 		}catch (Exception e){
-			LOGGER.error("error while loading all ROMs into the mainWindowController", e);
+			LOGGER.error("error while loading all games into the mainWindowController", e);
 		}
 	}
 	
 	//load one single ROM after manual adding into the mainWindowController
-	public void loadSingleRom(String titleID){
-		LOGGER.info("loading a single ROM (ID: "+titleID+") into the mainWindowController ..."); 
+	public void loadSingleGame(String titleID){
+		LOGGER.info("loading a single game (ID: "+titleID+") into the mainWindowController ..."); 
 		try { 
 			Statement stmt = connection.createStatement(); 
 			ResultSet rs = stmt.executeQuery("SELECT * FROM local_roms where titleID = '"+titleID+"'"); 
@@ -181,11 +194,14 @@ public class dbController {
 			stmt.close();
 			rs.close();
 		}catch (Exception e){
-			LOGGER.error("error while loading a single ROM into the mainWindowController", e);
+			LOGGER.error("error while loading a single game into the mainWindowController", e);
 		}
 	}
 	
-	//get all files with .rpx TODO add other formats
+	/**
+	 * get all .rpx files from a given directory and add them to the games database if they don't exist there
+	 * @param directory where to search for the .rpx files
+	 */
 	public void loadRomDirectory(String directory){
 		File dir = new File(directory);
 		File appFile;
@@ -203,6 +219,7 @@ public class dbController {
 			Statement stmt = connectionGames.createStatement();
 			List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, true);
 			LOGGER.info("Getting all .rpx files in " + dir.getCanonicalPath()+" including those in subdirectories");
+			// for all files in dir get the app.xml
 			for (File file : files) {
 				if(System.getProperty("os.name").equals("Linux")){
 					appFile = new File(file.getParent()+"/app.xml");
@@ -212,10 +229,11 @@ public class dbController {
 				DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 				DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 				Document document = documentBuilder.parse(appFile);
-				String title_ID = document.getElementsByTagName("title_id").item(0).getTextContent();
+				String title_ID = document.getElementsByTagName("title_id").item(0).getTextContent(); //get titile_ID from app.xml
 				title_ID = title_ID.substring(0, 8) + "-" + title_ID.substring(8, title_ID.length());
 				LOGGER.info("Name: "+file.getName()+"; Title ID: "+title_ID);
 				ResultSet rs = stmt.executeQuery("SELECT * FROM games WHERE TitleID = '"+title_ID+"';");
+				// for all elements in the games table check if it's already present, else add it
 				while (rs.next()) {
 					if (checkEntry(rs.getString(2))) {
 						LOGGER.info(rs.getString(2) + ": game already in database");
@@ -233,7 +251,7 @@ public class dbController {
 					    }
 					    
 						LOGGER.info(rs.getString(2) + ": adding ROM");
-						addRom(rs.getString(2), coverPath, file.getCanonicalPath(), rs.getString(1), rs.getString(3), rs.getString(5),"","0");
+						addGame(rs.getString(2), coverPath, file.getCanonicalPath(), rs.getString(1), rs.getString(3), rs.getString(5),"","0");
 					}
 				}
 			}

@@ -54,7 +54,7 @@ public class CloudController {
 				LOGGER.error("error while initialize connection", e);
 				return success;
 			}
-			success = true;
+			success = true;		
 		}
 		
 		if(cloudService.equals("Dropbox")) {
@@ -122,8 +122,8 @@ public class CloudController {
         		}
         		Platform.runLater(() -> {
             		mwc.getPlayBtn().setText("play");
+            		mwc.saveSettings();
                  });
-        		mwc.saveSettings();
         		LOGGER.info("synchronization successful!");
             }
         });

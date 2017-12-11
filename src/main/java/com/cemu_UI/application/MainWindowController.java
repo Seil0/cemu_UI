@@ -24,11 +24,13 @@ package com.cemu_UI.application;
 import java.awt.Desktop;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
@@ -59,18 +61,19 @@ import com.cemu_UI.datatypes.UIROMDataType;
 import com.cemu_UI.uiElements.JFXEditGameDialog;
 import com.cemu_UI.uiElements.JFXInfoDialog;
 import com.cemu_UI.uiElements.JFXOkayCancelDialog;
+import com.cemu_UI.uiElements.JFXTextAreaInfoDialog;
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXColorPicker;
 import com.jfoenix.controls.JFXHamburger;
+import com.jfoenix.controls.JFXSpinner;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
 import com.jfoenix.controls.JFXTreeTableColumn;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.transitions.hamburger.HamburgerBackArrowBasicTransition;
 
-import javafx.animation.FadeTransition;
-import javafx.animation.ParallelTransition;
 import javafx.animation.TranslateTransition;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
@@ -149,6 +152,9 @@ public class MainWindowController {
 
 	@FXML
 	private JFXTextField romTextField;
+	
+	@FXML
+	private JFXTextField courseSearchTextFiled;
 
 	@FXML
 	private TextFlow smmdbTextFlow;
@@ -188,6 +194,9 @@ public class MainWindowController {
 
 	@FXML
 	private ScrollPane smmdbScrollPane;
+	
+	@FXML
+	private ScrollPane smmdbImageViewScrollPane;
 
 	@FXML
 	private VBox sideMenuVBox;
@@ -266,8 +275,8 @@ public class MainWindowController {
 	private String selectedGameTitleID;
 	private String selectedGameTitle;
 	private String id;
-	private String version = "0.2.1";
-	private String buildNumber = "057";
+	private String version = "0.2.2";
+	private String buildNumber = "061";
 	private String versionName = "Puzzle Plank Galaxy";
 	private int xPos = -200;
 	private int yPos = 17;
@@ -288,6 +297,7 @@ public class MainWindowController {
 	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2", "44fc5929"); // TODO add more IDs
 	private ObservableList<UIROMDataType> games = FXCollections.observableArrayList();
 	ObservableList<SmmdbApiDataType> courses = FXCollections.observableArrayList();
+	ObservableList<SmmdbApiDataType> filteredCourses = FXCollections.observableArrayList();
 	ArrayList<Text> courseText = new ArrayList<Text>();
 	ArrayList<Text> nameText = new ArrayList<Text>();
 	Properties props = new Properties();
@@ -319,7 +329,21 @@ public class MainWindowController {
 		smmdbAPIController = new SmmdbAPIController();
 	}
 	
-	void initUI() {
+	/**
+	 * initialize the MainWindowController
+	 * loadSettings, checkAutoUpdate, initUI and initActions
+	 */
+	void init() {
+		loadSettings();
+		checkAutoUpdate();
+		initUI();
+		initActions();
+	}
+	
+	/**
+	 * initialize all variable UI parameters and elements
+	 */
+	private void initUI() {
 		LOGGER.info("initializing UI ...");
 		
 		if (getWindowWidth() > 100 && getWindowHeight() > 100) {
@@ -344,9 +368,9 @@ public class MainWindowController {
 		applyColor();
 		
 		// initialize courseTable
-		titleColumn.setPrefWidth(160);
-		timeColumn.setPrefWidth(127);
-		starsColumn.setPrefWidth(100);
+		titleColumn.setPrefWidth(185);
+		timeColumn.setPrefWidth(112);
+		starsColumn.setPrefWidth(90);
 		
 		courseTreeTable.setRoot(root);
 		courseTreeTable.setShowRoot(false);
@@ -369,7 +393,7 @@ public class MainWindowController {
 	/**
 	 * initialize all actions not initialized by a own method
 	 */
-	void initActions() {
+	private void initActions() {
 		LOGGER.info("initializing Actions ...");
 		
 		MWC = this;
@@ -391,7 +415,6 @@ public class MainWindowController {
 			}
 			if (settingsTrue) {
 				settingsScrollPane.setVisible(false);
-//				setPath(tfPath.getText());
 				saveSettings();
 				settingsTrue = false;
 			}
@@ -437,7 +460,7 @@ public class MainWindowController {
 						public void handle(ActionEvent event) {
 							try {
 								games.remove(selectedUIDataIndex); // remove game form games-list
-								dbController.removeRom(selectedGameTitleID); // remove game from database
+								dbController.removeGame(selectedGameTitleID); // remove game from database
 								refreshUIData(); // refresh all games at gamesAnchorPane (UI)
 							} catch (Exception e) {
 								LOGGER.error("error while removing ROM from database!", e);
@@ -595,24 +618,57 @@ public class MainWindowController {
 			}
 		});
 		
+		courseSearchTextFiled.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+
+				filteredCourses.removeAll(filteredCourses);
+				root.getChildren().remove(0, root.getChildren().size());
+
+				for (int i = 0; i < courses.size(); i++) {
+					if (courses.get(i).getTitle().toLowerCase()
+							.contains(courseSearchTextFiled.getText().toLowerCase())) {
+
+						// add data from courses to filteredCourses where title contains search input
+						filteredCourses.add(courses.get(i));
+					}
+				}
+
+				for (int i = 0; i < filteredCourses.size(); i++) {
+					CourseTableDataType helpCourse = new CourseTableDataType(filteredCourses.get(i).getTitle(),
+							filteredCourses.get(i).getId(), filteredCourses.get(i).getTime(),
+							filteredCourses.get(i).getStars());
+
+					root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse)); // add data to root-node
+				}
+			}
+		});
+		
 		// Change-listener for TreeTable
 		courseTreeTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Object>() {
 			@Override
 			public void changed(ObservableValue<?> observable, Object oldVal, Object newVal) {
 				selected = courseTreeTable.getSelectionModel().getSelectedIndex(); // get selected item
 
-				// FIXME if a item is selected and you change the sorting,you can't select a new
-				// item
+				// FIXME if a item is selected and you change the sorting,you can't select a new item
 				id = idColumn.getCellData(selected); // get name of selected item
 
 				for (int i = 0; i < courses.size(); i++) {
 					if (courses.get(i).getId() == id) {
 						try {
 							URL url = new URL("https://smmdb.ddns.net/courseimg/" + id + "_full?v=1");
-							Image image = new Image(url.toURI().toString());
-							smmdbImageView.setImage(image);
+							Image sourceImage = new Image(url.toURI().toString());
+							
+							// scale image to 142px
+							double scalefactor = 142 / sourceImage.getHeight(); // calculate scaling factor
+							int nWidth = (int) Math.rint(scalefactor * sourceImage.getWidth());
+							int nHeight = (int) Math.rint(scalefactor * sourceImage.getHeight());
+							Image scaledImage = new Image(url.toURI().toString(), nWidth, nHeight, false, true); // generate a scaled image
+							
+							smmdbImageView.setFitWidth(scaledImage.getWidth()); // set ImageView width to the image width 
+							smmdbImageView.setImage(scaledImage); // set imageview to image
 						} catch (MalformedURLException | URISyntaxException e) {
-							e.printStackTrace();
+							LOGGER.warn("There was either a problem or no image!", e);
 							smmdbImageView.setImage(close_black);
 						}
 						addCourseDescription(courses.get(i));
@@ -625,11 +681,17 @@ public class MainWindowController {
 			@Override
 			public void handle(MouseEvent mouseEvent) {
 				if (mouseEvent.getButton().equals(MouseButton.PRIMARY)) {
-					try {
-						Desktop.getDesktop().browse(new URI("https://github.com/Seil0/cemu_UI/issues/3"));
-					} catch (IOException | URISyntaxException e) {
-						e.printStackTrace();
-					}
+					Thread thread = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								Desktop.getDesktop().browse(new URI("https://github.com/Seil0/cemu_UI/issues/3"));
+							} catch (IOException | URISyntaxException e) {
+								e.printStackTrace();
+							}
+						}
+					});
+					thread.start();
 				}
 			}
 		});
@@ -650,6 +712,7 @@ public class MainWindowController {
 		    @Override
 		    public void handle(MouseEvent mouseEvent) {
 		        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
+		        	
 		        	String headingText = "cemu_UI";
 		        	String bodyText = "cemu_UI is licensed under the terms of GNU GPL 3.\n\n"
 		        					+ "JFoenix, Apache License 2.0\n"
@@ -659,8 +722,44 @@ public class MainWindowController {
 		        					+ "Apache Commons Logging, Apache License 2.0\n"
 		        					+ "Apache Commons Codec, Apache License 2.0\n"
 		        					+ "Apache Log4j 2, Apache License 2.0\n";
-		        	JFXInfoDialog licenseDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 275, main.pane);
-		        	licenseDialog.show(); 	
+		        	
+		        	EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent event) {
+							// do nothing
+						}
+					};
+					EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent event) {
+							String headingText = "cemu_UI";
+							String bodyText = "";
+
+							try {
+								BufferedReader licenseBR = new BufferedReader(
+										new InputStreamReader(getClass().getResourceAsStream("/licenses/licenses_show.txt")));
+								String currentLine;
+
+								while ((currentLine = licenseBR.readLine()) != null) {
+									bodyText = bodyText + currentLine + "\n";	
+								}
+								
+								licenseBR.close();
+							} catch (IOException e) {
+								LOGGER.error("Cloud not read the license file!", e);
+							}
+							
+							JFXTextAreaInfoDialog licenseDialog = new JFXTextAreaInfoDialog(headingText, bodyText,
+									dialogBtnStyle, 510, 450, main.pane);
+							licenseDialog.show();
+							licenseDialog.getTextArea().setEditable(false);
+						}
+					};
+		        	
+					JFXOkayCancelDialog licenseOverviewDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle,
+							350, 275, okayAction, cancelAction, main.pane);
+					licenseOverviewDialog.setCancelText("show licenses");
+					licenseOverviewDialog.show(); 	
 		        }
 		    }
 		});
@@ -702,10 +801,26 @@ public class MainWindowController {
     
 	@FXML
 	void reloadRomsBtnAction() throws IOException {
-		reloadRomsBtn.setText("reloading...");
-		dbController.loadRomDirectory(getRomPath()); // TODO own thread
-		Runtime.getRuntime().exec("java -jar cemu_UI.jar"); // start again (preventing Bugs)
-		System.exit(0); // finishes itself
+		
+		JFXSpinner spinner = new JFXSpinner();
+		spinner.setPrefSize(30, 30);
+		spinner.setStyle(" -fx-background-color: #f4f4f4;");
+		main.pane.getChildren().add(spinner);
+		AnchorPane.setTopAnchor(spinner, (main.pane.getHeight()-spinner.getPrefHeight())/2);
+    	AnchorPane.setLeftAnchor(spinner, (main.pane.getWidth()-spinner.getPrefWidth())/2);
+    	
+    	Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				dbController.loadRomDirectory(getRomPath()); // reload the rom directory
+				
+				Platform.runLater(() -> {
+					refreshUIData(); // refresh the list of games displayed on screen
+					main.pane.getChildren().remove(spinner);
+                });
+			}
+		});
+		thread.start();
 	}
     
 	@FXML
@@ -718,17 +833,32 @@ public class MainWindowController {
 			smmdbAnchorPane.setVisible(true);
 			smmdbTrue = true;
 
-			// start query
-			courses.removeAll(courses);
-			courses.addAll(smmdbAPIController.startQuery());
+			// start query in new thread		
+			Thread thread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					Platform.runLater(() -> {
+						smmdbDownloadBtn.setText("loading ...");
+						smmdbDownloadBtn.setDisable(true);
+						root.getChildren().remove(0,root.getChildren().size());
+	                });
+					courses.removeAll(courses); // remove existing courses
+					courses.addAll(smmdbAPIController.startQuery()); // start query
 
-			// add query response to courseTreeTable
-			for (int i = 0; i < courses.size(); i++) {
-				CourseTableDataType helpCourse = new CourseTableDataType(courses.get(i).getTitle(),
-						courses.get(i).getId(), courses.get(i).getTime(), courses.get(i).getStars());
+					// add query response to courseTreeTable
+					for (int i = 0; i < courses.size(); i++) {
+						CourseTableDataType helpCourse = new CourseTableDataType(courses.get(i).getTitle(),
+								courses.get(i).getId(), courses.get(i).getTime(), courses.get(i).getStars());
 
-				root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse)); // add data to root-node
-			}
+						Platform.runLater(() -> {
+							root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse)); // add data to root-node
+							smmdbDownloadBtn.setText("Download");
+							smmdbDownloadBtn.setDisable(false);
+		                });
+					}
+				}
+			});
+			thread.start();
 		}
 	}
     	
@@ -803,6 +933,11 @@ public class MainWindowController {
 		}
 		saveSettings();
 	}
+	
+	@FXML
+	void courseSearchTextFiledAction(ActionEvent event) {
+		// not in use
+	}
     
     @FXML
     void smmdbDownloadBtnAction(ActionEvent event) {
@@ -811,6 +946,7 @@ public class MainWindowController {
     	String outputFile = getCemuPath() + "/";
     	
     	try {
+    		LOGGER.info("beginning download ...");
 			HttpURLConnection conn = (HttpURLConnection) new URL(downloadUrl).openConnection();
 			ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(null, "Downloading...", conn.getInputStream());
 			ProgressMonitor pm = pmis.getProgressMonitor();
@@ -833,6 +969,7 @@ public class MainWindowController {
 				File smmDirectory = new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(i));
 
 				if (smmDirectory.exists()) {
+					LOGGER.info("found smm directory: " + smmDirectory.getAbsolutePath());
 					File[] courses = smmDirectory.listFiles(File::isDirectory);
 
 					// get all existing courses in smm directory, new name is highest number +1
@@ -845,22 +982,23 @@ public class MainWindowController {
 					
 					String number = "000" + (highestCourseNumber +1);
 					courseName = "course" + number.substring(number.length() -3, number.length());
-					File courseDirectory = new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(i) + "/");
-					
+					File courseDirectory = new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(i) + "/");		
 					destination = courseDirectory.getPath();
-				}	
+				}
 			}
 
-			try {			
-				ZipFile zipFile = new ZipFile(source);
-			    zipFile.extractAll(destination);
-			    
-			    // rename zip-file
-			    File course = new File(destination + "/course000");
-			    course.renameTo( new File(destination + "/" + courseName));
-			    LOGGER.info("Added new course: " + courseName + ", full path is: " + destination + "/" + courseName);
-			} catch (ZipException e) {
-			    LOGGER.error("an error occurred during unziping the file!", e);
+			if (destination != null) {
+				try {			
+					ZipFile zipFile = new ZipFile(source);
+				    zipFile.extractAll(destination);
+				    
+				    // rename zip-file
+				    File course = new File(destination + "/course000");
+				    course.renameTo( new File(destination + "/" + courseName));
+				    LOGGER.info("Added new course: " + courseName + ", full path is: " + destination + "/" + courseName);
+				} catch (ZipException e) {
+				    LOGGER.error("an error occurred during unziping the file!", e);
+				}
 			}
 			
 			downloadFile.delete();		
@@ -906,21 +1044,30 @@ public class MainWindowController {
 	    			cloudSync = true;
 	    			//TODO rework for other cloud services
 	    			cloudService = "GoogleDrive";
+	    			
+	    			// start cloud sync in new thread			
+	    			Thread thread = new Thread(new Runnable() {
+		    			@Override
+						public void run() {
+		    				
+		    				if (main.cloudController.initializeConnection(getCloudService(), getCemuPath())) {
+			        	    	main.cloudController.sync(getCloudService(), getCemuPath());
+			        	        saveSettings();
+			    	    	} else {
+			    	    		cloudSyncToggleBtn.setSelected(false);
 
-	    	    	if (main.cloudController.initializeConnection(getCloudService(), getCemuPath())) {
-	        	    	main.cloudController.sync(getCloudService(), getCemuPath());
-	        	        saveSettings();
-	    	    	} else {
-	    	    		cloudSyncToggleBtn.setSelected(false);
-
-	    	    	   	//cloud sync init error dialog
-	    	    		String headingText = "Error while initializing cloud sync!";
-	    		    	String bodyText = "There was some truble adding your game."
-	    		    					+ "\nPlease upload the app.log (which can be found in the cemu_UI directory)"
-	    		    					+ "\nto \"https://github.com/Seil0/cemu_UI/issues\" so we can fix this.";
-	    	    	   	JFXInfoDialog cloudSyncErrorDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 450, 170, main.pane);
-	    	    	   	cloudSyncErrorDialog.show();		
-	    	    	}
+			    	    	   	//cloud sync init error dialog
+			    	    		String headingText = "Error while initializing cloud sync!";
+			    		    	String bodyText = "There was some truble adding your game."
+			    		    					+ "\nPlease upload the app.log (which can be found in the cemu_UI directory)"
+			    		    					+ "\nto \"https://github.com/Seil0/cemu_UI/issues\" so we can fix this.";
+			    	    	   	JFXInfoDialog cloudSyncErrorDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 450, 170, main.pane);
+			    	    	   	cloudSyncErrorDialog.show();		
+			    	    	}
+		    				
+		    			}
+		    		});
+		    		thread.start();	
 	    		 }
 	    	};
 	    	
@@ -994,8 +1141,8 @@ public class MainWindowController {
 			}
 			
 			try {
-				dbController.addRom(title, coverPath, romPath, titleID, "", "", "", "0");
-				dbController.loadSingleRom(titleID);
+				dbController.addGame(title, coverPath, romPath, titleID, "", "", "", "0");
+				dbController.loadSingleGame(titleID);
 				if (menuTrue) {
 					sideMenuSlideOut();
 					burgerTask.setRate(-1.0);
@@ -1012,7 +1159,7 @@ public class MainWindowController {
 	public void editBtnReturn(String title, String coverPath, String romPath, String titleID) {
 		dbController.setGameInfo(title, coverPath, romPath, titleID);
 		games.remove(selectedUIDataIndex);
-		dbController.loadSingleRom(titleID);
+		dbController.loadSingleGame(titleID);
 		refreshUIData();
 
 		LOGGER.info("successfully edited " + titleID + ", new name is \"" + title + "\"");
@@ -1023,7 +1170,7 @@ public class MainWindowController {
      * @param title : game title
      * @param coverPath : path to cover (cache)
      * @param romPath : path to ROM file (.rpx)
-     * @param titleID : ROM ID
+     * @param titleID : game ID
      */
     public void addGame(String title, String coverPath, String romPath, String titleID){
     	VBox VBox = new VBox();
@@ -1161,7 +1308,7 @@ public class MainWindowController {
 		lastTimePlayedBtn.setLayoutX((width / 2) + 50 + 20.5);
 	}
 
-	void checkAutoUpdate() {
+	private void checkAutoUpdate() {
 
 		if (isAutoUpdate()) {
 			try {
@@ -1429,7 +1576,7 @@ public class MainWindowController {
      * loading saved settings from the config.xml file
      * if a value is not present, default is used instead
      */
-    void loadSettings(){
+    private void loadSettings(){
     	LOGGER.info("loading settings ...");
 		InputStream inputStream;
 		try {
@@ -1526,34 +1673,19 @@ public class MainWindowController {
     
     private void sideMenuSlideIn(){
 		sideMenuVBox.setVisible(true);
-		//fade in from 40% to 100% opacity in 400ms
-		FadeTransition fadeTransition = new FadeTransition(Duration.millis(400), sideMenuVBox);
-		fadeTransition.setFromValue(0.4);
-		fadeTransition.setToValue(1.0);
 		//slide in in 400ms
 		TranslateTransition translateTransition = new TranslateTransition(Duration.millis(400), sideMenuVBox);
 		translateTransition.setFromX(-175);
 		translateTransition.setToX(0);
-		//in case both animations are used (add (fadeTransition, translateTransition) in the second line under this command)    
-		ParallelTransition parallelTransition = new ParallelTransition();
-		parallelTransition.getChildren().addAll(translateTransition);//(fadeTransition, translateTransition);
-		parallelTransition.play();
+		translateTransition.play();
 	}
 	
 	private void sideMenuSlideOut(){
-//		sideMenuVBox.setVisible(false);
-		//fade out from 100% to 40% opacity in 400ms
-		FadeTransition fadeTransition = new FadeTransition(Duration.millis(400), sideMenuVBox);
-		fadeTransition.setFromValue(1.0);
-		fadeTransition.setToValue(0.4);
 		//slide out in 400ms
 		TranslateTransition translateTransition = new TranslateTransition(Duration.millis(400), sideMenuVBox);
 		translateTransition.setFromX(0);
 		translateTransition.setToX(-175);
-		//in case both animations are used (add (fadeTransition, translateTransition) in the second line under this command)	    
-		ParallelTransition parallelTransition = new ParallelTransition();
-		parallelTransition.getChildren().addAll(translateTransition);//(fadeTransition, translateTransition);
-		parallelTransition.play();
+		translateTransition.play();
 	}
 	
 	private void playBtnSlideIn(){
@@ -1563,17 +1695,17 @@ public class MainWindowController {
 		playTrue = true;
 		
 		TranslateTransition playBtnTransition = new TranslateTransition(Duration.millis(300), playBtn);
-		playBtnTransition.setFromY(55);
+		playBtnTransition.setFromY(56);
 		playBtnTransition.setToY(0);
 		playBtnTransition.play();
 		
 		TranslateTransition lastTimePlayedBtnTransition = new TranslateTransition(Duration.millis(300), lastTimePlayedBtn);
-		lastTimePlayedBtnTransition.setFromY(55);
+		lastTimePlayedBtnTransition.setFromY(56);
 		lastTimePlayedBtnTransition.setToY(0);
 		lastTimePlayedBtnTransition.play();
 		
 		TranslateTransition timePlayedBtnTransition = new TranslateTransition(Duration.millis(300), totalPlaytimeBtn);
-		timePlayedBtnTransition.setFromY(55);
+		timePlayedBtnTransition.setFromY(56);
 		timePlayedBtnTransition.setToY(0);
 		timePlayedBtnTransition.play();
 	}

@@ -68,7 +68,7 @@ public class UpdateController implements Runnable {
 
 	@Override
 	public void run() {
-		System.out.println("checking for updates ...");
+		LOGGER.info("beta:" + useBeta + "; checking for updates ...");
 		Platform.runLater(() -> {
 			mainWindowController.getUpdateBtn().setText("checking for updates ...");
 		});
