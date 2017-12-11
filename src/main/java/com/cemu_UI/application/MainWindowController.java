@@ -152,6 +152,9 @@ public class MainWindowController {
 
 	@FXML
 	private JFXTextField romTextField;
+	
+	@FXML
+	private JFXTextField courseSearchTextFiled;
 
 	@FXML
 	private TextFlow smmdbTextFlow;
@@ -291,6 +294,7 @@ public class MainWindowController {
 	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2", "44fc5929"); // TODO add more IDs
 	private ObservableList<UIROMDataType> games = FXCollections.observableArrayList();
 	ObservableList<SmmdbApiDataType> courses = FXCollections.observableArrayList();
+	ObservableList<SmmdbApiDataType> filteredCourses = FXCollections.observableArrayList();
 	ArrayList<Text> courseText = new ArrayList<Text>();
 	ArrayList<Text> nameText = new ArrayList<Text>();
 	Properties props = new Properties();
@@ -361,9 +365,9 @@ public class MainWindowController {
 		applyColor();
 		
 		// initialize courseTable
-		titleColumn.setPrefWidth(160);
-		timeColumn.setPrefWidth(127);
-		starsColumn.setPrefWidth(100);
+		titleColumn.setPrefWidth(185);
+		timeColumn.setPrefWidth(112);
+		starsColumn.setPrefWidth(90);
 		
 		courseTreeTable.setRoot(root);
 		courseTreeTable.setShowRoot(false);
@@ -607,6 +611,32 @@ public class MainWindowController {
 			public void handle(MouseEvent event) {
 				if (playTrue) {
 					playBtnSlideOut();
+				}
+			}
+		});
+		
+		courseSearchTextFiled.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+
+				filteredCourses.removeAll(filteredCourses);
+				root.getChildren().remove(0, root.getChildren().size());
+
+				for (int i = 0; i < courses.size(); i++) {
+					if (courses.get(i).getTitle().toLowerCase()
+							.contains(courseSearchTextFiled.getText().toLowerCase())) {
+
+						// add data from courses to filteredCourses where title contains search input
+						filteredCourses.add(courses.get(i));
+					}
+				}
+
+				for (int i = 0; i < filteredCourses.size(); i++) {
+					CourseTableDataType helpCourse = new CourseTableDataType(filteredCourses.get(i).getTitle(),
+							filteredCourses.get(i).getId(), filteredCourses.get(i).getTime(),
+							filteredCourses.get(i).getStars());
+
+					root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse)); // add data to root-node
 				}
 			}
 		});
@@ -886,6 +916,11 @@ public class MainWindowController {
 			setAutoUpdate(true);
 		}
 		saveSettings();
+	}
+	
+	@FXML
+	void courseSearchTextFiledAction(ActionEvent event) {
+		// not in use
 	}
     
     @FXML
