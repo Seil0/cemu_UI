@@ -194,6 +194,9 @@ public class MainWindowController {
 
 	@FXML
 	private ScrollPane smmdbScrollPane;
+	
+	@FXML
+	private ScrollPane smmdbImageViewScrollPane;
 
 	@FXML
 	private VBox sideMenuVBox;
@@ -654,8 +657,23 @@ public class MainWindowController {
 				for (int i = 0; i < courses.size(); i++) {
 					if (courses.get(i).getId() == id) {
 						try {
+							
 							URL url = new URL("https://smmdb.ddns.net/courseimg/" + id + "_full?v=1");
 							Image image = new Image(url.toURI().toString());
+							
+							System.out.println("Bild Höhe: " + image.getHeight() + ",Breite: " + image.getWidth());
+							System.out.println("Imageview Höhe: " + smmdbImageView.getFitHeight() + ",Breite: " + smmdbImageView.getFitWidth());
+							
+							// scale image to 148px Height
+							double scalefactor = 148 / image.getHeight();					
+							System.out.println("Skalierung: " + scalefactor);
+							
+							int nWidth = (int) Math.rint(scalefactor * image.getWidth());
+							int nHeight = (int) Math.rint(scalefactor * image.getHeight());
+							
+							System.out.println("Bild NEU Höhe: " + nHeight + ",Breite: " + nWidth);
+							
+							smmdbImageView.setFitWidth(image.getWidth()); // set ImageView width to the image width 
 							smmdbImageView.setImage(image);
 						} catch (MalformedURLException | URISyntaxException e) {
 							e.printStackTrace();

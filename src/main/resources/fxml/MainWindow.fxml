@@ -149,8 +149,7 @@
          <children>
             <JFXTextField fx:id="courseSearchTextFiled" layoutX="14.0" layoutY="14.0" onAction="#courseSearchTextFiledAction" prefHeight="25.0" prefWidth="405.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="14.0" />
             <JFXTreeTableView fx:id="courseTreeTable" layoutX="14.0" layoutY="53.0" prefHeight="494.0" prefWidth="405.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="53.0" />
-            <ImageView fx:id="smmdbImageView" fitHeight="150.0" fitWidth="267.0" layoutX="436.0" layoutY="14.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="436.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
-            <ScrollPane fx:id="smmdbScrollPane" layoutX="436.0" layoutY="181.0" prefHeight="290.0" prefWidth="267.0" AnchorPane.bottomAnchor="91.0" AnchorPane.leftAnchor="436.0" AnchorPane.rightAnchor="14.0">
+            <ScrollPane fx:id="smmdbScrollPane" layoutX="436.0" layoutY="181.0" prefHeight="290.0" prefWidth="279.0" AnchorPane.bottomAnchor="91.0" AnchorPane.leftAnchor="436.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="181.0">
                <content>
                   <TextFlow fx:id="smmdbTextFlow" maxWidth="265.0" prefWidth="265.0" />
                </content>
@@ -165,6 +164,11 @@
                   <Font size="14.0" />
                </font>
             </Label>
+            <ScrollPane fx:id="smmdbImageViewScrollPane" layoutX="436.0" layoutY="14.0" prefHeight="150.0" prefWidth="279.0" AnchorPane.leftAnchor="436.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+               <content>
+                  <ImageView fx:id="smmdbImageView" fitHeight="148.0" fitWidth="277.0" pickOnBounds="true" preserveRatio="true" />
+               </content>
+            </ScrollPane>
          </children>
       </AnchorPane>
       <JFXButton fx:id="playBtn" buttonType="RAISED" layoutX="396.0" maxHeight="28.0" minWidth="100.0" onAction="#playBtnAction" ripplerFill="#00aacc" text="play" textAlignment="CENTER" visible="false" AnchorPane.bottomAnchor="12.0">
