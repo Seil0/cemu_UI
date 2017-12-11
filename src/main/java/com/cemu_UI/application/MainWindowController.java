@@ -275,8 +275,8 @@ public class MainWindowController {
 	private String selectedGameTitleID;
 	private String selectedGameTitle;
 	private String id;
-	private String version = "0.2.1";
-	private String buildNumber = "059";
+	private String version = "0.2.2";
+	private String buildNumber = "061";
 	private String versionName = "Puzzle Plank Galaxy";
 	private int xPos = -200;
 	private int yPos = 17;
@@ -739,8 +739,7 @@ public class MainWindowController {
 								BufferedReader licenseBR = new BufferedReader(
 										new InputStreamReader(getClass().getResourceAsStream("/licenses/licenses_show.txt")));
 								String currentLine;
-								
-								
+
 								while ((currentLine = licenseBR.readLine()) != null) {
 									bodyText = bodyText + currentLine + "\n";	
 								}
@@ -753,6 +752,7 @@ public class MainWindowController {
 							JFXTextAreaInfoDialog licenseDialog = new JFXTextAreaInfoDialog(headingText, bodyText,
 									dialogBtnStyle, 510, 450, main.pane);
 							licenseDialog.show();
+							licenseDialog.getTextArea().setEditable(false);
 						}
 					};
 		        	

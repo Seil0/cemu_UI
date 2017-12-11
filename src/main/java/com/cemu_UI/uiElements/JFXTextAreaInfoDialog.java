@@ -40,6 +40,7 @@ public class JFXTextAreaInfoDialog {
 	private String dialogBtnStyle;
 	private int dialogWidth;
 	private int dialogHeight;
+	private JFXTextArea textArea;
 	private Pane pane;
 
 	/**
@@ -61,9 +62,11 @@ public class JFXTextAreaInfoDialog {
 	}
 
 	public void show() {
+		textArea = new JFXTextArea(bodyText);
+		
 		JFXDialogLayout content = new JFXDialogLayout();
 		content.setHeading(new Text(headingText));
-		content.setBody(new JFXTextArea(bodyText));
+		content.setBody(textArea);
 		content.setPrefSize(dialogWidth, dialogHeight);
 		StackPane stackPane = new StackPane();
 		stackPane.autosize();
@@ -83,5 +86,13 @@ public class JFXTextAreaInfoDialog {
 		AnchorPane.setTopAnchor(stackPane, (pane.getHeight() - content.getPrefHeight()) / 2);
 		AnchorPane.setLeftAnchor(stackPane, (pane.getWidth() - content.getPrefWidth()) / 2);
 		dialog.show();
+	}
+
+	public JFXTextArea getTextArea() {
+		return textArea;
+	}
+
+	public void setTextArea(JFXTextArea textArea) {
+		this.textArea = textArea;
 	}
 }
