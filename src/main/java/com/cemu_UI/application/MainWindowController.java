@@ -971,6 +971,7 @@ public class MainWindowController {
 				File smmDirectory = new File(outputFile + "mlc01/emulatorSave/" + smmIDs.get(i));
 
 				if (smmDirectory.exists()) {
+					LOGGER.info("found smm directory: " + smmDirectory.getAbsolutePath());
 					File[] courses = smmDirectory.listFiles(File::isDirectory);
 
 					// get all existing courses in smm directory, new name is highest number +1

@@ -56,9 +56,16 @@ public class Main extends Application {
 	CloudController cloudController;
 	AnchorPane pane;
 	Scene scene;	// TODO make private
-	private String dirWin = System.getProperty("user.home") + "/Documents/cemu_UI";	// Windows: C:/Users/"User"/Documents/cemu_UI
-	private String dirLinux = System.getProperty("user.home") + "/cemu_UI";	// Linux: /home/"User"/cemu_UI
+	private static String userHome = System.getProperty("user.home");
+	private static String userName = System.getProperty("user.name");
+	private static String osName = System.getProperty("os.name");
+	private static String osArch = System.getProperty("os.arch");
+	private static String osVers = System.getProperty("os.version");
+	private static String javaVers = System.getProperty("java.version");
+	private static String javaVend= System.getProperty("java.vendor");
 	private String gamesDBdownloadURL = "https://github.com/Seil0/cemu_UI/raw/master/downloadContent/games.db";
+	public String dirWin = userHome + "/Documents/cemu_UI";	// Windows: C:/Users/"User"/Documents/cemu_UI
+	public String dirLinux = userHome + "/cemu_UI";	// Linux: /home/"User"/cemu_UI
 	private File directory;
 	private File configFile;
 	private File gamesDBFile;
@@ -70,6 +77,9 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
+			LOGGER.info("OS: " + osName + " " + osVers + " " + osArch);
+			LOGGER.info("Java: " + javaVend + " " + javaVers);
+			LOGGER.info("User: " + userName + " " + userHome);
 			this.primaryStage = primaryStage;
 			mainWindow();
 			initActions();
@@ -92,7 +102,7 @@ public class Main extends Application {
 			cloudController = new CloudController(mainWindowController); // call cloudController constructor
 			
 			// get OS and the specific paths
-			if (System.getProperty("os.name").equals("Linux")) {
+			if (osName.equals("Linux")) {
 				directory = new File(dirLinux);
 				configFile = new File(dirLinux + "/config.xml");
 				gamesDBFile = new File(dirLinux + "/games.db");
@@ -118,8 +128,6 @@ public class Main extends Application {
 		    	alert.showAndWait();
 			}
 
-			LOGGER.info("Directory: " + directory.exists());
-			LOGGER.info("Configfile: " + configFile.exists());
 			if (!directory.exists()) {
 				LOGGER.info("creating cemu_UI directory");
 				directory.mkdir();
@@ -283,13 +291,13 @@ public class Main extends Application {
 	
 	public static void main(String[] args) {
 		// delete old log file and create new
-		if(System.getProperty("os.name").equals("Linux")){
-			System.setProperty("logFilename", System.getProperty("user.home") + "/cemu_UI/app.log");
-			File logFile = new File(System.getProperty("user.home") + "/cemu_UI/app.log");
+		if(osName.equals("Linux")){
+			System.setProperty("logFilename", userHome + "/cemu_UI/app.log");
+			File logFile = new File(userHome + "/cemu_UI/app.log");
 			logFile.delete();
 		}else{
-			System.setProperty("logFilename", System.getProperty("user.home") + "/Documents/cemu_UI/app.log");
-			File logFile = new File(System.getProperty("user.home") + "/Documents/cemu_UI/app.log");
+			System.setProperty("logFilename", userHome + "/Documents/cemu_UI/app.log");
+			File logFile = new File(userHome + "/Documents/cemu_UI/app.log");
 			logFile.delete();
 		}
 		LOGGER = LogManager.getLogger(Main.class.getName());

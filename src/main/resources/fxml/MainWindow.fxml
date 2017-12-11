@@ -10,6 +10,7 @@
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -64,17 +65,32 @@
       <ScrollPane fx:id="settingsScrollPane" prefHeight="562.0" prefWidth="729.0" style="-fx-background: white;" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="175.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0">
          <content>
            		<!-- space between settings sections  35px, between sections elements (label + element) 20px, between label and element 3px(or more) -->
-            <AnchorPane fx:id="settingsAnchorPane" prefHeight="607.0" prefWidth="511.0" style="-fx-background-color: white;">
+            <AnchorPane fx:id="settingsAnchorPane" prefHeight="686.0" prefWidth="711.0" style="-fx-background-color: white;">
                <children>
-                  <VBox spacing="30.0">
+                  <VBox spacing="30.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <VBox prefHeight="485.0" prefWidth="563.0" spacing="25.0">
+                        <VBox prefHeight="485.0" prefWidth="710.0" spacing="25.0">
                            <children>
-                              <Label fx:id="cemu_UISettingsLbl" text="cemu_UI Settings">
-                                 <font>
-                                    <Font name="System Bold" size="14.0" />
-                                 </font>
-                              </Label>
+                              <VBox prefHeight="21.0" prefWidth="676.0">
+                                 <children>
+                                    <Label fx:id="cemu_UISettingsLbl" text="cemu_UI Settings">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                       <VBox.margin>
+                                          <Insets />
+                                       </VBox.margin>
+                                    </Label>
+                                    <Separator prefWidth="200.0">
+                                       <padding>
+                                          <Insets right="5.0" />
+                                       </padding>
+                                    </Separator>
+                                 </children>
+                                 <padding>
+                                    <Insets left="-14.0" />
+                                 </padding>
+                              </VBox>
                               <VBox spacing="10.0">
                                  <children>
                                     <Label fx:id="cemuDirectoryLbl" text="Cemu Directory" />
@@ -85,6 +101,9 @@
                                        </children>
                                     </HBox>
                                  </children>
+                                 <padding>
+                                    <Insets right="5.0" />
+                                 </padding>
                               </VBox>
                               <VBox spacing="10.0">
                                  <children>
@@ -119,21 +138,36 @@
                               </VBox>
                            </children>
                            <padding>
-                              <Insets left="14.0" />
+                              <Insets left="24.0" />
                            </padding>
                         </VBox>
                         <VBox spacing="25.0">
                            <children>
-                              <Label fx:id="cemuSettingsLbl" text="Cemu Settings">
-                                 <font>
-                                    <Font name="System Bold" size="14.0" />
-                                 </font>
-                              </Label>
-                              <JFXToggleButton fx:id="fullscreenToggleBtn" onAction="#fullscreenToggleBtnAction" text="start game in fullscreen" />
+                              <VBox>
+                                 <children>
+                                    <Label fx:id="cemuSettingsLbl" text="Cemu Settings">
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                    </Label>
+                                    <Separator prefWidth="200.0">
+                                       <padding>
+                                          <Insets right="5.0" />
+                                       </padding>
+                                    </Separator>
+                                 </children>
+                                 <padding>
+                                    <Insets left="-14.0" />
+                                 </padding>
+                              </VBox>
+                              <JFXToggleButton fx:id="fullscreenToggleBtn" onAction="#fullscreenToggleBtnAction" text="start game in fullscreen">
+                                 <VBox.margin>
+                                    <Insets top="-10.0" />
+                                 </VBox.margin></JFXToggleButton>
                               <Label fx:id="licensesLbl" text="Licenses" />
                            </children>
                            <padding>
-                              <Insets left="14.0" />
+                              <Insets left="24.0" />
                            </padding>
                         </VBox>
                      </children>
