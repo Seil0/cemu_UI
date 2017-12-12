@@ -26,17 +26,17 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.cemu_UI.controller.dbController;
+import com.cemu_UI.controller.DBController;
 
 import javafx.application.Platform;
 
 public class playGame extends Thread{
 
 	MainWindowController mainWindowController;
-	dbController dbController;
+	DBController dbController;
 	private static final Logger LOGGER = LogManager.getLogger(playGame.class.getName());
 	
-	public playGame(MainWindowController m, com.cemu_UI.controller.dbController db){
+	public playGame(MainWindowController m, com.cemu_UI.controller.DBController db){
 		mainWindowController = m;
 		dbController = db;
 	}
@@ -52,7 +52,7 @@ public class playGame extends Thread{
 		Process p;
 		
 		Platform.runLater(() -> {
-			mainWindowController.main.primaryStage.setIconified(true);
+			mainWindowController.main.getPrimaryStage().setIconified(true); // minimize cemu_UI
 		});
     	startTime = System.currentTimeMillis();
 		try{
@@ -86,13 +86,13 @@ public class playGame extends Thread{
             	}else{
             		mainWindowController.totalPlaytimeBtn.setText(dbController.getTotalPlaytime(selectedGameTitleID)+ " min");
             	}
-        		mainWindowController.main.primaryStage.setIconified(false);
+        		mainWindowController.main.getPrimaryStage().setIconified(false); // maximize cemu_UI
              });
     		
 //    		System.out.println(mainWindowController.getCemuPath()+"/mlc01/emulatorSave/"+);
     		//sync savegame with cloud service
     		if(mainWindowController.isCloudSync()) {
-    			mainWindowController.main.cloudController.sync(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
+    			mainWindowController.main.getCloudController().sync(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
     		}
     		
 		}catch (IOException | InterruptedException e){

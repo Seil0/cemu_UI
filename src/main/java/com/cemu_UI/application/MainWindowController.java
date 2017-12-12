@@ -54,7 +54,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cemu_UI.controller.SmmdbAPIController;
 import com.cemu_UI.controller.UpdateController;
-import com.cemu_UI.controller.dbController;
+import com.cemu_UI.controller.DBController;
 import com.cemu_UI.datatypes.CourseTableDataType;
 import com.cemu_UI.datatypes.SmmdbApiDataType;
 import com.cemu_UI.datatypes.UIROMDataType;
@@ -253,7 +253,7 @@ public class MainWindowController {
 	private JFXTreeTableColumn<CourseTableDataType, Integer> timeColumn = new JFXTreeTableColumn<>("time");
 
 	Main main;
-	dbController dbController;
+	DBController dbController;
 	SmmdbAPIController smmdbAPIController;
 	playGame playGame;
 	private static MainWindowController MWC;
@@ -322,10 +322,10 @@ public class MainWindowController {
 	private ImageView cached_white = new ImageView(new Image("icons/ic_cached_white_24dp_1x.png"));
 	private ImageView smmdb_white = new ImageView(new Image("icons/ic_get_app_white_24dp_1x.png"));
 	private Image close_black = new Image("icons/close_black_2048x2048.png");
-
-	public void setMain(Main main) {
-		this.main = main;
-		dbController = new dbController(this);
+	
+	public void setMain(Main m) {
+		this.main = m;
+		dbController = new DBController(this);
 		smmdbAPIController = new SmmdbAPIController();
 	}
 	
@@ -436,7 +436,7 @@ public class MainWindowController {
 					String headingText = "edit a game";
 					String bodyText = "You can edit the tile and rom/cover path.";
 					JFXEditGameDialog editGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 450,
-							300, 1, MWC, main.primaryStage, main.pane);
+							300, 1, MWC, main.getPrimaryStage(), main.getPane());
 					editGameDialog.setTitle(gameInfo[0]);
 					editGameDialog.setCoverPath(gameInfo[1]);
 					editGameDialog.setRomPath(gameInfo[2]);
@@ -471,12 +471,12 @@ public class MainWindowController {
 					EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
-							// do nothing
+							LOGGER.info("Action canceld by user!");
 						}
 					};
 
 					JFXOkayCancelDialog removeGameDialog = new JFXOkayCancelDialog(headingText, bodyText,
-							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.pane);
+							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.getPane());
 					removeGameDialog.show();
 				} catch (Exception e) {
 					LOGGER.error("error while removing " + selectedGameTitle + "(" + selectedGameTitleID + ")", e);
@@ -495,7 +495,7 @@ public class MainWindowController {
 						@Override
 						public void handle(ActionEvent event) {
 							DirectoryChooser directoryChooser = new DirectoryChooser();
-							File selectedDirecroty = directoryChooser.showDialog(main.primaryStage);
+							File selectedDirecroty = directoryChooser.showDialog(main.getPrimaryStage());
 							String updatePath = selectedDirecroty.getAbsolutePath();
 							String[] parts = selectedGameTitleID.split("-"); // split string into 2 parts at "-"
 							File srcDir = new File(updatePath);
@@ -529,12 +529,12 @@ public class MainWindowController {
 					EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
-							// do nothing
+							LOGGER.info("Action canceld by user!");
 						}
 					};
 
 					JFXOkayCancelDialog updateGameDialog = new JFXOkayCancelDialog(headingText, bodyText,
-							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.pane);
+							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.getPane());
 					updateGameDialog.show();
 				} catch (Exception e) {
 					LOGGER.warn("trying to update " + selectedGameTitleID + ",which is not a valid type!", e);
@@ -553,7 +553,7 @@ public class MainWindowController {
 						@Override
 						public void handle(ActionEvent event) {
 							DirectoryChooser directoryChooser = new DirectoryChooser();
-							File selectedDirecroty = directoryChooser.showDialog(main.primaryStage);
+							File selectedDirecroty = directoryChooser.showDialog(main.getPrimaryStage());
 							String dlcPath = selectedDirecroty.getAbsolutePath();
 							String[] parts = selectedGameTitleID.split("-"); // split string into 2 parts at "-"
 							File srcDir = new File(dlcPath);
@@ -587,12 +587,12 @@ public class MainWindowController {
 					EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
-							// do nothing
+							LOGGER.info("Action canceld by user!");
 						}
 					};
 
 					JFXOkayCancelDialog addDLCDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle,
-							350, 170, okayAction, cancelAction, main.pane);
+							350, 170, okayAction, cancelAction, main.getPane());
 					addDLCDialog.show();
 				} catch (Exception e) {
 					LOGGER.warn("trying to add a dlc to " + selectedGameTitleID + ",which is not a valid type!", e);
@@ -650,7 +650,6 @@ public class MainWindowController {
 			public void changed(ObservableValue<?> observable, Object oldVal, Object newVal) {
 				selected = courseTreeTable.getSelectionModel().getSelectedIndex(); // get selected item
 
-				// FIXME if a item is selected and you change the sorting,you can't select a new item
 				id = idColumn.getCellData(selected); // get name of selected item
 
 				for (int i = 0; i < courses.size(); i++) {
@@ -750,14 +749,14 @@ public class MainWindowController {
 							}
 							
 							JFXTextAreaInfoDialog licenseDialog = new JFXTextAreaInfoDialog(headingText, bodyText,
-									dialogBtnStyle, 510, 450, main.pane);
+									dialogBtnStyle, 510, 450, main.getPane());
 							licenseDialog.show();
 							licenseDialog.getTextArea().setEditable(false);
 						}
 					};
 		        	
 					JFXOkayCancelDialog licenseOverviewDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle,
-							350, 275, okayAction, cancelAction, main.pane);
+							350, 275, okayAction, cancelAction, main.getPane());
 					licenseOverviewDialog.setCancelText("show licenses");
 					licenseOverviewDialog.show(); 	
 		        }
@@ -779,7 +778,7 @@ public class MainWindowController {
     					+ "This Application is made with free Software\n"
     					+ "and licensed under the terms of GNU GPL 3.\n\n"
     					+ "www.kellerkinder.xyz";
-    	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 200, main.pane);
+    	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 200, main.getPane());
     	aboutDialog.show();
     }
 
@@ -805,9 +804,9 @@ public class MainWindowController {
 		JFXSpinner spinner = new JFXSpinner();
 		spinner.setPrefSize(30, 30);
 		spinner.setStyle(" -fx-background-color: #f4f4f4;");
-		main.pane.getChildren().add(spinner);
-		AnchorPane.setTopAnchor(spinner, (main.pane.getHeight()-spinner.getPrefHeight())/2);
-    	AnchorPane.setLeftAnchor(spinner, (main.pane.getWidth()-spinner.getPrefWidth())/2);
+		main.getPane().getChildren().add(spinner);
+		AnchorPane.setTopAnchor(spinner, (main.getPane().getHeight()-spinner.getPrefHeight())/2);
+    	AnchorPane.setLeftAnchor(spinner, (main.getPane().getWidth()-spinner.getPrefWidth())/2);
     	
     	Thread thread = new Thread(new Runnable() {
 			@Override
@@ -816,7 +815,7 @@ public class MainWindowController {
 				
 				Platform.runLater(() -> {
 					refreshUIData(); // refresh the list of games displayed on screen
-					main.pane.getChildren().remove(spinner);
+					main.getPane().getChildren().remove(spinner);
                 });
 			}
 		});
@@ -882,7 +881,7 @@ public class MainWindowController {
     
 	@FXML
 	void cemuTFBtnAction(ActionEvent event) {
-		File cemuDirectory = directoryChooser.showDialog(main.primaryStage);
+		File cemuDirectory = directoryChooser.showDialog(main.getPrimaryStage());
 		if (cemuDirectory == null) {
 			LOGGER.info("No Directory selected");
 		} else {
@@ -900,7 +899,7 @@ public class MainWindowController {
     
 	@FXML
 	void romTFBtnAction(ActionEvent event) {
-		File romDirectory = directoryChooser.showDialog(main.primaryStage);
+		File romDirectory = directoryChooser.showDialog(main.getPrimaryStage());
 		if (romDirectory == null) {
 			LOGGER.info("No Directory selected");
 		} else {
@@ -1050,8 +1049,8 @@ public class MainWindowController {
 		    			@Override
 						public void run() {
 		    				
-		    				if (main.cloudController.initializeConnection(getCloudService(), getCemuPath())) {
-			        	    	main.cloudController.sync(getCloudService(), getCemuPath());
+		    				if (main.getCloudController().initializeConnection(getCloudService(), getCemuPath())) {
+			        	    	main.getCloudController().sync(getCloudService(), getCemuPath());
 			        	        saveSettings();
 			    	    	} else {
 			    	    		cloudSyncToggleBtn.setSelected(false);
@@ -1061,7 +1060,7 @@ public class MainWindowController {
 			    		    	String bodyText = "There was some truble adding your game."
 			    		    					+ "\nPlease upload the app.log (which can be found in the cemu_UI directory)"
 			    		    					+ "\nto \"https://github.com/Seil0/cemu_UI/issues\" so we can fix this.";
-			    	    	   	JFXInfoDialog cloudSyncErrorDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 450, 170, main.pane);
+			    	    	   	JFXInfoDialog cloudSyncErrorDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 450, 170, main.getPane());
 			    	    	   	cloudSyncErrorDialog.show();		
 			    	    	}
 		    				
@@ -1079,7 +1078,7 @@ public class MainWindowController {
 	    	};
 	    	
 			JFXOkayCancelDialog cloudSyncErrorDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle,
-					419, 140, okayAction, cancelAction, main.pane);
+					419, 140, okayAction, cancelAction, main.getPane());
 	    	cloudSyncErrorDialog.show();	
     	}
     }
@@ -1095,7 +1094,7 @@ public class MainWindowController {
 		String headingText = "add a new game to cemu_UI";
 		String bodyText = "";
 		JFXEditGameDialog addGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 450, 300, 0,
-				this, main.primaryStage, main.pane);
+				this, main.getPrimaryStage(), main.getPane());
 		addGameDialog.show();
 	}
     
@@ -1119,7 +1118,7 @@ public class MainWindowController {
 			String headingTextError = "Error while adding a new Game!";
 	    	String bodyTextError = "There was some truble adding your game."
 	    						+ "\nOne of the needed values was empty, please try again to add your game."; 
-	    	JFXInfoDialog errorDialog = new JFXInfoDialog(headingTextError, bodyTextError, dialogBtnStyle, 350, 170, main.pane);	
+	    	JFXInfoDialog errorDialog = new JFXInfoDialog(headingTextError, bodyTextError, dialogBtnStyle, 350, 170, main.getPane());	
 	    	errorDialog.show();
 
 		} else {
@@ -1556,7 +1555,7 @@ public class MainWindowController {
 			} else {
 				props.setProperty("cloudService", getCloudService());
 			}
-			props.setProperty("folderID", main.cloudController.getFolderID(getCloudService()));
+			props.setProperty("folderID", main.getCloudController().getFolderID(getCloudService()));
 			props.setProperty("windowWidth", String.valueOf(mainAnchorPane.getWidth()));
 			props.setProperty("windowHeight", String.valueOf(mainAnchorPane.getHeight()));
     		if(System.getProperty("os.name").equals("Linux")){
@@ -1644,7 +1643,7 @@ public class MainWindowController {
 			}
 			
 			try {
-				main.cloudController.setFolderID(props.getProperty("folderID"), getCloudService());
+				main.getCloudController().setFolderID(props.getProperty("folderID"), getCloudService());
 			} catch (Exception e) {
 				LOGGER.error("could not load folderID, disable cloud sync. Please contact an developer", e);
 				setCloudSync(false);

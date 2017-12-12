@@ -47,10 +47,10 @@ import org.xml.sax.SAXException;
 
 import com.cemu_UI.application.MainWindowController;
 
-public class dbController {
+public class DBController {
 	
-	public dbController(MainWindowController m) {
-		mainWindowController = m;
+	public DBController(MainWindowController mwc) {
+		mainWindowController = mwc;
 	}
 	
 	private MainWindowController mainWindowController;
@@ -59,9 +59,14 @@ public class dbController {
 	private String DB_PATH_games;
 	private Connection connection = null;
 	private Connection connectionGames = null;
-	private static final Logger LOGGER = LogManager.getLogger(dbController.class.getName());
+	private static final Logger LOGGER = LogManager.getLogger(DBController.class.getName());
 	
-	public void main(){
+	/**
+	 * initialize the sqlite database controller
+	 * load ROM and games database
+	 * load all games
+	 */
+	public void init(){
 		LOGGER.info("<==========starting loading sql==========>");
 		loadRomDatabase();
 		loadGamesDatabase();

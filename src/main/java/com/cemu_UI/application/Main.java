@@ -51,11 +51,13 @@ import javafx.scene.layout.AnchorPane;
 
 public class Main extends Application {
 	
-	Stage primaryStage;
-	public MainWindowController mainWindowController; // TODO find a better way
-	CloudController cloudController;
-	AnchorPane pane;
-	Scene scene;	// TODO make private
+	private Stage primaryStage; // TODO same as #Test01
+	private MainWindowController mainWindowController; // TODO Needs more testing: if cemu_UI will work as
+													   //normally expected this waring can be removed #Test01
+													   // if not working correctly remove private!
+	private CloudController cloudController; // TODO same as #Test01
+	private AnchorPane pane; // TODO same as #Test01
+	private Scene scene;	 // TODO same as #Test01
 	private static String userHome = System.getProperty("user.home");
 	private static String userName = System.getProperty("user.name");
 	private static String osName = System.getProperty("os.name");
@@ -69,8 +71,6 @@ public class Main extends Application {
 	private File directory;
 	private File configFile;
 	private File gamesDBFile;
-	@SuppressWarnings("unused")
-	private File localDB;
 	private File pictureCache;
     private static Logger LOGGER;
 	
@@ -106,13 +106,11 @@ public class Main extends Application {
 				directory = new File(dirLinux);
 				configFile = new File(dirLinux + "/config.xml");
 				gamesDBFile = new File(dirLinux + "/games.db");
-				localDB = new File(dirLinux+"/localRoms.db");
 				pictureCache= new File(dirLinux+"/picture_cache");
 			} else {
 				directory = new File(dirWin);
 				configFile = new File(dirWin + "/config.xml");
 				gamesDBFile = new File(dirWin + "/games.db");
-				localDB = new File(dirWin+"/localRoms.db");
 				pictureCache= new File(dirWin+"/picture_cache");
 			}
 			
@@ -165,7 +163,7 @@ public class Main extends Application {
 			
 			// loading settings and initialize UI, dbController.main() loads all databases
 			mainWindowController.init();
-			mainWindowController.dbController.main();
+			mainWindowController.dbController.init();
 			// if cloud sync is activated start sync
 			if(mainWindowController.isCloudSync()) {
 				cloudController.initializeConnection(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
@@ -307,5 +305,29 @@ public class Main extends Application {
 	@Override
 	public void stop() {
 	    System.exit(0);
+	}
+
+	public Stage getPrimaryStage() {
+		return primaryStage;
+	}
+
+	public void setPrimaryStage(Stage primaryStage) {
+		this.primaryStage = primaryStage;
+	}
+
+	public CloudController getCloudController() {
+		return cloudController;
+	}
+
+	public void setCloudController(CloudController cloudController) {
+		this.cloudController = cloudController;
+	}
+
+	public AnchorPane getPane() {
+		return pane;
+	}
+
+	public void setPane(AnchorPane pane) {
+		this.pane = pane;
 	}
 }
