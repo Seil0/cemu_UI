@@ -1555,6 +1555,7 @@ public class MainWindowController {
 			} else {
 				props.setProperty("cloudService", getCloudService());
 			}
+			props.setProperty("folderID", main.getCloudController().getFolderID(getCloudService()));
 			props.setProperty("lastLocalSync", String.valueOf(getLastLocalSync()));
 			props.setProperty("windowWidth", String.valueOf(mainAnchorPane.getWidth()));
 			props.setProperty("windowHeight", String.valueOf(mainAnchorPane.getHeight()));
@@ -1642,6 +1643,13 @@ public class MainWindowController {
 				setCloudService("");
 			}
 			
+			try {
+				main.getCloudController().setFolderID(props.getProperty("folderID"), getCloudService());
+			} catch (Exception e) {
+				LOGGER.error("could not load folderID, disable cloud sync. Please contact an developer", e);
+				setCloudSync(false);
+			}
+
 			try {
 				setLastLocalSync(Long.parseLong(props.getProperty("lastLocalSync")));
 			} catch (Exception e) {

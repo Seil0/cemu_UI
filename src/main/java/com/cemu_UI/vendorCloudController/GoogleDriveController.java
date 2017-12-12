@@ -116,10 +116,13 @@ public class GoogleDriveController {
 	                .build();
 	 }
 	 
-	 
-	 public void main(String cemuDirectory) throws IOException {
-		 service = getDriveService(); 
-	 }
+	public void main(String cemuDirectory) throws IOException {
+		service = getDriveService();
+
+		if (getFolderID() == "" || getFolderID() == null) {
+			getSavegamesFolderID();
+		}
+	}
 	
 	// create a folder in google drive
 	public void creatFolder() throws IOException {
@@ -202,5 +205,25 @@ public class GoogleDriveController {
 		LOGGER.info("download successfull: " + downloadFile.getName());
 		return outputFile;
 	}
+	
+	private void getSavegamesFolderID() throws IOException {
+		Files.List request = service.files().list().setQ("mimeType = 'application/vnd.google-apps.folder' and name = 'cemu_savegames'");
+		FileList files = request.execute();
+
+		try {
+			LOGGER.info("FolderID: " + files.getFiles().get(0).getId());
+			setFolderID(files.getFiles().get(0).getId());
+		} catch (Exception e) {
+			LOGGER.error("Oops, something went wrong! It seems that you have more than one folder called 'cemu_savegames'!", e);
+		}	
+} 
+	
+	public String getFolderID() {
+		return folderID;
+	}
+
+	public void setFolderID(String folderID) {
+		this.folderID = folderID;
+}
 	
 }

@@ -202,4 +202,28 @@ public class CloudController {
 		}
 	}
 	
+	public String getFolderID(String cloudService) {
+		String folderID = "";
+		if (cloudService != null) {
+			if (cloudService.equals("GoogleDrive")) {
+				folderID = googleDriveController.getFolderID();
+			}
+			if (cloudService.equals("Dropbox")) {
+
+			}
+		}
+		return folderID;
+	}
+
+	public void setFolderID(String folderID, String cloudService) {
+		if (cloudService != null) {
+			if (cloudService.equals("GoogleDrive")) {
+				googleDriveController.setFolderID(folderID);
+			}
+			if (cloudService.equals("Dropbox")) {
+
+			}
+		}
+	}
+	
 }
