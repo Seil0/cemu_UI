@@ -102,13 +102,13 @@ public class DBController {
 	 * set the path to the localRoms.db file and initialize the connection
 	 * 
 	 * games.dbcontains a reverence list to for the automatic detection mode
-	 * TODO this should be called ReferenceGameList the games table should be called reference_games
+	 * TODO rework paths
 	 */
 	private void loadGamesDatabase() {
 		if (System.getProperty("os.name").equals("Linux")) {
-			DB_PATH_games = System.getProperty("user.home") + "/cemu_UI/games.db";
+			DB_PATH_games = System.getProperty("user.home") + "/cemu_UI/reference_games.db";
 		} else {
-			DB_PATH_games = System.getProperty("user.home") + "\\Documents\\cemu_UI" + "\\" + "games.db";
+			DB_PATH_games = System.getProperty("user.home") + "\\Documents\\cemu_UI" + "\\" + "reference_games.db";
 		}
 		try {
 			// create a database connection
@@ -247,6 +247,7 @@ public class DBController {
 						BufferedImage originalImage = ImageIO.read(new URL(rs.getString(6)));//change path to where file is located
 					    int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
 					    BufferedImage resizeImagePNG = resizeImage(originalImage, type, 400, 600);
+					    // TODO rework paths
 					    if(System.getProperty("os.name").equals("Linux")) {
 						    ImageIO.write(resizeImagePNG, "png", new File(pictureCache+"/"+rs.getString(3)+".png")); //change path where you want it saved
 						    coverPath = pictureCache+"/"+rs.getString(3)+".png";

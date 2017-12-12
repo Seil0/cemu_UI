@@ -71,6 +71,7 @@ public class Main extends Application {
 	private File directory;
 	private File configFile;
 	private File gamesDBFile;
+	private File reference_gamesFile;
 	private File pictureCache;
     private static Logger LOGGER;
 	
@@ -106,11 +107,13 @@ public class Main extends Application {
 				directory = new File(dirLinux);
 				configFile = new File(dirLinux + "/config.xml");
 				gamesDBFile = new File(dirLinux + "/games.db");
+				reference_gamesFile = new File(dirLinux + "/reference_games.db");
 				pictureCache= new File(dirLinux+"/picture_cache");
 			} else {
 				directory = new File(dirWin);
 				configFile = new File(dirWin + "/config.xml");
 				gamesDBFile = new File(dirWin + "/games.db");
+				reference_gamesFile = new File(dirWin + "/reference_games.db");
 				pictureCache= new File(dirWin+"/picture_cache");
 			}
 			
@@ -147,12 +150,16 @@ public class Main extends Application {
 				pictureCache.mkdir();
 			}
 			
-			if (gamesDBFile.exists() != true) {
+			
+			if (!reference_gamesFile.exists()) {
+				if (gamesDBFile.exists()) {
+					gamesDBFile.delete();
+				}
 				try {
-					LOGGER.info("downloading games.db... ");
+					LOGGER.info("downloading ReferenceGameList.db... ");
 					URL website = new URL(gamesDBdownloadURL);
 					ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-					FileOutputStream fos = new FileOutputStream(gamesDBFile);
+					FileOutputStream fos = new FileOutputStream(reference_gamesFile);
 					fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 					fos.close();
 					LOGGER.info("finished downloading games.db");
@@ -160,6 +167,9 @@ public class Main extends Application {
 					e.printStackTrace();
 				}
 			}
+			
+			
+			
 			
 			// loading settings and initialize UI, dbController.main() loads all databases
 			mainWindowController.init();

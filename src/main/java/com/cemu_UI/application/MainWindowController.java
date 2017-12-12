@@ -1103,14 +1103,11 @@ public class MainWindowController {
      * and add them to the database and the UI
      */
     public void addBtnReturn(String title, String coverPath, String romPath, String titleID) {
-    	File pictureCache;
-    	
     	/**
 		 * if one parameter dosen't contain any value do not add the game
 		 * else convert the cover to .png add copy it into the picture cache,
 		 * then add the rom to the local_roms database
 		 */
-    	System.out.println(romPath.length());
 		if (romPath.length() == 0 || coverPath.length() == 0 || title.length() == 0 || titleID.length() == 0) {
 			LOGGER.info("No parameter set!");
 			
@@ -1121,7 +1118,8 @@ public class MainWindowController {
 	    	JFXInfoDialog errorDialog = new JFXInfoDialog(headingTextError, bodyTextError, dialogBtnStyle, 350, 170, main.getPane());	
 	    	errorDialog.show();
 
-		} else {
+		} else {	
+	    	File pictureCache;
 			String coverName = new File(coverPath).getName();
 			try	{
 				if (System.getProperty("os.name").equals("Linux")) {
@@ -1133,8 +1131,8 @@ public class MainWindowController {
 			    BufferedImage originalImage = ImageIO.read(new File(coverPath)); //load cover
 			    int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
 			    BufferedImage resizeImagePNG = resizeImage(originalImage, type, 400, 600);
-			    ImageIO.write(resizeImagePNG, "png", new File(pictureCache+"\\"+coverName)); //save image to pictureCache
-			    coverPath = pictureCache+"\\"+coverName;
+			    coverPath = pictureCache + "/" + coverName;
+			    ImageIO.write(resizeImagePNG, "png", new File(coverPath)); //save image to pictureCache
 			} catch (IOException e) {
 				LOGGER.error("Ops something went wrong! Error while resizing cover.", e);
 			}
