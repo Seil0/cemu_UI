@@ -22,6 +22,7 @@
 package com.cemu_UI.application;
 
 import java.io.IOException;
+import java.time.Instant;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -91,9 +92,11 @@ public class playGame extends Thread{
     		
 //    		System.out.println(mainWindowController.getCemuPath()+"/mlc01/emulatorSave/"+);
     		//sync savegame with cloud service
-    		if(mainWindowController.isCloudSync()) {
-    			mainWindowController.main.getCloudController().sync(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
-    		}
+			if (mainWindowController.isCloudSync()) {
+				mainWindowController.setLastLocalSync(Instant.now().getEpochSecond());
+				mainWindowController.main.getCloudController().sync(mainWindowController.getCloudService(),
+						mainWindowController.getCemuPath(), mainWindowController.main.getDirectory().getPath());
+			}
     		
 		}catch (IOException | InterruptedException e){
 			e.printStackTrace();

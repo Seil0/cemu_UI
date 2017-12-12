@@ -141,6 +141,7 @@ public class Main extends Application {
 				mainWindowController.setColor("00a8cc");
 				mainWindowController.setAutoUpdate(false);
 				mainWindowController.setxPosHelper(0);
+				mainWindowController.setLastLocalSync(0);
 				mainWindowController.saveSettings();
 				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
 				System.exit(0);	//finishes itself
@@ -174,10 +175,11 @@ public class Main extends Application {
 			// loading settings and initialize UI, dbController.main() loads all databases
 			mainWindowController.init();
 			mainWindowController.dbController.init();
+			
 			// if cloud sync is activated start sync
 			if(mainWindowController.isCloudSync()) {
 				cloudController.initializeConnection(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
-				cloudController.stratupCheck(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
+				cloudController.sync(mainWindowController.getCloudService(), mainWindowController.getCemuPath(), directory.getPath());
 			}			
 			mainWindowController.addUIData();
 			
@@ -339,5 +341,13 @@ public class Main extends Application {
 
 	public void setPane(AnchorPane pane) {
 		this.pane = pane;
+	}
+
+	public File getDirectory() {
+		return directory;
+	}
+
+	public void setDirectory(File directory) {
+		this.directory = directory;
 	}
 }

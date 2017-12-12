@@ -284,6 +284,7 @@ public class MainWindowController {
 	private int oldXPosHelper;
 	private int selectedUIDataIndex;
 	private int selected;
+	private long lastLocalSync;
 	private double windowWidth;
 	private double windowHeight;
 	private DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -1034,8 +1035,9 @@ public class MainWindowController {
     		cloudSync = false;
     	} else {
     		String headingText = "activate cloud savegame sync (beta)";
-    	   	String bodyText = "You just activate the cloud savegame sync function of cemu_UI, "
-   							+ "\nwhich is currently in beta. Are you sure you want to do this?";
+    	   	String bodyText = "WARNING this is a completly WIP cloud save integration, "
+   							+ "\nit's NOT recomended to use this!!\n"
+    	   					+ "\nUse it on your own risk and backup everthing before!";
 	    	
 	    	EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>(){
 	    		 @Override
@@ -1050,7 +1052,7 @@ public class MainWindowController {
 						public void run() {
 		    				
 		    				if (main.getCloudController().initializeConnection(getCloudService(), getCemuPath())) {
-			        	    	main.getCloudController().sync(getCloudService(), getCemuPath());
+		    					main.getCloudController().sync(getCloudService(), getCemuPath(), main.getDirectory().getPath());
 			        	        saveSettings();
 			    	    	} else {
 			    	    		cloudSyncToggleBtn.setSelected(false);
@@ -1553,7 +1555,7 @@ public class MainWindowController {
 			} else {
 				props.setProperty("cloudService", getCloudService());
 			}
-			props.setProperty("folderID", main.getCloudController().getFolderID(getCloudService()));
+			props.setProperty("lastLocalSync", String.valueOf(getLastLocalSync()));
 			props.setProperty("windowWidth", String.valueOf(mainAnchorPane.getWidth()));
 			props.setProperty("windowHeight", String.valueOf(mainAnchorPane.getHeight()));
     		if(System.getProperty("os.name").equals("Linux")){
@@ -1641,10 +1643,10 @@ public class MainWindowController {
 			}
 			
 			try {
-				main.getCloudController().setFolderID(props.getProperty("folderID"), getCloudService());
+				setLastLocalSync(Long.parseLong(props.getProperty("lastLocalSync")));
 			} catch (Exception e) {
-				LOGGER.error("could not load folderID, disable cloud sync. Please contact an developer", e);
-				setCloudSync(false);
+				LOGGER.error("could not load lastSuccessSync, setting default instead", e);
+				setLastLocalSync(0);
 			}
 			
 			try {
@@ -1826,6 +1828,14 @@ public class MainWindowController {
 
 	public void setxPosHelper(int xPosHelper) {
 		this.xPosHelper = xPosHelper;
+	}
+
+	public long getLastLocalSync() {
+		return lastLocalSync;
+	}
+
+	public void setLastLocalSync(long lastLocalSync) {
+		this.lastLocalSync = lastLocalSync;
 	}
 
 	public boolean isFullscreen() {
