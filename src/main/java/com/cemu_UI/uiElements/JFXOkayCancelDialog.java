@@ -28,7 +28,6 @@ import com.jfoenix.controls.JFXDialogLayout;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -93,9 +92,7 @@ public class JFXOkayCancelDialog {
     	cancelBtn.setButtonType(com.jfoenix.controls.JFXButton.ButtonType.RAISED);
     	cancelBtn.setPrefHeight(32);
     	cancelBtn.setStyle(dialogBtnStyle);
-    	Label placeholder = new Label();
-    	placeholder.setPrefSize(15, 10);
-    	content.setActions(cancelBtn, placeholder, okayBtn);
+    	content.setActions(cancelBtn, okayBtn);
     	content.setPrefSize(dialogWidth, dialogHeight);
     	pane.getChildren().add(stackPane);
     	AnchorPane.setTopAnchor(stackPane, (pane.getHeight()-content.getPrefHeight())/2);

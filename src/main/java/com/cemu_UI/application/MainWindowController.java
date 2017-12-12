@@ -1131,7 +1131,7 @@ public class MainWindowController {
 			    BufferedImage originalImage = ImageIO.read(new File(coverPath)); //load cover
 			    int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
 			    BufferedImage resizeImagePNG = resizeImage(originalImage, type, 400, 600);
-			    coverPath = pictureCache + "/" + coverName;
+			    coverPath = pictureCache + "/" + coverName; // TODO test path
 			    ImageIO.write(resizeImagePNG, "png", new File(coverPath)); //save image to pictureCache
 			} catch (IOException e) {
 				LOGGER.error("Ops something went wrong! Error while resizing cover.", e);

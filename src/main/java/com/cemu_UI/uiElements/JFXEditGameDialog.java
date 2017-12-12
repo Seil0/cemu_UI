@@ -88,10 +88,7 @@ public class JFXEditGameDialog {
     	StackPane stackPane = new StackPane();
     	stackPane.autosize();
     	JFXDialog dialog = new JFXDialog(stackPane, content, JFXDialog.DialogTransition.LEFT, true);
-    	
-    	Label placeholder = new Label();
-    	placeholder.setPrefSize(15, 10);
-    		
+
     	TextField gameTitleTF = new TextField();
     	gameTitleTF.setPromptText("game tile");
     	TextField gameTitleIDTF = new TextField();
@@ -207,7 +204,7 @@ public class JFXEditGameDialog {
     	
 		content.setHeading(new Text(headingText));
     	content.setBody(vbox);
-    	content.setActions(cancelBtn, placeholder, okayBtn);
+    	content.setActions(cancelBtn, okayBtn);
     	content.setPrefSize(dialogWidth, dialogHeight);
     	pane.getChildren().add(stackPane);
     	AnchorPane.setTopAnchor(stackPane, (pane.getHeight()-content.getPrefHeight())/2);
