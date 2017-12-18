@@ -170,6 +170,9 @@ public class MainWindowController {
 
 	@FXML
 	private JFXToggleButton fullscreenToggleBtn;
+	
+	@FXML
+	private ChoiceBox<String> languageChoisBox;
 
 	@FXML
 	private ChoiceBox<String> branchChoisBox;
@@ -203,6 +206,9 @@ public class MainWindowController {
 
 	@FXML
 	private HBox topHBox;
+	
+	@FXML
+	private HBox bottomHBox;
 
 	@FXML
 	private ImageView smmdbImageView;
@@ -221,6 +227,9 @@ public class MainWindowController {
 
 	@FXML
 	private Label mainColorLbl;
+	
+	@FXML
+	private Label languageLbl;
 
 	@FXML
 	private Label updateLbl;
@@ -276,7 +285,7 @@ public class MainWindowController {
 	private String selectedGameTitle;
 	private String id;
 	private String version = "0.2.2";
-	private String buildNumber = "065";
+	private String buildNumber = "067";
 	private String versionName = "Puzzle Plank Galaxy";
 	private int xPos = -200;
 	private int yPos = 17;
@@ -295,6 +304,7 @@ public class MainWindowController {
 	private File pictureCacheWin = new File(dirWin + "/picture_cache");
 	private File pictureCacheLinux = new File(dirLinux + "/picture_cache");
 	private ObservableList<String> branches = FXCollections.observableArrayList("stable", "beta");
+	private ObservableList<String> languages = FXCollections.observableArrayList("english", "deutsch");
 	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2", "44fc5929"); // TODO add more IDs
 	private ObservableList<UIROMDataType> games = FXCollections.observableArrayList();
 	ObservableList<SmmdbApiDataType> courses = FXCollections.observableArrayList();
@@ -350,7 +360,6 @@ public class MainWindowController {
 		if (getWindowWidth() > 100 && getWindowHeight() > 100) {
 			mainAnchorPane.setPrefSize(getWindowWidth(), getWindowHeight());	
 		}
-		refreshplayBtnPosition();
 		
 		cemuTextField.setText(cemuPath);
 		romTextField.setText(romPath);
@@ -359,6 +368,8 @@ public class MainWindowController {
 		cloudSyncToggleBtn.setSelected(isCloudSync());
 		autoUpdateToggleBtn.setSelected(isAutoUpdate());
 		branchChoisBox.setItems(branches);
+		languageChoisBox.setItems(languages);
+		bottomHBox.setPickOnBounds(false);
 		
 		if (isUseBeta()) {
 			branchChoisBox.getSelectionModel().select(1);
@@ -1293,19 +1304,6 @@ public class MainWindowController {
 			gamesAnchorPane.getChildren().add(games.get(i).getVBox());
 		}
     }
-    
-	void refreshplayBtnPosition() {
-		double width;
-
-		if (mainAnchorPane.getWidth() < 10) {
-			width = mainAnchorPane.getPrefWidth();
-		} else {
-			width = mainAnchorPane.getWidth();
-		}
-		playBtn.setLayoutX((width / 2) - 50);
-		totalPlaytimeBtn.setLayoutX((width / 2) - 50 - 20.5 - 100);
-		lastTimePlayedBtn.setLayoutX((width / 2) + 50 + 20.5);
-	}
 
 	private void checkAutoUpdate() {
 
@@ -1696,43 +1694,21 @@ public class MainWindowController {
 	}
 	
 	private void playBtnSlideIn(){
-		playBtn.setVisible(true);
-		lastTimePlayedBtn.setVisible(true);
-		totalPlaytimeBtn.setVisible(true);
+		bottomHBox.setVisible(true);
 		playTrue = true;
 		
-		TranslateTransition playBtnTransition = new TranslateTransition(Duration.millis(300), playBtn);
+		TranslateTransition playBtnTransition = new TranslateTransition(Duration.millis(300), bottomHBox);
 		playBtnTransition.setFromY(56);
 		playBtnTransition.setToY(0);
 		playBtnTransition.play();
-		
-		TranslateTransition lastTimePlayedBtnTransition = new TranslateTransition(Duration.millis(300), lastTimePlayedBtn);
-		lastTimePlayedBtnTransition.setFromY(56);
-		lastTimePlayedBtnTransition.setToY(0);
-		lastTimePlayedBtnTransition.play();
-		
-		TranslateTransition timePlayedBtnTransition = new TranslateTransition(Duration.millis(300), totalPlaytimeBtn);
-		timePlayedBtnTransition.setFromY(56);
-		timePlayedBtnTransition.setToY(0);
-		timePlayedBtnTransition.play();
 	}
 	
 	private void playBtnSlideOut(){
 		playTrue = false;
-		TranslateTransition playBtnTransition = new TranslateTransition(Duration.millis(300), playBtn);
+		TranslateTransition playBtnTransition = new TranslateTransition(Duration.millis(300), bottomHBox);
 		playBtnTransition.setFromY(0);
 		playBtnTransition.setToY(56);
 		playBtnTransition.play();
-		
-		TranslateTransition lastTimePlayedBtnTransition = new TranslateTransition(Duration.millis(300), lastTimePlayedBtn);
-		lastTimePlayedBtnTransition.setFromY(0);
-		lastTimePlayedBtnTransition.setToY(56);
-		lastTimePlayedBtnTransition.play();
-		
-		TranslateTransition timePlayedBtnTransition = new TranslateTransition(Duration.millis(300), totalPlaytimeBtn);
-		timePlayedBtnTransition.setFromY(0);
-		timePlayedBtnTransition.setToY(56);
-		timePlayedBtnTransition.play();
 	}
 	
 	private void editColor(String input){

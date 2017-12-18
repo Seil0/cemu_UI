@@ -51,13 +51,11 @@ import javafx.scene.layout.AnchorPane;
 
 public class Main extends Application {
 	
-	private Stage primaryStage; // TODO same as #Test01
-	private MainWindowController mainWindowController; // TODO Needs more testing: if cemu_UI will work as
-													   //normally expected this waring can be removed #Test01
-													   // if not working correctly remove private!
-	private CloudController cloudController; // TODO same as #Test01
-	private AnchorPane pane; // TODO same as #Test01
-	private Scene scene;	 // TODO same as #Test01
+	private Stage primaryStage;
+	private MainWindowController mainWindowController;
+	private CloudController cloudController;
+	private AnchorPane pane;
+	private Scene scene;
 	private static String userHome = System.getProperty("user.home");
 	private static String userName = System.getProperty("user.name");
 	private static String osName = System.getProperty("os.name");
@@ -234,8 +232,6 @@ public class Main extends Application {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, final Number newValue) {
 				int xPosHelperMax = (int) Math.floor((mainWindowController.getMainAnchorPane().getWidth() - 36) / 217);
-
-				mainWindowController.refreshplayBtnPosition();
 				
 				// call only if there is enough space for a new row
 				if (mainWindowController.getOldXPosHelper() != xPosHelperMax) {
