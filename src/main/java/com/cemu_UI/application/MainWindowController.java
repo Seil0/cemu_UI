@@ -287,7 +287,7 @@ public class MainWindowController {
 	private String selectedGameTitle;
 	private String id;
 	private String version = "0.2.2";
-	private String buildNumber = "069";
+	private String buildNumber = "071";
 	private String versionName = "Puzzle Plank Galaxy";
 	private int xPos = -200;
 	private int yPos = 17;
@@ -349,6 +349,7 @@ public class MainWindowController {
 	private String addDLCBodyText;
 	private String licensesLblHeadingText;
 	private String licensesLblBodyText;
+	private String showLicenses;
 	private String aboutBtnHeadingText;
 	private String aboutBtnBodyText;
 	private String cloudSyncWaringHeadingText;
@@ -362,6 +363,7 @@ public class MainWindowController {
 	private String lastPlayed;
 	private String today;
 	private String yesterday;
+	private String never;
 	
 	private String playBtnPlay;
 	private String playBtnUpdating;
@@ -793,7 +795,7 @@ public class MainWindowController {
 					JFXOkayCancelDialog licenseOverviewDialog = new JFXOkayCancelDialog(licensesLblHeadingText,
 							licensesLblBodyText, dialogBtnStyle, 350, 275, okayAction, cancelAction, main.getPane(),
 							bundle);
-					licenseOverviewDialog.setCancelText("show licenses");
+					licenseOverviewDialog.setCancelText(showLicenses);
 					licenseOverviewDialog.show();
 		        }
 		    }
@@ -1240,7 +1242,7 @@ public class MainWindowController {
 
 				// setting last played, if lastPlayed is empty game was never played before, else set correct date
 				if (dbController.getLastPlayed(titleID).equals("") || dbController.getLastPlayed(titleID).equals(null)) {
-					lastTimePlayedBtn.setText("Last played, never");
+					lastTimePlayedBtn.setText(lastPlayed + never);
 					totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID) + " min");
 				} else {
 					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -1344,6 +1346,8 @@ public class MainWindowController {
 		updateBtn.setText(bundle.getString("updateBtnCheckNow"));
 		smmdbDownloadBtn.setText(bundle.getString("smmdbDownloadBtn"));
 		playBtn.setText(bundle.getString("playBtn"));
+		cloudSyncToggleBtn.setText(bundle.getString("cloudSyncToggleBtn"));
+		autoUpdateToggleBtn.setText(bundle.getString("autoUpdateToggleBtn"));
 		
 		// Labels
 		cemu_UISettingsLbl.setText(bundle.getString("cemu_UISettingsLbl"));
@@ -1373,6 +1377,7 @@ public class MainWindowController {
 		addDLCBodyText = bundle.getString("addDLCBodyText");
 		licensesLblHeadingText = bundle.getString("licensesLblHeadingText");
 		licensesLblBodyText = bundle.getString("licensesLblBodyText");
+		showLicenses = bundle.getString("showLicenses");
 		aboutBtnHeadingText = bundle.getString("aboutBtnHeadingText");
 		aboutBtnBodyText = bundle.getString("aboutBtnBodyText");
 		cloudSyncWaringHeadingText = bundle.getString("cloudSyncWaringHeadingText");
@@ -1386,6 +1391,7 @@ public class MainWindowController {
 		lastPlayed = bundle.getString("lastPlayed");
 		today = bundle.getString("today");
 		yesterday = bundle.getString("yesterday");
+		never = bundle.getString("never");
 		
 		playBtnPlay = bundle.getString("playBtnPlay");
 		playBtnUpdating = bundle.getString("playBtnUpdating");

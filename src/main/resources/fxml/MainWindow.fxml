@@ -213,14 +213,14 @@
       </AnchorPane>
       <HBox fx:id="bottomHBox" alignment="CENTER" layoutX="326.0" layoutY="602.0" prefHeight="48.0" prefWidth="200.0" spacing="10.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
-            <JFXButton fx:id="totalPlaytimeBtn" buttonType="RAISED" maxHeight="32.0" maxWidth="125.0" minWidth="125.0" onAction="#totalPlaytimeBtnAction" prefHeight="32.0" prefWidth="125.0" style="-fx-background-color: #ffffff; -fx-button-type: RAISED; -fx-text-fill: BLACK;" text="0 h     0 min">
+            <JFXButton fx:id="totalPlaytimeBtn" buttonType="RAISED" maxHeight="32.0" maxWidth="150.0" minWidth="125.0" onAction="#totalPlaytimeBtnAction" prefHeight="32.0" style="-fx-background-color: #ffffff; -fx-button-type: RAISED; -fx-text-fill: BLACK;" text="0 h     0 min">
       </JFXButton>
             <JFXButton fx:id="playBtn" buttonType="RAISED" maxHeight="28.0" minWidth="100.0" onAction="#playBtnAction" ripplerFill="#00aacc" text="play" textAlignment="CENTER">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
             </JFXButton>
-            <JFXButton fx:id="lastTimePlayedBtn" buttonType="RAISED" maxHeight="32.0" maxWidth="125.0" minWidth="125.0" onAction="#lastTimePlayedBtnAction" prefHeight="32.0" prefWidth="125.0" style="-fx-background-color: #ffffff; -fx-button-type: RAISED; -fx-text-fill: BLACK;" text="Last played, never" />
+            <JFXButton fx:id="lastTimePlayedBtn" buttonType="RAISED" maxHeight="32.0" maxWidth="150.0" minWidth="125.0" onAction="#lastTimePlayedBtnAction" prefHeight="32.0" style="-fx-background-color: #ffffff; -fx-button-type: RAISED; -fx-text-fill: BLACK;" text="Last played, never" />
          </children>
       </HBox>
    </children>

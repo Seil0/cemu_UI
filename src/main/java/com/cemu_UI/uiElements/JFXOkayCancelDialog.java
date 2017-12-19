@@ -47,7 +47,6 @@ public class JFXOkayCancelDialog {
 	private EventHandler<ActionEvent> okayAction;
 	private EventHandler<ActionEvent> cancelAction;
 	private Pane pane;
-	private ResourceBundle bundle;
 	
 	/**
 	 * Creates a new JFoenix Dialog to show some information with okay and cancel option
@@ -71,12 +70,11 @@ public class JFXOkayCancelDialog {
 		this.okayAction = okayAction;
 		this.cancelAction = cancelAction;
 		this.pane = pane;
-		this.bundle = bundle;
+		okayText = bundle.getString("okayBtnText");
+		cancelText = bundle.getString("cancelBtnText");
 	}
 	
 	public void show() {
-		okayText = bundle.getString("okayBtnText");
-		cancelText = bundle.getString("cancelBtnText");
 		
 		JFXDialogLayout content = new JFXDialogLayout();
     	content.setHeading(new Text(headingText));

@@ -1,0 +1,8 @@
+[21:08:03] mlc01 path is set to: Z:\home\jannik\Downloads\cemu_1.10.0\mlc01\
+[21:08:03] Using AES-NI for filesystem decryption
+[21:08:06] RDTSC measurement test:
+[21:08:06] TSC-diff:   0x0000000274783686
+[21:08:06] TSC-freq:   0x00000000d0dadcff
+[21:08:06] HPC-diff:   0x0000000001cb27c1
+[21:08:06] HPC-freq:   0x0000000000989680
+[21:08:06] Multiplier: 0x000000000000015e
