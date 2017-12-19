@@ -42,7 +42,9 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
 import javax.swing.ProgressMonitor;
@@ -304,7 +306,7 @@ public class MainWindowController {
 	private File pictureCacheWin = new File(dirWin + "/picture_cache");
 	private File pictureCacheLinux = new File(dirLinux + "/picture_cache");
 	private ObservableList<String> branches = FXCollections.observableArrayList("stable", "beta");
-	private ObservableList<String> languages = FXCollections.observableArrayList("english", "deutsch");
+	private ObservableList<String> languages = FXCollections.observableArrayList("English (en_US)", "Deutsch (de_DE)");
 	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2", "44fc5929"); // TODO add more IDs
 	private ObservableList<UIROMDataType> games = FXCollections.observableArrayList();
 	ObservableList<SmmdbApiDataType> courses = FXCollections.observableArrayList();
@@ -333,6 +335,37 @@ public class MainWindowController {
 	private ImageView cached_white = new ImageView(new Image("icons/ic_cached_white_24dp_1x.png"));
 	private ImageView smmdb_white = new ImageView(new Image("icons/ic_get_app_white_24dp_1x.png"));
 	private Image close_black = new Image("icons/close_black_2048x2048.png");
+	
+	// language support
+	private ResourceBundle bundle;
+	private String language;
+	private String editHeadingText;
+	private String editBodyText;
+	private String removeHeadingText;
+	private String removeBodyText;
+	private String addUpdateHeadingText;
+	private String addUpdateBodyText;
+	private String addDLCHeadingText;
+	private String addDLCBodyText;
+	private String licensesLblHeadingText;
+	private String licensesLblBodyText;
+	private String aboutBtnHeadingText;
+	private String aboutBtnBodyText;
+	private String cloudSyncWaringHeadingText;
+	private String cloudSyncWaringBodyText;
+	private String cloudSyncErrorHeadingText;
+	private String cloudSyncErrorBodyText;
+	private String addBtnReturnErrorHeadingText;
+	private String addBtnReturnErrorBodyText;
+	
+	private String playBtnPlay;
+	private String playBtnUpdating;
+	private String playBtnCopyingFiles;
+	private String okayBtnText;
+	private String cancelBtnText;
+	private String updateBtnCheckNow;
+	private String updateBtnNoUpdateAvailable;
+	private String updateBtnUpdateAvailable;
 	
 	public void setMain(Main m) {
 		this.main = m;
@@ -399,6 +432,8 @@ public class MainWindowController {
 		courseTreeTable.getColumns().add(idColumn);
 		courseTreeTable.getColumns().get(3).setVisible(false); // the idColumn should not bee displayed
 		
+		setUILanguage();
+		
 		LOGGER.info("initializing UI done");
 	}
 	
@@ -445,7 +480,7 @@ public class MainWindowController {
 					String[] gameInfo = dbController.getGameInfo(selectedGameTitleID);
 
 					// new edit dialog
-					String headingText = "edit a game";
+					String headingText = "edit \"" + selectedGameTitle + "\"";
 					String bodyText = "You can edit the tile and rom/cover path.";
 					JFXEditGameDialog editGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 450,
 							300, 1, MWC, main.getPrimaryStage(), main.getPane());
@@ -706,6 +741,17 @@ public class MainWindowController {
 				}
 			}
 		});
+		
+        languageChoisBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+  		public void changed(ObservableValue<? extends Number> ov, Number value, Number new_value) {
+          	  String language = languageChoisBox.getItems().get((int) new_value).toString();
+          	language = language.substring(language.length()-6,language.length()-1);	//reading only en_US from English (en_US)
+          	  setLanguage(language);
+          	  setUILanguage();
+          	  saveSettings();
+            }
+          });
 
 		branchChoisBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
 			@Override
@@ -1304,6 +1350,82 @@ public class MainWindowController {
 			gamesAnchorPane.getChildren().add(games.get(i).getVBox());
 		}
     }
+    
+    // TODO add strings for dialogs
+    void setUILanguage(){
+		switch(getLanguage()){
+		case "en_US":	
+			bundle = ResourceBundle.getBundle("locals.cemu_UI-Local", Locale.US);	//us_English
+			languageChoisBox.getSelectionModel().select(0);
+			break;
+     	case "de_DE":	
+     		bundle = ResourceBundle.getBundle("locals.cemu_UI-Local", Locale.GERMAN);	//German
+     		languageChoisBox.getSelectionModel().select(1);
+			break;
+     	default:		
+     		bundle = ResourceBundle.getBundle("locals.cemu_UI-Local", Locale.US);	//default local
+     		languageChoisBox.getSelectionModel().select(0);
+			break;
+		 }
+		
+		// Buttons
+		aboutBtn.setText(bundle.getString("aboutBtn"));
+		settingsBtn.setText(bundle.getString("settingsBtn"));
+		addBtn.setText(bundle.getString("addBtn"));
+		reloadRomsBtn.setText(bundle.getString("reloadRomsBtn"));
+		smmdbBtn.setText(bundle.getString("smmdbBtn"));
+		cemuTFBtn.setText(bundle.getString("cemuTFBtn"));
+		romTFBtn.setText(bundle.getString("romTFBtn"));
+		updateBtn.setText(bundle.getString("updateBtnCheckNow"));
+		smmdbDownloadBtn.setText(bundle.getString("smmdbDownloadBtn"));
+		playBtn.setText(bundle.getString("playBtn"));
+		
+		// Labels
+		cemu_UISettingsLbl.setText(bundle.getString("cemu_UISettingsLbl"));
+		cemuDirectoryLbl.setText(bundle.getString("cemuDirectoryLbl"));
+		romDirectoryLbl.setText(bundle.getString("romDirectoryLbl"));
+		mainColorLbl.setText(bundle.getString("mainColorLbl"));
+		languageLbl.setText(bundle.getString("languageLbl"));
+		updateLbl.setText(bundle.getString("updateLbl"));
+		branchLbl.setText(bundle.getString("branchLbl"));
+		cemuSettingsLbl.setText(bundle.getString("cemuSettingsLbl"));
+		licensesLbl.setText(bundle.getString("licensesLbl"));
+		
+		// Columns
+		titleColumn.setText(bundle.getString("titleColumn"));
+		idColumn.setText(bundle.getString("idColumn"));
+		starsColumn.setText(bundle.getString("starsColumn"));
+		timeColumn.setText(bundle.getString("timeColumn"));
+		
+		// Strings
+		editHeadingText = bundle.getString("editHeadingText");
+		editBodyText = bundle.getString("editBodyText");
+		removeHeadingText = bundle.getString("removeHeadingText");
+		removeBodyText = bundle.getString("removeBodyText");
+		addUpdateHeadingText = bundle.getString("addUpdateHeadingText");
+		addUpdateBodyText = bundle.getString("addUpdateBodyText");
+		addDLCHeadingText = bundle.getString("addDLCHeadingText");
+		addDLCBodyText = bundle.getString("addDLCBodyText");
+		licensesLblHeadingText = bundle.getString("licensesLblHeadingText");
+		licensesLblBodyText = bundle.getString("licensesLblBodyText");
+		aboutBtnHeadingText = bundle.getString("aboutBtnHeadingText");
+		aboutBtnBodyText = bundle.getString("aboutBtnBodyText");
+		cloudSyncWaringHeadingText = bundle.getString("cloudSyncWaringHeadingText");
+		cloudSyncWaringBodyText = bundle.getString("cloudSyncWaringBodyText");
+		cloudSyncErrorHeadingText = bundle.getString("cloudSyncErrorHeadingText");
+		cloudSyncErrorBodyText = bundle.getString("cloudSyncErrorBodyText");
+		addBtnReturnErrorHeadingText = bundle.getString("addBtnReturnErrorHeadingText");
+		addBtnReturnErrorBodyText = bundle.getString("addBtnReturnErrorBodyText");
+		
+		playBtnPlay = bundle.getString("playBtnPlay");
+		playBtnUpdating = bundle.getString("playBtnUpdating");
+		playBtnCopyingFiles = bundle.getString("playBtnCopyingFiles");
+		okayBtnText = bundle.getString("okayBtnText");
+		cancelBtnText = bundle.getString("cancelBtnText");
+		updateBtnCheckNow = bundle.getString("updateBtnCheckNow");
+		updateBtnNoUpdateAvailable = bundle.getString("updateBtnNoUpdateAvailable");
+		updateBtnUpdateAvailable = bundle.getString("updateBtnUpdateAvailable");
+	}
 
 	private void checkAutoUpdate() {
 
@@ -1544,6 +1666,7 @@ public class MainWindowController {
     		props.setProperty("cemuPath", getCemuPath());
 			props.setProperty("romPath", getRomPath());
 			props.setProperty("color", getColor());
+			props.setProperty("language", getLanguage());
 			props.setProperty("fullscreen", String.valueOf(isFullscreen()));
 			props.setProperty("cloudSync", String.valueOf(isCloudSync()));
 			props.setProperty("autoUpdate", String.valueOf(isAutoUpdate()));
@@ -1604,6 +1727,13 @@ public class MainWindowController {
 			} catch (Exception e) {
 				LOGGER.error("could not load color value, setting default instead", e);
 				setColor("00a8cc");
+			}
+	
+			try {
+				setLanguage(props.getProperty("language"));
+			} catch (Exception e) {
+				LOGGER.error("cloud not load language", e);
+				setLanguage(System.getProperty("user.language")+"_"+System.getProperty("user.country"));
 			}
 			
 			try {
@@ -1908,6 +2038,14 @@ public class MainWindowController {
 
 	public void setOldXPosHelper(int oldXPosHelper) {
 		this.oldXPosHelper = oldXPosHelper;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 
 	public AnchorPane getMainAnchorPane() {
