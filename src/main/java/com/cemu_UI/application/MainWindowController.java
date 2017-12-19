@@ -287,7 +287,7 @@ public class MainWindowController {
 	private String selectedGameTitle;
 	private String id;
 	private String version = "0.2.2";
-	private String buildNumber = "067";
+	private String buildNumber = "069";
 	private String versionName = "Puzzle Plank Galaxy";
 	private int xPos = -200;
 	private int yPos = 17;
@@ -355,17 +355,19 @@ public class MainWindowController {
 	private String cloudSyncWaringBodyText;
 	private String cloudSyncErrorHeadingText;
 	private String cloudSyncErrorBodyText;
+	private String addGameBtnHeadingText;
+	private String addGameBtnBodyText;
 	private String addBtnReturnErrorHeadingText;
 	private String addBtnReturnErrorBodyText;
+	private String lastPlayed;
+	private String today;
+	private String yesterday;
 	
 	private String playBtnPlay;
 	private String playBtnUpdating;
 	private String playBtnCopyingFiles;
-	private String okayBtnText;
-	private String cancelBtnText;
-	private String updateBtnCheckNow;
-	private String updateBtnNoUpdateAvailable;
-	private String updateBtnUpdateAvailable;
+	private String smmdbDownloadBtnLoading;
+	private String smmdbDownloadBtnDownload;
 	
 	public void setMain(Main m) {
 		this.main = m;
@@ -480,9 +482,8 @@ public class MainWindowController {
 					String[] gameInfo = dbController.getGameInfo(selectedGameTitleID);
 
 					// new edit dialog
-					String headingText = "edit \"" + selectedGameTitle + "\"";
-					String bodyText = "You can edit the tile and rom/cover path.";
-					JFXEditGameDialog editGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 450,
+					String headingText = editHeadingText + " \"" + selectedGameTitle + "\"";
+					JFXEditGameDialog editGameDialog = new JFXEditGameDialog(headingText, editBodyText, dialogBtnStyle, 450,
 							300, 1, MWC, main.getPrimaryStage(), main.getPane());
 					editGameDialog.setTitle(gameInfo[0]);
 					editGameDialog.setCoverPath(gameInfo[1]);
@@ -500,8 +501,8 @@ public class MainWindowController {
             public void handle(ActionEvent event) {		
 				try {
 					LOGGER.info("remove " + selectedGameTitle + "(" + selectedGameTitleID + ")");
-					String headingText = "remove \"" + selectedGameTitle + "\"";
-					String bodyText = "Are you sure you want to delete " + selectedGameTitle + " ?";
+					String headingText = removeHeadingText + " \"" + selectedGameTitle + "\"";
+					String bodyText = removeBodyText + " " + selectedGameTitle + " ?";
 					EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
@@ -523,7 +524,7 @@ public class MainWindowController {
 					};
 
 					JFXOkayCancelDialog removeGameDialog = new JFXOkayCancelDialog(headingText, bodyText,
-							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.getPane());
+							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.getPane(), bundle);
 					removeGameDialog.show();
 				} catch (Exception e) {
 					LOGGER.error("error while removing " + selectedGameTitle + "(" + selectedGameTitleID + ")", e);
@@ -536,8 +537,7 @@ public class MainWindowController {
 			public void handle(ActionEvent event) {
 				try {
 					LOGGER.info("update: " + selectedGameTitleID);
-					String headingText = "update \"" + selectedGameTitle + "\"";
-					String bodyText = "pleas select the update root directory";
+					String headingText = addUpdateHeadingText + " \"" + selectedGameTitle + "\"";
 					EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
@@ -546,13 +546,7 @@ public class MainWindowController {
 							String updatePath = selectedDirecroty.getAbsolutePath();
 							String[] parts = selectedGameTitleID.split("-"); // split string into 2 parts at "-"
 							File srcDir = new File(updatePath);
-							File destDir;
-
-							if (System.getProperty("os.name").equals("Linux")) {
-								destDir = new File(cemuPath + "/mlc01/usr/title/" + parts[0] + "/" + parts[1]);
-							} else {
-								destDir = new File(cemuPath + "\\mlc01\\usr\\title\\" + parts[0] + "\\" + parts[1]);
-							}
+							File destDir = new File(cemuPath + "/mlc01/usr/title/" + parts[0] + "/" + parts[1]);
 
 							// if directory doesn't exist create it
 							if (destDir.exists() != true) {
@@ -561,10 +555,10 @@ public class MainWindowController {
 
 							try {
 								LOGGER.info("copying the content of " + updatePath + " to " + destDir.toString());
-								playBtn.setText("updating...");
+								playBtn.setText(playBtnUpdating);
 								playBtn.setDisable(true);
 								FileUtils.copyDirectory(srcDir, destDir); // TODO progress indicator
-								playBtn.setText("play");
+								playBtn.setText(playBtnPlay);
 								playBtn.setDisable(false);
 								LOGGER.info("copying files done!");
 							} catch (IOException e) {
@@ -580,8 +574,8 @@ public class MainWindowController {
 						}
 					};
 
-					JFXOkayCancelDialog updateGameDialog = new JFXOkayCancelDialog(headingText, bodyText,
-							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.getPane());
+					JFXOkayCancelDialog updateGameDialog = new JFXOkayCancelDialog(headingText, addUpdateBodyText,
+							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.getPane(), bundle);
 					updateGameDialog.show();
 				} catch (Exception e) {
 					LOGGER.warn("trying to update " + selectedGameTitleID + ",which is not a valid type!", e);
@@ -594,8 +588,7 @@ public class MainWindowController {
 			public void handle(ActionEvent event) {
 				try {
 					LOGGER.info("add DLC: " + selectedGameTitleID);
-					String headingText = "add a DLC to \"" + selectedGameTitle + "\"";
-					String bodyText = "pleas select the DLC root directory";
+					String headingText = addDLCHeadingText + " \"" + selectedGameTitle + "\"";
 					EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
@@ -604,13 +597,7 @@ public class MainWindowController {
 							String dlcPath = selectedDirecroty.getAbsolutePath();
 							String[] parts = selectedGameTitleID.split("-"); // split string into 2 parts at "-"
 							File srcDir = new File(dlcPath);
-							File destDir;
-							if (System.getProperty("os.name").equals("Linux")) {
-								destDir = new File(cemuPath + "/mlc01/usr/title/" + parts[0] + "/" + parts[1] + "/aoc");
-							} else {
-								destDir = new File(
-										cemuPath + "\\mlc01\\usr\\title\\" + parts[0] + "\\" + parts[1] + "\\aoc");
-							}
+							File destDir = new File(cemuPath + "/mlc01/usr/title/" + parts[0] + "/" + parts[1] + "/aoc");
 
 							// if directory doesn't exist create it
 							if (destDir.exists() != true) {
@@ -619,10 +606,10 @@ public class MainWindowController {
 
 							try {
 								LOGGER.info("copying the content of " + dlcPath + " to " + destDir.toString());
-								playBtn.setText("copying files...");
+								playBtn.setText(playBtnCopyingFiles);
 								playBtn.setDisable(true);
 								FileUtils.copyDirectory(srcDir, destDir); // TODO progress indicator
-								playBtn.setText("play");
+								playBtn.setText(playBtnPlay);
 								playBtn.setDisable(false);
 								LOGGER.info("copying files done!");
 							} catch (IOException e) {
@@ -638,8 +625,8 @@ public class MainWindowController {
 						}
 					};
 
-					JFXOkayCancelDialog addDLCDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle,
-							350, 170, okayAction, cancelAction, main.getPane());
+					JFXOkayCancelDialog addDLCDialog = new JFXOkayCancelDialog(headingText, addDLCBodyText, dialogBtnStyle,
+							350, 170, okayAction, cancelAction, main.getPane(), bundle);
 					addDLCDialog.show();
 				} catch (Exception e) {
 					LOGGER.warn("trying to add a dlc to " + selectedGameTitleID + ",which is not a valid type!", e);
@@ -769,17 +756,7 @@ public class MainWindowController {
 		    @Override
 		    public void handle(MouseEvent mouseEvent) {
 		        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
-		        	
-		        	String headingText = "cemu_UI";
-		        	String bodyText = "cemu_UI is licensed under the terms of GNU GPL 3.\n\n"
-		        					+ "JFoenix, Apache License 2.0\n"
-		        					+ "minimal-json, MIT License\n"
-		        					+ "sqlite-jdbc, Apache License 2.0\n"
-		        					+ "Apache Commons IO, Apache License 2.0\n"
-		        					+ "Apache Commons Logging, Apache License 2.0\n"
-		        					+ "Apache Commons Codec, Apache License 2.0\n"
-		        					+ "Apache Log4j 2, Apache License 2.0\n";
-		        	
+
 		        	EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
@@ -813,10 +790,11 @@ public class MainWindowController {
 						}
 					};
 		        	
-					JFXOkayCancelDialog licenseOverviewDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle,
-							350, 275, okayAction, cancelAction, main.getPane());
+					JFXOkayCancelDialog licenseOverviewDialog = new JFXOkayCancelDialog(licensesLblHeadingText,
+							licensesLblBodyText, dialogBtnStyle, 350, 275, okayAction, cancelAction, main.getPane(),
+							bundle);
 					licenseOverviewDialog.setCancelText("show licenses");
-					licenseOverviewDialog.show(); 	
+					licenseOverviewDialog.show();
 		        }
 		    }
 		});
@@ -831,12 +809,9 @@ public class MainWindowController {
     
     @FXML
     void aboutBtnAction() {
-    	String headingText = "cemu_UI";
     	String bodyText = "cemu_UI by @Seil0 \nVersion: " + version + " (" + buildNumber + ")  \"" + versionName + "\" \n"
-    					+ "This Application is made with free Software\n"
-    					+ "and licensed under the terms of GNU GPL 3.\n\n"
-    					+ "www.kellerkinder.xyz";
-    	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 200, main.getPane());
+    					+ aboutBtnBodyText;
+    	JFXInfoDialog aboutDialog = new JFXInfoDialog(aboutBtnHeadingText, bodyText, dialogBtnStyle, 350, 200, main.getPane());
     	aboutDialog.show();
     }
 
@@ -895,7 +870,7 @@ public class MainWindowController {
 				@Override
 				public void run() {
 					Platform.runLater(() -> {
-						smmdbDownloadBtn.setText("loading ...");
+						smmdbDownloadBtn.setText(smmdbDownloadBtnLoading);
 						smmdbDownloadBtn.setDisable(true);
 						root.getChildren().remove(0,root.getChildren().size());
 	                });
@@ -909,7 +884,7 @@ public class MainWindowController {
 
 						Platform.runLater(() -> {
 							root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse)); // add data to root-node
-							smmdbDownloadBtn.setText("Download");
+							smmdbDownloadBtn.setText(smmdbDownloadBtnDownload);
 							smmdbDownloadBtn.setDisable(false);
 		                });
 					}
@@ -1091,11 +1066,6 @@ public class MainWindowController {
     	if(cloudSync) {
     		cloudSync = false;
     	} else {
-    		String headingText = "activate cloud savegame sync (beta)";
-    	   	String bodyText = "WARNING this is a completly WIP cloud save integration, "
-   							+ "\nit's NOT recomended to use this!!\n"
-    	   					+ "\nUse it on your own risk and backup everthing before!";
-	    	
 	    	EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>(){
 	    		 @Override
 	        	 public void handle(ActionEvent event){
@@ -1115,12 +1085,9 @@ public class MainWindowController {
 			    	    		cloudSyncToggleBtn.setSelected(false);
 
 			    	    	   	//cloud sync init error dialog
-			    	    		String headingText = "Error while initializing cloud sync!";
-			    		    	String bodyText = "There was some truble adding your game."
-			    		    					+ "\nPlease upload the app.log (which can be found in the cemu_UI directory)"
-			    		    					+ "\nto \"https://github.com/Seil0/cemu_UI/issues\" so we can fix this.";
-			    	    	   	JFXInfoDialog cloudSyncErrorDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 450, 170, main.getPane());
-			    	    	   	cloudSyncErrorDialog.show();		
+								JFXInfoDialog cloudSyncErrorDialog = new JFXInfoDialog(cloudSyncErrorHeadingText,
+										cloudSyncErrorBodyText, dialogBtnStyle, 450, 170, main.getPane());
+								cloudSyncErrorDialog.show();
 			    	    	}
 		    				
 		    			}
@@ -1136,9 +1103,10 @@ public class MainWindowController {
 	    		 }
 	    	};
 	    	
-			JFXOkayCancelDialog cloudSyncErrorDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle,
-					419, 140, okayAction, cancelAction, main.getPane());
-	    	cloudSyncErrorDialog.show();	
+			JFXOkayCancelDialog cloudSyncWarningDialog = new JFXOkayCancelDialog(cloudSyncWaringHeadingText,
+					cloudSyncWaringBodyText, dialogBtnStyle, 419, 140, okayAction, cancelAction, main.getPane(),
+					bundle);
+			cloudSyncWarningDialog.show();
     	}
     }
     
@@ -1150,8 +1118,8 @@ public class MainWindowController {
     
 	@FXML
 	void addBtnAction(ActionEvent event) {
-		String headingText = "add a new game to cemu_UI";
-		String bodyText = "";
+		String headingText = addGameBtnHeadingText;
+		String bodyText = addGameBtnBodyText;
 		JFXEditGameDialog addGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 450, 300, 0,
 				this, main.getPrimaryStage(), main.getPane());
 		addGameDialog.show();
@@ -1171,11 +1139,9 @@ public class MainWindowController {
 			LOGGER.info("No parameter set!");
 			
 			//addGame error dialog
-			String headingTextError = "Error while adding a new Game!";
-	    	String bodyTextError = "There was some truble adding your game."
-	    						+ "\nOne of the needed values was empty, please try again to add your game."; 
-	    	JFXInfoDialog errorDialog = new JFXInfoDialog(headingTextError, bodyTextError, dialogBtnStyle, 350, 170, main.getPane());	
-	    	errorDialog.show();
+			JFXInfoDialog errorDialog = new JFXInfoDialog(addBtnReturnErrorHeadingText, addBtnReturnErrorBodyText,
+					dialogBtnStyle, 350, 170, main.getPane());
+			errorDialog.show();
 
 		} else {	
 	    	File pictureCache;
@@ -1279,16 +1245,16 @@ public class MainWindowController {
 				} else {
 					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-					int today = Integer.parseInt(dtf.format(LocalDate.now()).replaceAll("-", ""));
-					int yesterday = Integer.parseInt(dtf.format(LocalDate.now().minusDays(1)).replaceAll("-", ""));
-					int lastPlayedDay = Integer.parseInt(dbController.getLastPlayed(titleID).replaceAll("-", ""));
+					int tToday = Integer.parseInt(dtf.format(LocalDate.now()).replaceAll("-", ""));
+					int tYesterday = Integer.parseInt(dtf.format(LocalDate.now().minusDays(1)).replaceAll("-", ""));
+					int tLastPlayedDay = Integer.parseInt(dbController.getLastPlayed(titleID).replaceAll("-", ""));
 
-					if (lastPlayedDay == today) {
-						lastTimePlayedBtn.setText("Last played, today");
-					} else if (lastPlayedDay == yesterday) {
-						lastTimePlayedBtn.setText("Last played, yesterday");
+					if (tLastPlayedDay == tToday) {
+						lastTimePlayedBtn.setText(lastPlayed + today);
+					} else if (tLastPlayedDay == tYesterday) {
+						lastTimePlayedBtn.setText(lastPlayed + yesterday);
 					} else {
-						lastTimePlayedBtn.setText("Last played, " + dbController.getLastPlayed(titleID));
+						lastTimePlayedBtn.setText(lastPlayed + dbController.getLastPlayed(titleID));
 					}
 				}
 
@@ -1351,7 +1317,6 @@ public class MainWindowController {
 		}
     }
     
-    // TODO add strings for dialogs
     void setUILanguage(){
 		switch(getLanguage()){
 		case "en_US":	
@@ -1414,17 +1379,19 @@ public class MainWindowController {
 		cloudSyncWaringBodyText = bundle.getString("cloudSyncWaringBodyText");
 		cloudSyncErrorHeadingText = bundle.getString("cloudSyncErrorHeadingText");
 		cloudSyncErrorBodyText = bundle.getString("cloudSyncErrorBodyText");
+		addGameBtnHeadingText = bundle.getString("addGameBtnHeadingText");
+		addGameBtnBodyText = bundle.getString("addGameBtnBodyText");
 		addBtnReturnErrorHeadingText = bundle.getString("addBtnReturnErrorHeadingText");
 		addBtnReturnErrorBodyText = bundle.getString("addBtnReturnErrorBodyText");
+		lastPlayed = bundle.getString("lastPlayed");
+		today = bundle.getString("today");
+		yesterday = bundle.getString("yesterday");
 		
 		playBtnPlay = bundle.getString("playBtnPlay");
 		playBtnUpdating = bundle.getString("playBtnUpdating");
 		playBtnCopyingFiles = bundle.getString("playBtnCopyingFiles");
-		okayBtnText = bundle.getString("okayBtnText");
-		cancelBtnText = bundle.getString("cancelBtnText");
-		updateBtnCheckNow = bundle.getString("updateBtnCheckNow");
-		updateBtnNoUpdateAvailable = bundle.getString("updateBtnNoUpdateAvailable");
-		updateBtnUpdateAvailable = bundle.getString("updateBtnUpdateAvailable");
+		smmdbDownloadBtnLoading = bundle.getString("smmdbDownloadBtnLoading");
+		smmdbDownloadBtnDownload = bundle.getString("smmdbDownloadBtnDownload");
 	}
 
 	private void checkAutoUpdate() {
@@ -1728,12 +1695,12 @@ public class MainWindowController {
 				LOGGER.error("could not load color value, setting default instead", e);
 				setColor("00a8cc");
 			}
-	
-			try {
+			
+			if (props.getProperty("language") == null) {
+				LOGGER.error("cloud not load language, setting default instead");
+				setLanguage("en_US");
+			} else {
 				setLanguage(props.getProperty("language"));
-			} catch (Exception e) {
-				LOGGER.error("cloud not load language", e);
-				setLanguage(System.getProperty("user.language")+"_"+System.getProperty("user.country"));
 			}
 			
 			try {
@@ -2046,6 +2013,14 @@ public class MainWindowController {
 
 	public void setLanguage(String language) {
 		this.language = language;
+	}
+
+	public ResourceBundle getBundle() {
+		return bundle;
+	}
+
+	public void setBundle(ResourceBundle bundle) {
+		this.bundle = bundle;
 	}
 
 	public AnchorPane getMainAnchorPane() {

@@ -90,7 +90,6 @@ public class playGame extends Thread{
         		mainWindowController.main.getPrimaryStage().setIconified(false); // maximize cemu_UI
              });
     		
-//    		System.out.println(mainWindowController.getCemuPath()+"/mlc01/emulatorSave/"+);
     		//sync savegame with cloud service
 			if (mainWindowController.isCloudSync()) {
 				mainWindowController.setLastLocalSync(Instant.now().getEpochSecond());

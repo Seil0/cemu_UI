@@ -22,6 +22,8 @@
 
 package com.cemu_UI.uiElements;
 
+import java.util.ResourceBundle;
+
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
@@ -38,13 +40,14 @@ public class JFXOkayCancelDialog {
 	private String headingText;
 	private String bodyText;
 	private String dialogBtnStyle;
-	private String okayText = "okay";
-	private String cancelText = "cancel";
+	private String okayText;
+	private String cancelText;
 	private int dialogWidth;
 	private int dialogHeight;
 	private EventHandler<ActionEvent> okayAction;
 	private EventHandler<ActionEvent> cancelAction;
 	private Pane pane;
+	private ResourceBundle bundle;
 	
 	/**
 	 * Creates a new JFoenix Dialog to show some information with okay and cancel option
@@ -58,7 +61,8 @@ public class JFXOkayCancelDialog {
 	 * @param pane pane to which the dialog belongs
 	 */
 	public JFXOkayCancelDialog(String headingText, String bodyText, String dialogBtnStyle, int dialogWidth,
-			int dialogHeight, EventHandler<ActionEvent> okayAction, EventHandler<ActionEvent> cancelAction, Pane pane) {
+			int dialogHeight, EventHandler<ActionEvent> okayAction, EventHandler<ActionEvent> cancelAction, Pane pane,
+			ResourceBundle bundle) {
 		this.headingText = headingText;
 		this.bodyText = bodyText;
 		this.dialogBtnStyle = dialogBtnStyle;
@@ -67,9 +71,13 @@ public class JFXOkayCancelDialog {
 		this.okayAction = okayAction;
 		this.cancelAction = cancelAction;
 		this.pane = pane;
+		this.bundle = bundle;
 	}
 	
 	public void show() {
+		okayText = bundle.getString("okayBtnText");
+		cancelText = bundle.getString("cancelBtnText");
+		
 		JFXDialogLayout content = new JFXDialogLayout();
     	content.setHeading(new Text(headingText));
     	content.setBody(new Text(bodyText));

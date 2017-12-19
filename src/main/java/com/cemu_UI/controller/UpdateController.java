@@ -52,6 +52,7 @@ public class UpdateController implements Runnable {
 	private String browserDownloadUrl; // update download link
 	private String githubApiRelease = "https://api.github.com/repos/Seil0/cemu_UI/releases/latest";
 	private String githubApiBeta = "https://api.github.com/repos/Seil0/cemu_UI/releases";
+	
 	private URL githubApiUrl;
 	private boolean useBeta;
 	private static final Logger LOGGER = LogManager.getLogger(UpdateController.class.getName());
@@ -70,7 +71,7 @@ public class UpdateController implements Runnable {
 	public void run() {
 		LOGGER.info("beta:" + useBeta + "; checking for updates ...");
 		Platform.runLater(() -> {
-			mainWindowController.getUpdateBtn().setText("checking for updates ...");
+			mainWindowController.getUpdateBtn().setText(mainWindowController.getBundle().getString("updateBtnChecking"));
 		});
 
 		try {
@@ -126,12 +127,12 @@ public class UpdateController implements Runnable {
 
 		if (iversion >= iaktVersion) {
 			Platform.runLater(() -> {
-				mainWindowController.getUpdateBtn().setText("no update available");
+				mainWindowController.getUpdateBtn().setText(mainWindowController.getBundle().getString("updateBtnNoUpdateAvailable"));
 			});
 			LOGGER.info("no update available");
 		} else {
 			Platform.runLater(() -> {
-				mainWindowController.getUpdateBtn().setText("update available");
+				mainWindowController.getUpdateBtn().setText(mainWindowController.getBundle().getString("updateBtnUpdateAvailable"));
 			});
 			LOGGER.info("update available");
 			LOGGER.info("download link: " + browserDownloadUrl);

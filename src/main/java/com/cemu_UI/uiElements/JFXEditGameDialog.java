@@ -90,13 +90,13 @@ public class JFXEditGameDialog {
     	JFXDialog dialog = new JFXDialog(stackPane, content, JFXDialog.DialogTransition.LEFT, true);
 
     	TextField gameTitleTF = new TextField();
-    	gameTitleTF.setPromptText("game tile");
+    	gameTitleTF.setPromptText(mwc.getBundle().getString("gameTitle"));
     	TextField gameTitleIDTF = new TextField();
-    	gameTitleIDTF.setPromptText("title ID");
+    	gameTitleIDTF.setPromptText(mwc.getBundle().getString("titleID"));
     	TextField romPathTF = new TextField();
-    	romPathTF.setPromptText("ROM path");
+    	romPathTF.setPromptText(mwc.getBundle().getString("romPath"));
     	TextField gameCoverTF = new TextField();
-    	gameCoverTF.setPromptText("cover path");
+    	gameCoverTF.setPromptText(mwc.getBundle().getString("coverPath"));
     	
     	if (mode == 1) {
 			gameTitleTF.setText(title);
@@ -107,7 +107,7 @@ public class JFXEditGameDialog {
 			gameTitleIDTF.setEditable(false);
 		}
     	
-    	JFXButton okayBtn = new JFXButton("Okay");
+    	JFXButton okayBtn = new JFXButton(mwc.getBundle().getString("okayBtnText"));
 		okayBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -117,9 +117,8 @@ public class JFXEditGameDialog {
 					// LOGGER.info("No parameter set!");
 
 					// addGame error dialog
-					String headingTextError = "Error while adding a new Game!";
-					String bodyTextError = "There was some truble adding your game."
-										 + "\nOne of the needed values was empty, please try again to add your game.";
+					String headingTextError = mwc.getBundle().getString("editGameDialogHeadingTextError");
+					String bodyTextError = mwc.getBundle().getString("editGameDialogBodyTextError");
 					JFXInfoDialog errorDialog = new JFXInfoDialog(headingTextError, bodyTextError, dialogBtnStyle, 350,170, pane);
 					errorDialog.show();
 				} else {
@@ -147,7 +146,7 @@ public class JFXEditGameDialog {
     	okayBtn.setPrefHeight(32);
     	okayBtn.setStyle(dialogBtnStyle);
     	
-    	JFXButton cancelBtn = new JFXButton("Cancel");
+    	JFXButton cancelBtn = new JFXButton(mwc.getBundle().getString("cancelBtnText"));
     	cancelBtn.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -158,7 +157,7 @@ public class JFXEditGameDialog {
     	cancelBtn.setPrefHeight(32);
     	cancelBtn.setStyle(dialogBtnStyle);
     	
-    	JFXButton selectPathBtn = new JFXButton("select .rpx file");
+    	JFXButton selectPathBtn = new JFXButton(mwc.getBundle().getString("editGameDialogSelectPathBtn"));
     	selectPathBtn.setPrefWidth(110);
     	selectPathBtn.setStyle(dialogBtnStyle);
     	selectPathBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -170,7 +169,7 @@ public class JFXEditGameDialog {
             }
     	});
     	
-    	JFXButton selectCoverBtn = new JFXButton("select cover file");
+    	JFXButton selectCoverBtn = new JFXButton(mwc.getBundle().getString("editGameDialogSelectCoverBtn"));
     	selectCoverBtn.setPrefWidth(110);
     	selectCoverBtn.setStyle(dialogBtnStyle);
     	selectCoverBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -186,14 +185,14 @@ public class JFXEditGameDialog {
     	grid.setHgap(10);
     	grid.setVgap(10);
     	grid.setPadding(new Insets(15, 10, 10, 10));
-    	grid.add(new Label("game title:"), 0, 0);
+    	grid.add(new Label(mwc.getBundle().getString("gameTitle") + ":"), 0, 0);
     	grid.add(gameTitleTF, 1, 0);
-    	grid.add(new Label("title id:"), 0, 1);
+    	grid.add(new Label(mwc.getBundle().getString("titleID") + ":"), 0, 1);
     	grid.add(gameTitleIDTF, 1, 1);
-    	grid.add(new Label("ROM path:"), 0, 2);
+    	grid.add(new Label(mwc.getBundle().getString("romPath") + ":"), 0, 2);
     	grid.add(romPathTF, 1, 2);
     	grid.add(selectPathBtn, 2, 2);
-    	grid.add(new Label("cover path:"), 0, 3);
+    	grid.add(new Label(mwc.getBundle().getString("coverPath") + ":"), 0, 3);
     	grid.add(gameCoverTF, 1, 3);
     	grid.add(selectCoverBtn, 2, 3);
     	

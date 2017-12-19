@@ -138,8 +138,9 @@ public class Main extends Application {
 				firstStart();
 				mainWindowController.setColor("00a8cc");
 				mainWindowController.setAutoUpdate(false);
-				mainWindowController.setxPosHelper(0);
+				mainWindowController.setLanguage("en_US");
 				mainWindowController.setLastLocalSync(0);
+				mainWindowController.setxPosHelper(0);
 				mainWindowController.saveSettings();
 				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
 				System.exit(0);	//finishes itself
