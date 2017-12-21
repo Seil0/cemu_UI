@@ -286,7 +286,7 @@ public class MainWindowController {
 	private String selectedGameTitleID;
 	private String selectedGameTitle;
 	private String id;
-	private String version = "0.2.2";
+	private String version = "0.2.3";
 	private String buildNumber = "071";
 	private String versionName = "Puzzle Plank Galaxy";
 	private int xPos = -200;
@@ -1348,6 +1348,7 @@ public class MainWindowController {
 		playBtn.setText(bundle.getString("playBtn"));
 		cloudSyncToggleBtn.setText(bundle.getString("cloudSyncToggleBtn"));
 		autoUpdateToggleBtn.setText(bundle.getString("autoUpdateToggleBtn"));
+		fullscreenToggleBtn.setText(bundle.getString("fullscreenToggleBtn"));
 		
 		// Labels
 		cemu_UISettingsLbl.setText(bundle.getString("cemu_UISettingsLbl"));

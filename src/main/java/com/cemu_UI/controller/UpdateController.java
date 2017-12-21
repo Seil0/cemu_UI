@@ -49,6 +49,8 @@ public class UpdateController implements Runnable {
 	private String buildNumber;
 	private String apiOutput;
 	private String updateBuildNumber; // tag_name from Github
+//	private String updateName;
+//	private String updateChanges;
 	private String browserDownloadUrl; // update download link
 	private String githubApiRelease = "https://api.github.com/repos/Seil0/cemu_UI/releases/latest";
 	private String githubApiBeta = "https://api.github.com/repos/Seil0/cemu_UI/releases";
@@ -98,8 +100,8 @@ public class UpdateController implements Runnable {
 			JsonArray objectAssets = object.asObject().get("assets").asArray();
 
 			updateBuildNumber = object.asObject().getString("tag_name", "");
-			// updateName = object.asObject().getString("name", "");
-			// updateChanges = object.asObject().getString("body", "");
+//			updateName = object.asObject().getString("name", "");
+//			updateChanges = object.asObject().getString("body", "");
 
 			for (JsonValue asset : objectAssets) {
 				browserDownloadUrl = asset.asObject().getString("browser_download_url", "");
@@ -110,8 +112,8 @@ public class UpdateController implements Runnable {
 			JsonArray objectAssets = Json.parse(apiOutput).asObject().get("assets").asArray();
 
 			updateBuildNumber = object.getString("tag_name", "");
-			// updateName = object.getString("name", "");
-			// updateChanges = object.getString("body", "");
+//			updateName = object.getString("name", "");
+//			updateChanges = object.getString("body", "");
 			for (JsonValue asset : objectAssets) {
 				browserDownloadUrl = asset.asObject().getString("browser_download_url", "");
 

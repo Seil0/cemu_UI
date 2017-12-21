@@ -96,7 +96,7 @@ public class Main extends Application {
 			primaryStage.setTitle("cemu_UI");
 //			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/resources/Homeflix_Icon_64x64.png"))); //adds application icon
 
-			mainWindowController = loader.getController();	// Link of FXMLController and controller class
+			mainWindowController = loader.getController(); // Link of FXMLController and controller class
 			mainWindowController.setMain(this);	// call setMain
 			cloudController = new CloudController(mainWindowController); // call cloudController constructor
 			
