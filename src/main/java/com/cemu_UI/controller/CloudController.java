@@ -143,7 +143,7 @@ public class CloudController {
 
 					LOGGER.info("synchronization successful!");
 				} catch (Exception e) {
-					// TODO: handle exception
+					LOGGER.error("There was an error during syncronisation! Please open a new issue on the cemu_UI github page:", e);
 				}
 			}
 		});
@@ -173,12 +173,10 @@ public class CloudController {
 	    }
 
 	    if (fileToZip.isDirectory()) {
-//	        System.out.println("+" + zipEntryName);
 	        for (File file : fileToZip.listFiles()) {
 	            addDirToZipArchive(zos, file, zipEntryName);
 	        }
 	    } else {
-//	        System.out.println("   " + zipEntryName);
 	        byte[] buffer = new byte[1024];
 	        FileInputStream fis = new FileInputStream(fileToZip);
 	        zos.putNextEntry(new ZipEntry(zipEntryName));

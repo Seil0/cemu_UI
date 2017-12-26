@@ -40,7 +40,6 @@ import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-
 import javafx.application.Platform;
 
 public class UpdateController implements Runnable {
@@ -140,15 +139,15 @@ public class UpdateController implements Runnable {
 			LOGGER.info("download link: " + browserDownloadUrl);
 			try {
 				// open new Http connection, ProgressMonitorInputStream for downloading the data
-				HttpURLConnection conn = (HttpURLConnection) new URL(browserDownloadUrl).openConnection();
-				ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(null, "Downloading...", conn.getInputStream());
+				HttpURLConnection connection = (HttpURLConnection) new URL(browserDownloadUrl).openConnection();
+				ProgressMonitorInputStream pmis = new ProgressMonitorInputStream(null, "Downloading...", connection.getInputStream());
 				ProgressMonitor pm = pmis.getProgressMonitor();
 				pm.setMillisToDecideToPopup(0);
 				pm.setMillisToPopup(0);
-				pm.setMinimum(0);// tell the progress bar that we start at the beginning of the stream
-				pm.setMaximum(conn.getContentLength());// tell the progress bar the total number of bytes we are going to read.
+				pm.setMinimum(0);// set beginning of the progress bar to 0
+				pm.setMaximum(connection.getContentLength());// set the end to the file length
 				FileUtils.copyInputStreamToFile(pmis, new File("cemu_UI_update.jar")); // download update
-				org.apache.commons.io.FileUtils.copyFile(new File("cemu_UI_update.jar"), new File("cemu_UI.jar")); // TODO rename update to old name
+				org.apache.commons.io.FileUtils.copyFile(new File("cemu_UI_update.jar"), new File("cemu_UI.jar"));
 				org.apache.commons.io.FileUtils.deleteQuietly(new File("cemu_UI_update.jar")); // delete update
 				Runtime.getRuntime().exec("java -jar cemu_UI.jar"); // start again
 				System.exit(0); // finishes itself

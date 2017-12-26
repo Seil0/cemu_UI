@@ -559,7 +559,7 @@ public class MainWindowController {
 								LOGGER.info("copying the content of " + updatePath + " to " + destDir.toString());
 								playBtn.setText(playBtnUpdating);
 								playBtn.setDisable(true);
-								FileUtils.copyDirectory(srcDir, destDir); // TODO progress indicator
+								FileUtils.copyDirectory(srcDir, destDir);
 								playBtn.setText(playBtnPlay);
 								playBtn.setDisable(false);
 								LOGGER.info("copying files done!");
@@ -610,7 +610,7 @@ public class MainWindowController {
 								LOGGER.info("copying the content of " + dlcPath + " to " + destDir.toString());
 								playBtn.setText(playBtnCopyingFiles);
 								playBtn.setDisable(true);
-								FileUtils.copyDirectory(srcDir, destDir); // TODO progress indicator
+								FileUtils.copyDirectory(srcDir, destDir);
 								playBtn.setText(playBtnPlay);
 								playBtn.setDisable(false);
 								LOGGER.info("copying files done!");

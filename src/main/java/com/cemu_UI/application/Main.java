@@ -168,9 +168,6 @@ public class Main extends Application {
 				}
 			}
 			
-			
-			
-			
 			// loading settings and initialize UI, dbController.main() loads all databases
 			mainWindowController.init();
 			mainWindowController.dbController.init();

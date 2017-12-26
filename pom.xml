@@ -4,7 +4,7 @@
 
   <groupId>com</groupId>
   <artifactId>cemu_UI</artifactId>
-  <version>0.2.2-SNAPSHOT</version>
+  <version>0.2.3-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>cemu_UI</name>
