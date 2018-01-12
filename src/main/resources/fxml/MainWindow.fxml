@@ -118,8 +118,14 @@
                               </VBox>
                               <HBox spacing="10.0">
                                  <children>
-                                    <Label fx:id="mainColorLbl" prefHeight="25.0" text="main Color" />
+                                    <Label fx:id="mainColorLbl" minHeight="25.0" text="main Color" />
                                     <JFXColorPicker fx:id="colorPicker" onAction="#colorPickerAction" />
+                                 </children>
+                              </HBox>
+                              <HBox prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                                 <children>
+                                    <Label fx:id="languageLbl" prefHeight="25.0" text="language" />
+                                    <ChoiceBox fx:id="languageChoisBox" prefWidth="150.0" />
                                  </children>
                               </HBox>
                               <JFXToggleButton fx:id="cloudSyncToggleBtn" onAction="#cloudSyncToggleBtnAction" text="cloud savegames (Google Drive)" />
@@ -205,13 +211,17 @@
             </ScrollPane>
          </children>
       </AnchorPane>
-      <JFXButton fx:id="playBtn" buttonType="RAISED" layoutX="396.0" maxHeight="28.0" minWidth="100.0" onAction="#playBtnAction" ripplerFill="#00aacc" text="play" textAlignment="CENTER" visible="false" AnchorPane.bottomAnchor="12.0">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font>
+      <HBox fx:id="bottomHBox" alignment="CENTER" layoutX="326.0" layoutY="602.0" prefHeight="48.0" prefWidth="200.0" spacing="10.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+         <children>
+            <JFXButton fx:id="totalPlaytimeBtn" buttonType="RAISED" maxHeight="32.0" maxWidth="150.0" minWidth="125.0" onAction="#totalPlaytimeBtnAction" prefHeight="32.0" style="-fx-background-color: #ffffff; -fx-button-type: RAISED; -fx-text-fill: BLACK;" text="0 h     0 min">
       </JFXButton>
-      <JFXButton fx:id="totalPlaytimeBtn" buttonType="RAISED" layoutX="275.5" maxHeight="32.0" minWidth="100.0" onAction="#totalPlaytimeBtnAction" prefHeight="32.0" style="-fx-background-color: #ffffff; -fx-button-type: RAISED; -fx-text-fill: BLACK;" text="0 h     0 min" visible="false" AnchorPane.bottomAnchor="10.0">
-      </JFXButton>
-      <JFXButton fx:id="lastTimePlayedBtn" buttonType="RAISED" layoutX="516.5" maxHeight="32.0" minWidth="100.0" onAction="#lastTimePlayedBtnAction" prefHeight="32.0" style="-fx-background-color: #ffffff; -fx-button-type: RAISED; -fx-text-fill: BLACK;" text="Last played, never" visible="false" AnchorPane.bottomAnchor="10.0" />
+            <JFXButton fx:id="playBtn" buttonType="RAISED" maxHeight="28.0" minWidth="100.0" onAction="#playBtnAction" ripplerFill="#00aacc" text="play" textAlignment="CENTER">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font>
+            </JFXButton>
+            <JFXButton fx:id="lastTimePlayedBtn" buttonType="RAISED" maxHeight="32.0" maxWidth="150.0" minWidth="125.0" onAction="#lastTimePlayedBtnAction" prefHeight="32.0" style="-fx-background-color: #ffffff; -fx-button-type: RAISED; -fx-text-fill: BLACK;" text="Last played, never" />
+         </children>
+      </HBox>
    </children>
 </AnchorPane>

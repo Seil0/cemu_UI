@@ -21,17 +21,12 @@
 
 package com.cemu_UI.vendorCloudController;
 
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -56,15 +51,11 @@ import com.google.api.services.drive.model.FileList;
 public class GoogleDriveController {
 	
 	Drive service;
-	private String saveDirectory;
 	private String folderID;
-	private ArrayList<java.io.File> localSavegames = new ArrayList<>();
-	private ArrayList<File> cloudSavegames = new ArrayList<>();
-	private ArrayList<String> localSavegamesName = new ArrayList<>();
-	private ArrayList<String> cloudSavegamesName = new ArrayList<>();
+	private File downloadFile;
 	private static final Logger LOGGER = LogManager.getLogger(GoogleDriveController.class.getName());
 	
-    private final String APPLICATION_NAME ="cemu_Ui Drive API Controller";	//TODO add Google
+    private final String APPLICATION_NAME ="cemu_Ui Google Drive API Controller";
 
     //Directory to store user credentials for this application
     private final java.io.File DATA_STORE_DIR = new java.io.File(System.getProperty("user.home"), ".credentials/cemu_UI_credential");
@@ -125,69 +116,15 @@ public class GoogleDriveController {
 	                .build();
 	 }
 	 
-	 
-	 public void main(String cemuDirectory) throws IOException {
-		 java.io.File dir = new java.io.File(cemuDirectory + "/mlc01/usr/save");
-		 
-		 service = getDriveService();
-		 
-		 // cemu >= 1.11 uses /mlc01/usr/save/... instead of /mlc01/emulatorSave/...
-		 if (dir.exists()) {
-			 LOGGER.info("using new save path");
-			 saveDirectory = cemuDirectory + "/mlc01/usr/save";
-		 } else {
-			 LOGGER.info("using old save path");
-			 saveDirectory = cemuDirectory + "/mlc01/emulatorSave";
-		 }
-	 }
-	 
-	public void sync(String cemuDirectory) throws IOException {
-		//in case there is no folderID saved, look it up first
+	public void main(String cemuDirectory) throws IOException {
+		service = getDriveService();
+
 		if (getFolderID() == "" || getFolderID() == null) {
 			getSavegamesFolderID();
 		}
-		getLocalSavegames();
-		getCloudSavegames();
-
-		// download files from cloud which don't exist locally
-		for (int i = 0; i < cloudSavegames.size(); i++) {
-
-			// if the file exists locally, check which one is newer
-			if (localSavegamesName.contains(cloudSavegames.get(i).getName())) {
-
-				int localSavegamesNumber = localSavegamesName.indexOf(cloudSavegames.get(i).getName());
-				long localModified = new DateTime(localSavegames.get(localSavegamesNumber).lastModified()).getValue();
-				long cloudModified = cloudSavegames.get(i).getModifiedTime().getValue();
-				FileInputStream fis = new FileInputStream(localSavegames.get(localSavegamesNumber));				
-				
-				if (cloudSavegames.get(i).getMd5Checksum().equals(org.apache.commons.codec.digest.DigestUtils.md5Hex(fis))) {
-					LOGGER.info("both files are the same, nothing to do");
-				} else {
-					if (localModified >= cloudModified) {
-						LOGGER.info("local is newer");
-						updateFile(cloudSavegames.get(i), localSavegames.get(localSavegamesNumber));
-					} else {
-						LOGGER.info("cloud is newer");
-						downloadFile(cloudSavegames.get(i));
-					}
-				}
-
-			} else {
-				LOGGER.info("file doesn't exist locally");
-				downloadFile(cloudSavegames.get(i));
-			}
-		}
-
-		// upload file to cloud which don't exist in the cloud
-		for (int j = 0; j < localSavegames.size(); j++) {
-			if (!cloudSavegamesName.contains(localSavegamesName.get(j))) {
-				LOGGER.info("file doesn't exist in the cloud");
-				uploadFile(localSavegames.get(j));
-			}
-		}
 	}
 	
-	//create a folder in google drive
+	// create a folder in google drive
 	public void creatFolder() throws IOException {
 		LOGGER.info("creating new folder");
 		 File fileMetadata = new File();
@@ -199,8 +136,8 @@ public class GoogleDriveController {
 		 folderID = file.getId();
 	}
 	
-	//check if folder already exist
-	public boolean checkFolder() {	 
+	// check if folder already exist
+	public boolean checkFolder() {
 		try {
 			Files.List request = service.files().list().setQ("mimeType = 'application/vnd.google-apps.folder' and name = 'cemu_savegames'");
 			FileList files = request.execute();
@@ -215,32 +152,58 @@ public class GoogleDriveController {
 		}
 	}
 	
-	//reading all local savegames
-	private void getLocalSavegames() throws IOException {
-		java.io.File dir = new  java.io.File(saveDirectory);
-		String[] extensions = new String[] { "dat","sav","bin" };
-		localSavegames.removeAll(localSavegames);
-		localSavegamesName.removeAll(localSavegamesName);
-		LOGGER.info("Getting all dat,sav,bin files in " + dir.getCanonicalPath()+" including those in subdirectories");
-		List<java.io.File> files = (List<java.io.File>) FileUtils.listFiles(dir, extensions, true);					
-		for (java.io.File file : files) {
-			 localSavegamesName.add(file.getParentFile().getName()+"_"+file.getName());
-			 localSavegames.add(file);
-		}
-	}
-	
-	//reading all cloud savegames
-	private void getCloudSavegames() throws IOException {
-		LOGGER.info("getting all cloud savegames");
-		cloudSavegames.removeAll(cloudSavegames);
-		cloudSavegamesName.removeAll(cloudSavegamesName);
+	// FIXME it seams like there is a bug in this method
+	// get the name of the zip in the semu_savegames folder, which is the last upload Unix time
+	public long getLastCloudSync() throws IOException {
+		LOGGER.info("getting last cloud sync");
+		long lastCloudSync = 0;
 		Files.List request = service.files().list().setQ("'"+folderID+"' in parents").setFields("nextPageToken, files(id, name, size, modifiedTime, createdTime, md5Checksum)");
 		FileList files = request.execute();
 		
 		for (File file : files.getFiles()) {
-			cloudSavegamesName.add(file.getName());
-			cloudSavegames.add(file);
+			downloadFile = file;
+			lastCloudSync = Long.parseLong(file.getName().substring(0, file.getName().length()-4));
+		}
+		
+		return lastCloudSync;
+	}
+	
+	/**
+	 * delete all existing files in cemu_savegames at first
+	 * upload the new savegames zip file
+	 * @param uploadFile savegames zip file
+	 * @throws IOException
+	 */
+	public void uploadZipFile(java.io.File uploadFile) throws IOException{
+		
+		LOGGER.info("deleting old savegames ...");
+		Files.List request = service.files().list().setQ("'"+folderID+"' in parents").setFields("nextPageToken, files(id, name, size, modifiedTime, createdTime, md5Checksum)");
+		FileList files = request.execute();
+		
+		for (File file : files.getFiles()) {
+			service.files().delete(file.getId()).execute();	// deleting old file
 		}	
+		
+		LOGGER.info("uploading " + uploadFile.getName() + " ...");
+	    File fileMetadata = new File();
+	    fileMetadata.setName(uploadFile.getName());
+	    fileMetadata.setParents(Collections.singletonList(folderID));
+	    fileMetadata.setModifiedTime(new DateTime(uploadFile.lastModified()));
+	    FileContent mediaContent = new FileContent("", uploadFile);
+	    File file = service.files().create(fileMetadata, mediaContent).setFields("id, parents").execute();
+	    LOGGER.info("upload successfull, File ID: " + file.getId()); 
+	}
+	    
+	// download zip file from the cloud and unzip it
+	public java.io.File downloadZipFile(String cemu_UIDirectory) throws IOException{	
+		LOGGER.info("downloading "+downloadFile.getName()+" ...");
+		java.io.File outputFile = new java.io.File(cemu_UIDirectory + "/" + downloadFile.getName());
+	    
+		OutputStream outputStream = new FileOutputStream(outputFile);
+		service.files().get(downloadFile.getId()).executeMediaAndDownloadTo(outputStream);
+		outputStream.close();
+		LOGGER.info("download successfull: " + downloadFile.getName());
+		return outputFile;
 	}
 	
 	private void getSavegamesFolderID() throws IOException {
@@ -253,72 +216,14 @@ public class GoogleDriveController {
 		} catch (Exception e) {
 			LOGGER.error("Oops, something went wrong! It seems that you have more than one folder called 'cemu_savegames'!", e);
 		}	
-	}	
-		
+} 
 	
-	//upload a file to the cloud from the local savegames folder
-	public void uploadFile(java.io.File uploadFile) throws IOException{
-		LOGGER.info("uploading " + uploadFile.getName() + " ...");
-	    File fileMetadata = new File();
-	    fileMetadata.setName(uploadFile.getParentFile().getName()+"_"+uploadFile.getName());
-	    fileMetadata.setParents(Collections.singletonList(folderID));
-	    fileMetadata.setModifiedTime(new DateTime(uploadFile.lastModified()));
-	    FileContent mediaContent = new FileContent("", uploadFile);
-	    File file = service.files().create(fileMetadata, mediaContent).setFields("id, parents").execute();
-	    LOGGER.info("upload successfull, File ID: " + file.getId()); 
-	}
-	    
-	//download a file from the cloud to the local savegames folder
-	private void downloadFile(File downloadFile) throws IOException{	
-		LOGGER.info("downloading "+downloadFile.getName()+" ...");
-		java.io.File directory = new java.io.File(saveDirectory + "/" + downloadFile.getName().substring(0,8));
-		String file = downloadFile.getName().substring(9,downloadFile.getName().length());
-		if(!directory.exists()) {
-			LOGGER.info("dir dosent exist");
-			directory.mkdir();
-		}
-	    
-		OutputStream outputStream = new FileOutputStream(directory +"/"+ file);
-		service.files().get(downloadFile.getId()).executeMediaAndDownloadTo(outputStream);
-		outputStream.close();
-		LOGGER.info("download successfull, File ID: " + file);	//TODO add FileID
-	}
-	
-	//update a file in the cloud, by deleting the old one and uploading an new with the same id
-	private void updateFile(File oldFile, java.io.File newFile) throws IOException {
-		LOGGER.info("updating " +oldFile.getName()+" ...");
-		service.files().delete(oldFile.getId()).execute();		//deleting old file
-		 
-		//uploading new file
-		File fileMetadata = new File();
-		fileMetadata.setName(newFile.getParentFile().getName()+"_"+newFile.getName());
-		fileMetadata.setParents(Collections.singletonList(folderID));
-		fileMetadata.setModifiedTime(new DateTime(newFile.lastModified()));
-		    
-		FileContent mediaContent = new FileContent("", newFile);
-		File file = service.files().create(fileMetadata, mediaContent).setFields("id, parents").execute();
-		LOGGER.info("update successfull, File ID: " + file.getId());
-	 }
-	
-	public void uploadAllFiles() {
-		try {
-			getLocalSavegames();
-			LOGGER.info("uploading " + localSavegames.size() + " files ...");
-			for (int i = 0; i < localSavegames.size(); i++) {
-		        uploadFile(localSavegames.get(i));
-		       }
-			LOGGER.info("finished uploading all files");
-		} catch (IOException e) {
-			LOGGER.error("error while uploading all files", e);
-		}
-    }
-	
-
 	public String getFolderID() {
 		return folderID;
 	}
 
 	public void setFolderID(String folderID) {
 		this.folderID = folderID;
-	}
+}
+	
 }

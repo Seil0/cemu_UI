@@ -22,7 +22,12 @@
 package com.cemu_UI.controller;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.time.Instant;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,6 +36,8 @@ import com.cemu_UI.application.MainWindowController;
 import com.cemu_UI.vendorCloudController.GoogleDriveController;
 
 import javafx.application.Platform;
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 
 public class CloudController {
 
@@ -63,105 +70,144 @@ public class CloudController {
 		LOGGER.info("cloud initialisation done!");
 		return success;
 	}
-	
-	public void stratupCheck(String cloudService, String cemuDirectory) {
-		if(cloudService.equals("GoogleDrive")) {
-			LOGGER.info("starting startup check google drive ...");
-			try {
-				if (!googleDriveController.checkFolder()) {
-					googleDriveController.creatFolder();
-					mwc.saveSettings();
-					
-	        		Thread thread = new Thread(new Runnable() {
-	        			@Override
-						public void run() {
-	        				Platform.runLater(() -> {
-	    	            		mwc.getPlayBtn().setText("syncing...");
-	    	                });
-	        				googleDriveController.uploadAllFiles();
-	        				Platform.runLater(() -> {
-	        				mwc.getPlayBtn().setText("play");
-	    	                });
-	        			}
-	        		});
-	        		thread.start();
-				} else {
-					sync(cloudService, cemuDirectory);
-				}
-			} catch (IOException e) {
-				LOGGER.error("google drive startup check failed", e);
-			}
-		}
-		if(cloudService.equals("Dropbox")) {
-			
-		}
-	}
-	
-	
-	
-	public void sync(String cloudService, String cemuDirectory) {
-		
-		//running sync in a new thread, instead of blocking the main thread
+
+	/**
+	 * to trigger a new sync set the mwc LastLocalSync to the actual time and call the sync method
+	 * @param cloudService
+	 * @param cemuDirectory
+	 * @param cemu_UIDirectory
+	 */
+	public void sync(String cloudService, String cemuDirectory, String cemu_UIDirectory) {
+
+		// running sync in a new thread, instead of blocking the main thread
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-            	Platform.runLater(() -> {
-        			mwc.getPlayBtn().setText("syncing...");
-                 });
-            	LOGGER.info("starting synchronization in new thread ...");
-            	
-            	if(cloudService.equals("GoogleDrive")) {
-        			try {
-        				googleDriveController.sync(cemuDirectory);
-        			} catch (IOException e) {
-        				LOGGER.error("google drive synchronization failed", e);
-        			}
-        		}
-        		if(cloudService.equals("Dropbox")) {
-        			
-        		}
-        		Platform.runLater(() -> {
-            		mwc.getPlayBtn().setText("play");
-            		mwc.saveSettings();
-                 });
-        		LOGGER.info("synchronization successful!");
-            }
-        });
-		thread.start();
-		
-	}	
-	
-	void uploadFile(String cloudService, File file) {
-		
-		//running uploadFile in a new thread, instead of blocking the main thread
-		new Thread() {
-            @Override
-			public void run() {
-            	LOGGER.info("starting uploadFile in new thread ...");
-            	
-            	if(cloudService.equals("GoogleDrive")) {
-       			 	try {
-       			 		googleDriveController.uploadFile(file);
-       			 	} catch (IOException e) {
-       			 		LOGGER.error("google drive uploadFile failed" ,e);
-       			 	}
-            	}
-            	if(cloudService.equals("Dropbox")) {
+				try {
+					Platform.runLater(() -> {
+						mwc.getPlayBtn().setDisable(true);
+						mwc.getPlayBtn().setText("syncing...");
+					});
+					LOGGER.info("starting synchronization in new thread ...");
+					
+					// zip the saves folder
+					File zipFile = zipSavegames(cemu_UIDirectory, cemuDirectory);
 
-            	}
-            }
-        }.start();
+					// upload the zip
+					switch (cloudService) {
+					
+					// use GoogleDriveController
+					case "GoogleDrive":
+						LOGGER.info("using GoogleDriveController");
+						long lastCloudSync = googleDriveController.getLastCloudSync();
+						
+						if (!googleDriveController.checkFolder()) {
+							LOGGER.info("cloud sync folder dosen't exist, creating one!");
+							googleDriveController.creatFolder();
+							googleDriveController.uploadZipFile(zipFile);
+						} else if (mwc.getLastLocalSync() > lastCloudSync) {
+							LOGGER.info("local is new, going to upload zip");
+							googleDriveController.uploadZipFile(zipFile);
+						} else if(mwc.getLastLocalSync() < lastCloudSync) {
+							LOGGER.info("cloud is new, going to download zip");
+							unzipSavegames(cemuDirectory, googleDriveController.downloadZipFile(cemu_UIDirectory));
+							mwc.setLastLocalSync(lastCloudSync);
+							break;
+						} else {
+							LOGGER.info("nothing to do");
+							break;
+						}
+						mwc.setLastLocalSync(Long.parseLong(zipFile.getName().substring(0, zipFile.getName().length()-4))); // set time of last sucessfull sync
+						break;
+						
+						
+
+					case "Dropbox":
+
+						break;
+
+						
+					default:
+						LOGGER.warn("no cloud vendor found!");
+						break;
+					}
+					
+					zipFile.delete(); // delete zipfile in cem_UI directory
+
+					Platform.runLater(() -> {
+						mwc.getPlayBtn().setText("play");
+						mwc.getPlayBtn().setDisable(false);
+						mwc.saveSettings();
+					});
+					
+
+					LOGGER.info("synchronization successful!");
+				} catch (Exception e) {
+					LOGGER.error("There was an error during syncronisation! Please open a new issue on the cemu_UI github page:", e);
+				}
+			}
+		});
+		thread.start();
+	}
 	
+	private File zipSavegames(String cemu_UIDirectory, String cemuDirectory) throws Exception {
+		long unixTimestamp = Instant.now().getEpochSecond();
+		FileOutputStream fos = new FileOutputStream(cemu_UIDirectory + "/" + unixTimestamp + ".zip");
+		ZipOutputStream zos = new ZipOutputStream(fos);
+		addDirToZipArchive(zos, new File(cemuDirectory + "/mlc01/usr/save"), null);
+		zos.flush();
+		fos.flush();
+		zos.close();
+		fos.close();
+		return new File(cemu_UIDirectory + "/" + unixTimestamp + ".zip");
+	}
+	
+	private static void addDirToZipArchive(ZipOutputStream zos, File fileToZip, String parrentDirectoryName) throws Exception {
+	    if (fileToZip == null || !fileToZip.exists()) {
+	        return;
+	    }
+
+	    String zipEntryName = fileToZip.getName();
+	    if (parrentDirectoryName!=null && !parrentDirectoryName.isEmpty()) {
+	        zipEntryName = parrentDirectoryName + "/" + fileToZip.getName();
+	    }
+
+	    if (fileToZip.isDirectory()) {
+	        for (File file : fileToZip.listFiles()) {
+	            addDirToZipArchive(zos, file, zipEntryName);
+	        }
+	    } else {
+	        byte[] buffer = new byte[1024];
+	        FileInputStream fis = new FileInputStream(fileToZip);
+	        zos.putNextEntry(new ZipEntry(zipEntryName));
+	        int length;
+	        while ((length = fis.read(buffer)) > 0) {
+	            zos.write(buffer, 0, length);
+	        }
+	        zos.closeEntry();
+	        fis.close();
+	    }
+	}
+	
+	private void unzipSavegames(String cemuDirectory, File outputFile) {
+		try {			
+			ZipFile zipFile = new ZipFile(outputFile);
+		    zipFile.extractAll(cemuDirectory + "/mlc01/usr");
+		    outputFile.delete();
+		    LOGGER.info("unzip successfull");
+		} catch (ZipException e) {
+		    LOGGER.error("an error occurred during unziping the file!", e);
+		}
 	}
 	
 	public String getFolderID(String cloudService) {
 		String folderID = "";
 		if (cloudService != null) {
-			if(cloudService.equals("GoogleDrive")) {
+			if (cloudService.equals("GoogleDrive")) {
 				folderID = googleDriveController.getFolderID();
 			}
-			if(cloudService.equals("Dropbox")) {
-				
+			if (cloudService.equals("Dropbox")) {
+
 			}
 		}
 		return folderID;
@@ -173,8 +219,9 @@ public class CloudController {
 				googleDriveController.setFolderID(folderID);
 			}
 			if (cloudService.equals("Dropbox")) {
-				
+
 			}
 		}
 	}
+	
 }

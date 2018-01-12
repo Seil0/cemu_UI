@@ -51,11 +51,11 @@ import javafx.scene.layout.AnchorPane;
 
 public class Main extends Application {
 	
-	Stage primaryStage;
-	public MainWindowController mainWindowController; // TODO find a better way
-	CloudController cloudController;
-	AnchorPane pane;
-	Scene scene;	// TODO make private
+	private Stage primaryStage;
+	private MainWindowController mainWindowController;
+	private CloudController cloudController;
+	private AnchorPane pane;
+	private Scene scene;
 	private static String userHome = System.getProperty("user.home");
 	private static String userName = System.getProperty("user.name");
 	private static String osName = System.getProperty("os.name");
@@ -69,8 +69,7 @@ public class Main extends Application {
 	private File directory;
 	private File configFile;
 	private File gamesDBFile;
-	@SuppressWarnings("unused")
-	private File localDB;
+	private File reference_gamesFile;
 	private File pictureCache;
     private static Logger LOGGER;
 	
@@ -97,7 +96,7 @@ public class Main extends Application {
 			primaryStage.setTitle("cemu_UI");
 //			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/resources/Homeflix_Icon_64x64.png"))); //adds application icon
 
-			mainWindowController = loader.getController();	// Link of FXMLController and controller class
+			mainWindowController = loader.getController(); // Link of FXMLController and controller class
 			mainWindowController.setMain(this);	// call setMain
 			cloudController = new CloudController(mainWindowController); // call cloudController constructor
 			
@@ -106,13 +105,13 @@ public class Main extends Application {
 				directory = new File(dirLinux);
 				configFile = new File(dirLinux + "/config.xml");
 				gamesDBFile = new File(dirLinux + "/games.db");
-				localDB = new File(dirLinux+"/localRoms.db");
+				reference_gamesFile = new File(dirLinux + "/reference_games.db");
 				pictureCache= new File(dirLinux+"/picture_cache");
 			} else {
 				directory = new File(dirWin);
 				configFile = new File(dirWin + "/config.xml");
 				gamesDBFile = new File(dirWin + "/games.db");
-				localDB = new File(dirWin+"/localRoms.db");
+				reference_gamesFile = new File(dirWin + "/reference_games.db");
 				pictureCache= new File(dirWin+"/picture_cache");
 			}
 			
@@ -139,6 +138,8 @@ public class Main extends Application {
 				firstStart();
 				mainWindowController.setColor("00a8cc");
 				mainWindowController.setAutoUpdate(false);
+				mainWindowController.setLanguage("en_US");
+				mainWindowController.setLastLocalSync(0);
 				mainWindowController.setxPosHelper(0);
 				mainWindowController.saveSettings();
 				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
@@ -149,12 +150,16 @@ public class Main extends Application {
 				pictureCache.mkdir();
 			}
 			
-			if (gamesDBFile.exists() != true) {
+			
+			if (!reference_gamesFile.exists()) {
+				if (gamesDBFile.exists()) {
+					gamesDBFile.delete();
+				}
 				try {
-					LOGGER.info("downloading games.db... ");
+					LOGGER.info("downloading ReferenceGameList.db... ");
 					URL website = new URL(gamesDBdownloadURL);
 					ReadableByteChannel rbc = Channels.newChannel(website.openStream());
-					FileOutputStream fos = new FileOutputStream(gamesDBFile);
+					FileOutputStream fos = new FileOutputStream(reference_gamesFile);
 					fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
 					fos.close();
 					LOGGER.info("finished downloading games.db");
@@ -165,11 +170,12 @@ public class Main extends Application {
 			
 			// loading settings and initialize UI, dbController.main() loads all databases
 			mainWindowController.init();
-			mainWindowController.dbController.main();
+			mainWindowController.dbController.init();
+			
 			// if cloud sync is activated start sync
 			if(mainWindowController.isCloudSync()) {
 				cloudController.initializeConnection(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
-				cloudController.stratupCheck(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
+				cloudController.sync(mainWindowController.getCloudService(), mainWindowController.getCemuPath(), directory.getPath());
 			}			
 			mainWindowController.addUIData();
 			
@@ -224,8 +230,6 @@ public class Main extends Application {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, final Number newValue) {
 				int xPosHelperMax = (int) Math.floor((mainWindowController.getMainAnchorPane().getWidth() - 36) / 217);
-
-				mainWindowController.refreshplayBtnPosition();
 				
 				// call only if there is enough space for a new row
 				if (mainWindowController.getOldXPosHelper() != xPosHelperMax) {
@@ -307,5 +311,37 @@ public class Main extends Application {
 	@Override
 	public void stop() {
 	    System.exit(0);
+	}
+
+	public Stage getPrimaryStage() {
+		return primaryStage;
+	}
+
+	public void setPrimaryStage(Stage primaryStage) {
+		this.primaryStage = primaryStage;
+	}
+
+	public CloudController getCloudController() {
+		return cloudController;
+	}
+
+	public void setCloudController(CloudController cloudController) {
+		this.cloudController = cloudController;
+	}
+
+	public AnchorPane getPane() {
+		return pane;
+	}
+
+	public void setPane(AnchorPane pane) {
+		this.pane = pane;
+	}
+
+	public File getDirectory() {
+		return directory;
+	}
+
+	public void setDirectory(File directory) {
+		this.directory = directory;
 	}
 }

@@ -42,7 +42,9 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
 import javax.imageio.ImageIO;
 import javax.swing.ProgressMonitor;
@@ -54,7 +56,7 @@ import org.apache.logging.log4j.Logger;
 
 import com.cemu_UI.controller.SmmdbAPIController;
 import com.cemu_UI.controller.UpdateController;
-import com.cemu_UI.controller.dbController;
+import com.cemu_UI.controller.DBController;
 import com.cemu_UI.datatypes.CourseTableDataType;
 import com.cemu_UI.datatypes.SmmdbApiDataType;
 import com.cemu_UI.datatypes.UIROMDataType;
@@ -170,6 +172,9 @@ public class MainWindowController {
 
 	@FXML
 	private JFXToggleButton fullscreenToggleBtn;
+	
+	@FXML
+	private ChoiceBox<String> languageChoisBox;
 
 	@FXML
 	private ChoiceBox<String> branchChoisBox;
@@ -203,6 +208,9 @@ public class MainWindowController {
 
 	@FXML
 	private HBox topHBox;
+	
+	@FXML
+	private HBox bottomHBox;
 
 	@FXML
 	private ImageView smmdbImageView;
@@ -221,6 +229,9 @@ public class MainWindowController {
 
 	@FXML
 	private Label mainColorLbl;
+	
+	@FXML
+	private Label languageLbl;
 
 	@FXML
 	private Label updateLbl;
@@ -253,7 +264,7 @@ public class MainWindowController {
 	private JFXTreeTableColumn<CourseTableDataType, Integer> timeColumn = new JFXTreeTableColumn<>("time");
 
 	Main main;
-	dbController dbController;
+	DBController dbController;
 	SmmdbAPIController smmdbAPIController;
 	playGame playGame;
 	private static MainWindowController MWC;
@@ -275,8 +286,8 @@ public class MainWindowController {
 	private String selectedGameTitleID;
 	private String selectedGameTitle;
 	private String id;
-	private String version = "0.2.2";
-	private String buildNumber = "061";
+	private String version = "0.2.3";
+	private String buildNumber = "071";
 	private String versionName = "Puzzle Plank Galaxy";
 	private int xPos = -200;
 	private int yPos = 17;
@@ -284,6 +295,7 @@ public class MainWindowController {
 	private int oldXPosHelper;
 	private int selectedUIDataIndex;
 	private int selected;
+	private long lastLocalSync;
 	private double windowWidth;
 	private double windowHeight;
 	private DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -294,6 +306,7 @@ public class MainWindowController {
 	private File pictureCacheWin = new File(dirWin + "/picture_cache");
 	private File pictureCacheLinux = new File(dirLinux + "/picture_cache");
 	private ObservableList<String> branches = FXCollections.observableArrayList("stable", "beta");
+	private ObservableList<String> languages = FXCollections.observableArrayList("English (en_US)", "Deutsch (de_DE)");
 	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2", "44fc5929"); // TODO add more IDs
 	private ObservableList<UIROMDataType> games = FXCollections.observableArrayList();
 	ObservableList<SmmdbApiDataType> courses = FXCollections.observableArrayList();
@@ -322,10 +335,45 @@ public class MainWindowController {
 	private ImageView cached_white = new ImageView(new Image("icons/ic_cached_white_24dp_1x.png"));
 	private ImageView smmdb_white = new ImageView(new Image("icons/ic_get_app_white_24dp_1x.png"));
 	private Image close_black = new Image("icons/close_black_2048x2048.png");
-
-	public void setMain(Main main) {
-		this.main = main;
-		dbController = new dbController(this);
+	
+	// language support
+	private ResourceBundle bundle;
+	private String language;
+	private String editHeadingText;
+	private String editBodyText;
+	private String removeHeadingText;
+	private String removeBodyText;
+	private String addUpdateHeadingText;
+	private String addUpdateBodyText;
+	private String addDLCHeadingText;
+	private String addDLCBodyText;
+	private String licensesLblHeadingText;
+	private String licensesLblBodyText;
+	private String showLicenses;
+	private String aboutBtnHeadingText;
+	private String aboutBtnBodyText;
+	private String cloudSyncWaringHeadingText;
+	private String cloudSyncWaringBodyText;
+	private String cloudSyncErrorHeadingText;
+	private String cloudSyncErrorBodyText;
+	private String addGameBtnHeadingText;
+	private String addGameBtnBodyText;
+	private String addBtnReturnErrorHeadingText;
+	private String addBtnReturnErrorBodyText;
+	private String lastPlayed;
+	private String today;
+	private String yesterday;
+	private String never;
+	
+	private String playBtnPlay;
+	private String playBtnUpdating;
+	private String playBtnCopyingFiles;
+	private String smmdbDownloadBtnLoading;
+	private String smmdbDownloadBtnDownload;
+	
+	public void setMain(Main m) {
+		this.main = m;
+		dbController = new DBController(this);
 		smmdbAPIController = new SmmdbAPIController();
 	}
 	
@@ -349,7 +397,6 @@ public class MainWindowController {
 		if (getWindowWidth() > 100 && getWindowHeight() > 100) {
 			mainAnchorPane.setPrefSize(getWindowWidth(), getWindowHeight());	
 		}
-		refreshplayBtnPosition();
 		
 		cemuTextField.setText(cemuPath);
 		romTextField.setText(romPath);
@@ -358,6 +405,8 @@ public class MainWindowController {
 		cloudSyncToggleBtn.setSelected(isCloudSync());
 		autoUpdateToggleBtn.setSelected(isAutoUpdate());
 		branchChoisBox.setItems(branches);
+		languageChoisBox.setItems(languages);
+		bottomHBox.setPickOnBounds(false);
 		
 		if (isUseBeta()) {
 			branchChoisBox.getSelectionModel().select(1);
@@ -386,6 +435,8 @@ public class MainWindowController {
 		courseTreeTable.getColumns().add(starsColumn);
 		courseTreeTable.getColumns().add(idColumn);
 		courseTreeTable.getColumns().get(3).setVisible(false); // the idColumn should not bee displayed
+		
+		setUILanguage();
 		
 		LOGGER.info("initializing UI done");
 	}
@@ -433,10 +484,9 @@ public class MainWindowController {
 					String[] gameInfo = dbController.getGameInfo(selectedGameTitleID);
 
 					// new edit dialog
-					String headingText = "edit a game";
-					String bodyText = "You can edit the tile and rom/cover path.";
-					JFXEditGameDialog editGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 450,
-							300, 1, MWC, main.primaryStage, main.pane);
+					String headingText = editHeadingText + " \"" + selectedGameTitle + "\"";
+					JFXEditGameDialog editGameDialog = new JFXEditGameDialog(headingText, editBodyText, dialogBtnStyle, 450,
+							300, 1, MWC, main.getPrimaryStage(), main.getPane());
 					editGameDialog.setTitle(gameInfo[0]);
 					editGameDialog.setCoverPath(gameInfo[1]);
 					editGameDialog.setRomPath(gameInfo[2]);
@@ -453,8 +503,8 @@ public class MainWindowController {
             public void handle(ActionEvent event) {		
 				try {
 					LOGGER.info("remove " + selectedGameTitle + "(" + selectedGameTitleID + ")");
-					String headingText = "remove \"" + selectedGameTitle + "\"";
-					String bodyText = "Are you sure you want to delete " + selectedGameTitle + " ?";
+					String headingText = removeHeadingText + " \"" + selectedGameTitle + "\"";
+					String bodyText = removeBodyText + " " + selectedGameTitle + " ?";
 					EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
@@ -471,12 +521,12 @@ public class MainWindowController {
 					EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
-							// do nothing
+							LOGGER.info("Action canceld by user!");
 						}
 					};
 
 					JFXOkayCancelDialog removeGameDialog = new JFXOkayCancelDialog(headingText, bodyText,
-							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.pane);
+							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.getPane(), bundle);
 					removeGameDialog.show();
 				} catch (Exception e) {
 					LOGGER.error("error while removing " + selectedGameTitle + "(" + selectedGameTitleID + ")", e);
@@ -489,23 +539,16 @@ public class MainWindowController {
 			public void handle(ActionEvent event) {
 				try {
 					LOGGER.info("update: " + selectedGameTitleID);
-					String headingText = "update \"" + selectedGameTitle + "\"";
-					String bodyText = "pleas select the update root directory";
+					String headingText = addUpdateHeadingText + " \"" + selectedGameTitle + "\"";
 					EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
 							DirectoryChooser directoryChooser = new DirectoryChooser();
-							File selectedDirecroty = directoryChooser.showDialog(main.primaryStage);
+							File selectedDirecroty = directoryChooser.showDialog(main.getPrimaryStage());
 							String updatePath = selectedDirecroty.getAbsolutePath();
 							String[] parts = selectedGameTitleID.split("-"); // split string into 2 parts at "-"
 							File srcDir = new File(updatePath);
-							File destDir;
-
-							if (System.getProperty("os.name").equals("Linux")) {
-								destDir = new File(cemuPath + "/mlc01/usr/title/" + parts[0] + "/" + parts[1]);
-							} else {
-								destDir = new File(cemuPath + "\\mlc01\\usr\\title\\" + parts[0] + "\\" + parts[1]);
-							}
+							File destDir = new File(cemuPath + "/mlc01/usr/title/" + parts[0] + "/" + parts[1]);
 
 							// if directory doesn't exist create it
 							if (destDir.exists() != true) {
@@ -514,10 +557,10 @@ public class MainWindowController {
 
 							try {
 								LOGGER.info("copying the content of " + updatePath + " to " + destDir.toString());
-								playBtn.setText("updating...");
+								playBtn.setText(playBtnUpdating);
 								playBtn.setDisable(true);
-								FileUtils.copyDirectory(srcDir, destDir); // TODO progress indicator
-								playBtn.setText("play");
+								FileUtils.copyDirectory(srcDir, destDir);
+								playBtn.setText(playBtnPlay);
 								playBtn.setDisable(false);
 								LOGGER.info("copying files done!");
 							} catch (IOException e) {
@@ -529,12 +572,12 @@ public class MainWindowController {
 					EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
-							// do nothing
+							LOGGER.info("Action canceld by user!");
 						}
 					};
 
-					JFXOkayCancelDialog updateGameDialog = new JFXOkayCancelDialog(headingText, bodyText,
-							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.pane);
+					JFXOkayCancelDialog updateGameDialog = new JFXOkayCancelDialog(headingText, addUpdateBodyText,
+							dialogBtnStyle, 350, 170, okayAction, cancelAction, main.getPane(), bundle);
 					updateGameDialog.show();
 				} catch (Exception e) {
 					LOGGER.warn("trying to update " + selectedGameTitleID + ",which is not a valid type!", e);
@@ -547,23 +590,16 @@ public class MainWindowController {
 			public void handle(ActionEvent event) {
 				try {
 					LOGGER.info("add DLC: " + selectedGameTitleID);
-					String headingText = "add a DLC to \"" + selectedGameTitle + "\"";
-					String bodyText = "pleas select the DLC root directory";
+					String headingText = addDLCHeadingText + " \"" + selectedGameTitle + "\"";
 					EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
 							DirectoryChooser directoryChooser = new DirectoryChooser();
-							File selectedDirecroty = directoryChooser.showDialog(main.primaryStage);
+							File selectedDirecroty = directoryChooser.showDialog(main.getPrimaryStage());
 							String dlcPath = selectedDirecroty.getAbsolutePath();
 							String[] parts = selectedGameTitleID.split("-"); // split string into 2 parts at "-"
 							File srcDir = new File(dlcPath);
-							File destDir;
-							if (System.getProperty("os.name").equals("Linux")) {
-								destDir = new File(cemuPath + "/mlc01/usr/title/" + parts[0] + "/" + parts[1] + "/aoc");
-							} else {
-								destDir = new File(
-										cemuPath + "\\mlc01\\usr\\title\\" + parts[0] + "\\" + parts[1] + "\\aoc");
-							}
+							File destDir = new File(cemuPath + "/mlc01/usr/title/" + parts[0] + "/" + parts[1] + "/aoc");
 
 							// if directory doesn't exist create it
 							if (destDir.exists() != true) {
@@ -572,10 +608,10 @@ public class MainWindowController {
 
 							try {
 								LOGGER.info("copying the content of " + dlcPath + " to " + destDir.toString());
-								playBtn.setText("copying files...");
+								playBtn.setText(playBtnCopyingFiles);
 								playBtn.setDisable(true);
-								FileUtils.copyDirectory(srcDir, destDir); // TODO progress indicator
-								playBtn.setText("play");
+								FileUtils.copyDirectory(srcDir, destDir);
+								playBtn.setText(playBtnPlay);
 								playBtn.setDisable(false);
 								LOGGER.info("copying files done!");
 							} catch (IOException e) {
@@ -587,12 +623,12 @@ public class MainWindowController {
 					EventHandler<ActionEvent> cancelAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
-							// do nothing
+							LOGGER.info("Action canceld by user!");
 						}
 					};
 
-					JFXOkayCancelDialog addDLCDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle,
-							350, 170, okayAction, cancelAction, main.pane);
+					JFXOkayCancelDialog addDLCDialog = new JFXOkayCancelDialog(headingText, addDLCBodyText, dialogBtnStyle,
+							350, 170, okayAction, cancelAction, main.getPane(), bundle);
 					addDLCDialog.show();
 				} catch (Exception e) {
 					LOGGER.warn("trying to add a dlc to " + selectedGameTitleID + ",which is not a valid type!", e);
@@ -650,7 +686,6 @@ public class MainWindowController {
 			public void changed(ObservableValue<?> observable, Object oldVal, Object newVal) {
 				selected = courseTreeTable.getSelectionModel().getSelectedIndex(); // get selected item
 
-				// FIXME if a item is selected and you change the sorting,you can't select a new item
 				id = idColumn.getCellData(selected); // get name of selected item
 
 				for (int i = 0; i < courses.size(); i++) {
@@ -695,6 +730,17 @@ public class MainWindowController {
 				}
 			}
 		});
+		
+        languageChoisBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+            @Override
+  		public void changed(ObservableValue<? extends Number> ov, Number value, Number new_value) {
+          	  String language = languageChoisBox.getItems().get((int) new_value).toString();
+          	language = language.substring(language.length()-6,language.length()-1);	//reading only en_US from English (en_US)
+          	  setLanguage(language);
+          	  setUILanguage();
+          	  saveSettings();
+            }
+          });
 
 		branchChoisBox.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
 			@Override
@@ -712,17 +758,7 @@ public class MainWindowController {
 		    @Override
 		    public void handle(MouseEvent mouseEvent) {
 		        if(mouseEvent.getButton().equals(MouseButton.PRIMARY)){
-		        	
-		        	String headingText = "cemu_UI";
-		        	String bodyText = "cemu_UI is licensed under the terms of GNU GPL 3.\n\n"
-		        					+ "JFoenix, Apache License 2.0\n"
-		        					+ "minimal-json, MIT License\n"
-		        					+ "sqlite-jdbc, Apache License 2.0\n"
-		        					+ "Apache Commons IO, Apache License 2.0\n"
-		        					+ "Apache Commons Logging, Apache License 2.0\n"
-		        					+ "Apache Commons Codec, Apache License 2.0\n"
-		        					+ "Apache Log4j 2, Apache License 2.0\n";
-		        	
+
 		        	EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>() {
 						@Override
 						public void handle(ActionEvent event) {
@@ -750,16 +786,17 @@ public class MainWindowController {
 							}
 							
 							JFXTextAreaInfoDialog licenseDialog = new JFXTextAreaInfoDialog(headingText, bodyText,
-									dialogBtnStyle, 510, 450, main.pane);
+									dialogBtnStyle, 510, 450, main.getPane());
 							licenseDialog.show();
 							licenseDialog.getTextArea().setEditable(false);
 						}
 					};
 		        	
-					JFXOkayCancelDialog licenseOverviewDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle,
-							350, 275, okayAction, cancelAction, main.pane);
-					licenseOverviewDialog.setCancelText("show licenses");
-					licenseOverviewDialog.show(); 	
+					JFXOkayCancelDialog licenseOverviewDialog = new JFXOkayCancelDialog(licensesLblHeadingText,
+							licensesLblBodyText, dialogBtnStyle, 350, 275, okayAction, cancelAction, main.getPane(),
+							bundle);
+					licenseOverviewDialog.setCancelText(showLicenses);
+					licenseOverviewDialog.show();
 		        }
 		    }
 		});
@@ -774,12 +811,9 @@ public class MainWindowController {
     
     @FXML
     void aboutBtnAction() {
-    	String headingText = "cemu_UI";
     	String bodyText = "cemu_UI by @Seil0 \nVersion: " + version + " (" + buildNumber + ")  \"" + versionName + "\" \n"
-    					+ "This Application is made with free Software\n"
-    					+ "and licensed under the terms of GNU GPL 3.\n\n"
-    					+ "www.kellerkinder.xyz";
-    	JFXInfoDialog aboutDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 350, 200, main.pane);
+    					+ aboutBtnBodyText;
+    	JFXInfoDialog aboutDialog = new JFXInfoDialog(aboutBtnHeadingText, bodyText, dialogBtnStyle, 350, 200, main.getPane());
     	aboutDialog.show();
     }
 
@@ -805,9 +839,9 @@ public class MainWindowController {
 		JFXSpinner spinner = new JFXSpinner();
 		spinner.setPrefSize(30, 30);
 		spinner.setStyle(" -fx-background-color: #f4f4f4;");
-		main.pane.getChildren().add(spinner);
-		AnchorPane.setTopAnchor(spinner, (main.pane.getHeight()-spinner.getPrefHeight())/2);
-    	AnchorPane.setLeftAnchor(spinner, (main.pane.getWidth()-spinner.getPrefWidth())/2);
+		main.getPane().getChildren().add(spinner);
+		AnchorPane.setTopAnchor(spinner, (main.getPane().getHeight()-spinner.getPrefHeight())/2);
+    	AnchorPane.setLeftAnchor(spinner, (main.getPane().getWidth()-spinner.getPrefWidth())/2);
     	
     	Thread thread = new Thread(new Runnable() {
 			@Override
@@ -816,7 +850,7 @@ public class MainWindowController {
 				
 				Platform.runLater(() -> {
 					refreshUIData(); // refresh the list of games displayed on screen
-					main.pane.getChildren().remove(spinner);
+					main.getPane().getChildren().remove(spinner);
                 });
 			}
 		});
@@ -838,7 +872,7 @@ public class MainWindowController {
 				@Override
 				public void run() {
 					Platform.runLater(() -> {
-						smmdbDownloadBtn.setText("loading ...");
+						smmdbDownloadBtn.setText(smmdbDownloadBtnLoading);
 						smmdbDownloadBtn.setDisable(true);
 						root.getChildren().remove(0,root.getChildren().size());
 	                });
@@ -852,7 +886,7 @@ public class MainWindowController {
 
 						Platform.runLater(() -> {
 							root.getChildren().add(new TreeItem<CourseTableDataType>(helpCourse)); // add data to root-node
-							smmdbDownloadBtn.setText("Download");
+							smmdbDownloadBtn.setText(smmdbDownloadBtnDownload);
 							smmdbDownloadBtn.setDisable(false);
 		                });
 					}
@@ -882,7 +916,7 @@ public class MainWindowController {
     
 	@FXML
 	void cemuTFBtnAction(ActionEvent event) {
-		File cemuDirectory = directoryChooser.showDialog(main.primaryStage);
+		File cemuDirectory = directoryChooser.showDialog(main.getPrimaryStage());
 		if (cemuDirectory == null) {
 			LOGGER.info("No Directory selected");
 		} else {
@@ -900,7 +934,7 @@ public class MainWindowController {
     
 	@FXML
 	void romTFBtnAction(ActionEvent event) {
-		File romDirectory = directoryChooser.showDialog(main.primaryStage);
+		File romDirectory = directoryChooser.showDialog(main.getPrimaryStage());
 		if (romDirectory == null) {
 			LOGGER.info("No Directory selected");
 		} else {
@@ -1034,10 +1068,6 @@ public class MainWindowController {
     	if(cloudSync) {
     		cloudSync = false;
     	} else {
-    		String headingText = "activate cloud savegame sync (beta)";
-    	   	String bodyText = "You just activate the cloud savegame sync function of cemu_UI, "
-   							+ "\nwhich is currently in beta. Are you sure you want to do this?";
-	    	
 	    	EventHandler<ActionEvent> okayAction = new EventHandler<ActionEvent>(){
 	    		 @Override
 	        	 public void handle(ActionEvent event){
@@ -1050,19 +1080,16 @@ public class MainWindowController {
 		    			@Override
 						public void run() {
 		    				
-		    				if (main.cloudController.initializeConnection(getCloudService(), getCemuPath())) {
-			        	    	main.cloudController.sync(getCloudService(), getCemuPath());
+		    				if (main.getCloudController().initializeConnection(getCloudService(), getCemuPath())) {
+		    					main.getCloudController().sync(getCloudService(), getCemuPath(), main.getDirectory().getPath());
 			        	        saveSettings();
 			    	    	} else {
 			    	    		cloudSyncToggleBtn.setSelected(false);
 
 			    	    	   	//cloud sync init error dialog
-			    	    		String headingText = "Error while initializing cloud sync!";
-			    		    	String bodyText = "There was some truble adding your game."
-			    		    					+ "\nPlease upload the app.log (which can be found in the cemu_UI directory)"
-			    		    					+ "\nto \"https://github.com/Seil0/cemu_UI/issues\" so we can fix this.";
-			    	    	   	JFXInfoDialog cloudSyncErrorDialog = new JFXInfoDialog(headingText, bodyText, dialogBtnStyle, 450, 170, main.pane);
-			    	    	   	cloudSyncErrorDialog.show();		
+								JFXInfoDialog cloudSyncErrorDialog = new JFXInfoDialog(cloudSyncErrorHeadingText,
+										cloudSyncErrorBodyText, dialogBtnStyle, 450, 170, main.getPane());
+								cloudSyncErrorDialog.show();
 			    	    	}
 		    				
 		    			}
@@ -1078,9 +1105,10 @@ public class MainWindowController {
 	    		 }
 	    	};
 	    	
-			JFXOkayCancelDialog cloudSyncErrorDialog = new JFXOkayCancelDialog(headingText, bodyText, dialogBtnStyle,
-					419, 140, okayAction, cancelAction, main.pane);
-	    	cloudSyncErrorDialog.show();	
+			JFXOkayCancelDialog cloudSyncWarningDialog = new JFXOkayCancelDialog(cloudSyncWaringHeadingText,
+					cloudSyncWaringBodyText, dialogBtnStyle, 419, 140, okayAction, cancelAction, main.getPane(),
+					bundle);
+			cloudSyncWarningDialog.show();
     	}
     }
     
@@ -1092,10 +1120,10 @@ public class MainWindowController {
     
 	@FXML
 	void addBtnAction(ActionEvent event) {
-		String headingText = "add a new game to cemu_UI";
-		String bodyText = "";
+		String headingText = addGameBtnHeadingText;
+		String bodyText = addGameBtnBodyText;
 		JFXEditGameDialog addGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 450, 300, 0,
-				this, main.primaryStage, main.pane);
+				this, main.getPrimaryStage(), main.getPane());
 		addGameDialog.show();
 	}
     
@@ -1104,25 +1132,21 @@ public class MainWindowController {
      * and add them to the database and the UI
      */
     public void addBtnReturn(String title, String coverPath, String romPath, String titleID) {
-    	File pictureCache;
-    	
     	/**
 		 * if one parameter dosen't contain any value do not add the game
 		 * else convert the cover to .png add copy it into the picture cache,
 		 * then add the rom to the local_roms database
 		 */
-    	System.out.println(romPath.length());
 		if (romPath.length() == 0 || coverPath.length() == 0 || title.length() == 0 || titleID.length() == 0) {
 			LOGGER.info("No parameter set!");
 			
 			//addGame error dialog
-			String headingTextError = "Error while adding a new Game!";
-	    	String bodyTextError = "There was some truble adding your game."
-	    						+ "\nOne of the needed values was empty, please try again to add your game."; 
-	    	JFXInfoDialog errorDialog = new JFXInfoDialog(headingTextError, bodyTextError, dialogBtnStyle, 350, 170, main.pane);	
-	    	errorDialog.show();
+			JFXInfoDialog errorDialog = new JFXInfoDialog(addBtnReturnErrorHeadingText, addBtnReturnErrorBodyText,
+					dialogBtnStyle, 350, 170, main.getPane());
+			errorDialog.show();
 
-		} else {
+		} else {	
+	    	File pictureCache;
 			String coverName = new File(coverPath).getName();
 			try	{
 				if (System.getProperty("os.name").equals("Linux")) {
@@ -1134,8 +1158,8 @@ public class MainWindowController {
 			    BufferedImage originalImage = ImageIO.read(new File(coverPath)); //load cover
 			    int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
 			    BufferedImage resizeImagePNG = resizeImage(originalImage, type, 400, 600);
-			    ImageIO.write(resizeImagePNG, "png", new File(pictureCache+"\\"+coverName)); //save image to pictureCache
-			    coverPath = pictureCache+"\\"+coverName;
+			    coverPath = pictureCache + "/" + coverName;
+			    ImageIO.write(resizeImagePNG, "png", new File(coverPath)); //save image to pictureCache
 			} catch (IOException e) {
 				LOGGER.error("Ops something went wrong! Error while resizing cover.", e);
 			}
@@ -1218,21 +1242,21 @@ public class MainWindowController {
 
 				// setting last played, if lastPlayed is empty game was never played before, else set correct date
 				if (dbController.getLastPlayed(titleID).equals("") || dbController.getLastPlayed(titleID).equals(null)) {
-					lastTimePlayedBtn.setText("Last played, never");
+					lastTimePlayedBtn.setText(lastPlayed + never);
 					totalPlaytimeBtn.setText(dbController.getTotalPlaytime(titleID) + " min");
 				} else {
 					DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-					int today = Integer.parseInt(dtf.format(LocalDate.now()).replaceAll("-", ""));
-					int yesterday = Integer.parseInt(dtf.format(LocalDate.now().minusDays(1)).replaceAll("-", ""));
-					int lastPlayedDay = Integer.parseInt(dbController.getLastPlayed(titleID).replaceAll("-", ""));
+					int tToday = Integer.parseInt(dtf.format(LocalDate.now()).replaceAll("-", ""));
+					int tYesterday = Integer.parseInt(dtf.format(LocalDate.now().minusDays(1)).replaceAll("-", ""));
+					int tLastPlayedDay = Integer.parseInt(dbController.getLastPlayed(titleID).replaceAll("-", ""));
 
-					if (lastPlayedDay == today) {
-						lastTimePlayedBtn.setText("Last played, today");
-					} else if (lastPlayedDay == yesterday) {
-						lastTimePlayedBtn.setText("Last played, yesterday");
+					if (tLastPlayedDay == tToday) {
+						lastTimePlayedBtn.setText(lastPlayed + today);
+					} else if (tLastPlayedDay == tYesterday) {
+						lastTimePlayedBtn.setText(lastPlayed + yesterday);
 					} else {
-						lastTimePlayedBtn.setText("Last played, " + dbController.getLastPlayed(titleID));
+						lastTimePlayedBtn.setText(lastPlayed + dbController.getLastPlayed(titleID));
 					}
 				}
 
@@ -1295,17 +1319,86 @@ public class MainWindowController {
 		}
     }
     
-	void refreshplayBtnPosition() {
-		double width;
-
-		if (mainAnchorPane.getWidth() < 10) {
-			width = mainAnchorPane.getPrefWidth();
-		} else {
-			width = mainAnchorPane.getWidth();
-		}
-		playBtn.setLayoutX((width / 2) - 50);
-		totalPlaytimeBtn.setLayoutX((width / 2) - 50 - 20.5 - 100);
-		lastTimePlayedBtn.setLayoutX((width / 2) + 50 + 20.5);
+    void setUILanguage(){
+		switch(getLanguage()){
+		case "en_US":	
+			bundle = ResourceBundle.getBundle("locals.cemu_UI-Local", Locale.US);	//us_English
+			languageChoisBox.getSelectionModel().select(0);
+			break;
+     	case "de_DE":	
+     		bundle = ResourceBundle.getBundle("locals.cemu_UI-Local", Locale.GERMAN);	//German
+     		languageChoisBox.getSelectionModel().select(1);
+			break;
+     	default:		
+     		bundle = ResourceBundle.getBundle("locals.cemu_UI-Local", Locale.US);	//default local
+     		languageChoisBox.getSelectionModel().select(0);
+			break;
+		 }
+		
+		// Buttons
+		aboutBtn.setText(bundle.getString("aboutBtn"));
+		settingsBtn.setText(bundle.getString("settingsBtn"));
+		addBtn.setText(bundle.getString("addBtn"));
+		reloadRomsBtn.setText(bundle.getString("reloadRomsBtn"));
+		smmdbBtn.setText(bundle.getString("smmdbBtn"));
+		cemuTFBtn.setText(bundle.getString("cemuTFBtn"));
+		romTFBtn.setText(bundle.getString("romTFBtn"));
+		updateBtn.setText(bundle.getString("updateBtnCheckNow"));
+		smmdbDownloadBtn.setText(bundle.getString("smmdbDownloadBtn"));
+		playBtn.setText(bundle.getString("playBtn"));
+		cloudSyncToggleBtn.setText(bundle.getString("cloudSyncToggleBtn"));
+		autoUpdateToggleBtn.setText(bundle.getString("autoUpdateToggleBtn"));
+		fullscreenToggleBtn.setText(bundle.getString("fullscreenToggleBtn"));
+		
+		// Labels
+		cemu_UISettingsLbl.setText(bundle.getString("cemu_UISettingsLbl"));
+		cemuDirectoryLbl.setText(bundle.getString("cemuDirectoryLbl"));
+		romDirectoryLbl.setText(bundle.getString("romDirectoryLbl"));
+		mainColorLbl.setText(bundle.getString("mainColorLbl"));
+		languageLbl.setText(bundle.getString("languageLbl"));
+		updateLbl.setText(bundle.getString("updateLbl"));
+		branchLbl.setText(bundle.getString("branchLbl"));
+		cemuSettingsLbl.setText(bundle.getString("cemuSettingsLbl"));
+		licensesLbl.setText(bundle.getString("licensesLbl"));
+		
+		// Columns
+		titleColumn.setText(bundle.getString("titleColumn"));
+		idColumn.setText(bundle.getString("idColumn"));
+		starsColumn.setText(bundle.getString("starsColumn"));
+		timeColumn.setText(bundle.getString("timeColumn"));
+		
+		// Strings
+		editHeadingText = bundle.getString("editHeadingText");
+		editBodyText = bundle.getString("editBodyText");
+		removeHeadingText = bundle.getString("removeHeadingText");
+		removeBodyText = bundle.getString("removeBodyText");
+		addUpdateHeadingText = bundle.getString("addUpdateHeadingText");
+		addUpdateBodyText = bundle.getString("addUpdateBodyText");
+		addDLCHeadingText = bundle.getString("addDLCHeadingText");
+		addDLCBodyText = bundle.getString("addDLCBodyText");
+		licensesLblHeadingText = bundle.getString("licensesLblHeadingText");
+		licensesLblBodyText = bundle.getString("licensesLblBodyText");
+		showLicenses = bundle.getString("showLicenses");
+		aboutBtnHeadingText = bundle.getString("aboutBtnHeadingText");
+		aboutBtnBodyText = bundle.getString("aboutBtnBodyText");
+		cloudSyncWaringHeadingText = bundle.getString("cloudSyncWaringHeadingText");
+		cloudSyncWaringBodyText = bundle.getString("cloudSyncWaringBodyText");
+		cloudSyncErrorHeadingText = bundle.getString("cloudSyncErrorHeadingText");
+		cloudSyncErrorBodyText = bundle.getString("cloudSyncErrorBodyText");
+		addGameBtnHeadingText = bundle.getString("addGameBtnHeadingText");
+		addGameBtnBodyText = bundle.getString("addGameBtnBodyText");
+		addBtnReturnErrorHeadingText = bundle.getString("addBtnReturnErrorHeadingText");
+		addBtnReturnErrorBodyText = bundle.getString("addBtnReturnErrorBodyText");
+		lastPlayed = bundle.getString("lastPlayed");
+		today = bundle.getString("today");
+		yesterday = bundle.getString("yesterday");
+		never = bundle.getString("never");
+		
+		playBtnPlay = bundle.getString("playBtnPlay");
+		playBtnUpdating = bundle.getString("playBtnUpdating");
+		playBtnCopyingFiles = bundle.getString("playBtnCopyingFiles");
+		smmdbDownloadBtnLoading = bundle.getString("smmdbDownloadBtnLoading");
+		smmdbDownloadBtnDownload = bundle.getString("smmdbDownloadBtnDownload");
 	}
 
 	private void checkAutoUpdate() {
@@ -1547,6 +1640,7 @@ public class MainWindowController {
     		props.setProperty("cemuPath", getCemuPath());
 			props.setProperty("romPath", getRomPath());
 			props.setProperty("color", getColor());
+			props.setProperty("language", getLanguage());
 			props.setProperty("fullscreen", String.valueOf(isFullscreen()));
 			props.setProperty("cloudSync", String.valueOf(isCloudSync()));
 			props.setProperty("autoUpdate", String.valueOf(isAutoUpdate()));
@@ -1556,7 +1650,8 @@ public class MainWindowController {
 			} else {
 				props.setProperty("cloudService", getCloudService());
 			}
-			props.setProperty("folderID", main.cloudController.getFolderID(getCloudService()));
+			props.setProperty("folderID", main.getCloudController().getFolderID(getCloudService()));
+			props.setProperty("lastLocalSync", String.valueOf(getLastLocalSync()));
 			props.setProperty("windowWidth", String.valueOf(mainAnchorPane.getWidth()));
 			props.setProperty("windowHeight", String.valueOf(mainAnchorPane.getHeight()));
     		if(System.getProperty("os.name").equals("Linux")){
@@ -1608,6 +1703,13 @@ public class MainWindowController {
 				setColor("00a8cc");
 			}
 			
+			if (props.getProperty("language") == null) {
+				LOGGER.error("cloud not load language, setting default instead");
+				setLanguage("en_US");
+			} else {
+				setLanguage(props.getProperty("language"));
+			}
+			
 			try {
 				setFullscreen(Boolean.parseBoolean(props.getProperty("fullscreen")));
 			} catch (Exception e) {
@@ -1644,10 +1746,17 @@ public class MainWindowController {
 			}
 			
 			try {
-				main.cloudController.setFolderID(props.getProperty("folderID"), getCloudService());
+				main.getCloudController().setFolderID(props.getProperty("folderID"), getCloudService());
 			} catch (Exception e) {
 				LOGGER.error("could not load folderID, disable cloud sync. Please contact an developer", e);
 				setCloudSync(false);
+			}
+
+			try {
+				setLastLocalSync(Long.parseLong(props.getProperty("lastLocalSync")));
+			} catch (Exception e) {
+				LOGGER.error("could not load lastSuccessSync, setting default instead", e);
+				setLastLocalSync(0);
 			}
 			
 			try {
@@ -1689,43 +1798,21 @@ public class MainWindowController {
 	}
 	
 	private void playBtnSlideIn(){
-		playBtn.setVisible(true);
-		lastTimePlayedBtn.setVisible(true);
-		totalPlaytimeBtn.setVisible(true);
+		bottomHBox.setVisible(true);
 		playTrue = true;
 		
-		TranslateTransition playBtnTransition = new TranslateTransition(Duration.millis(300), playBtn);
+		TranslateTransition playBtnTransition = new TranslateTransition(Duration.millis(300), bottomHBox);
 		playBtnTransition.setFromY(56);
 		playBtnTransition.setToY(0);
 		playBtnTransition.play();
-		
-		TranslateTransition lastTimePlayedBtnTransition = new TranslateTransition(Duration.millis(300), lastTimePlayedBtn);
-		lastTimePlayedBtnTransition.setFromY(56);
-		lastTimePlayedBtnTransition.setToY(0);
-		lastTimePlayedBtnTransition.play();
-		
-		TranslateTransition timePlayedBtnTransition = new TranslateTransition(Duration.millis(300), totalPlaytimeBtn);
-		timePlayedBtnTransition.setFromY(56);
-		timePlayedBtnTransition.setToY(0);
-		timePlayedBtnTransition.play();
 	}
 	
 	private void playBtnSlideOut(){
 		playTrue = false;
-		TranslateTransition playBtnTransition = new TranslateTransition(Duration.millis(300), playBtn);
+		TranslateTransition playBtnTransition = new TranslateTransition(Duration.millis(300), bottomHBox);
 		playBtnTransition.setFromY(0);
 		playBtnTransition.setToY(56);
 		playBtnTransition.play();
-		
-		TranslateTransition lastTimePlayedBtnTransition = new TranslateTransition(Duration.millis(300), lastTimePlayedBtn);
-		lastTimePlayedBtnTransition.setFromY(0);
-		lastTimePlayedBtnTransition.setToY(56);
-		lastTimePlayedBtnTransition.play();
-		
-		TranslateTransition timePlayedBtnTransition = new TranslateTransition(Duration.millis(300), totalPlaytimeBtn);
-		timePlayedBtnTransition.setFromY(0);
-		timePlayedBtnTransition.setToY(56);
-		timePlayedBtnTransition.play();
 	}
 	
 	private void editColor(String input){
@@ -1831,6 +1918,14 @@ public class MainWindowController {
 		this.xPosHelper = xPosHelper;
 	}
 
+	public long getLastLocalSync() {
+		return lastLocalSync;
+	}
+
+	public void setLastLocalSync(long lastLocalSync) {
+		this.lastLocalSync = lastLocalSync;
+	}
+
 	public boolean isFullscreen() {
 		return fullscreen;
 	}
@@ -1917,6 +2012,22 @@ public class MainWindowController {
 
 	public void setOldXPosHelper(int oldXPosHelper) {
 		this.oldXPosHelper = oldXPosHelper;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
+	}
+
+	public ResourceBundle getBundle() {
+		return bundle;
+	}
+
+	public void setBundle(ResourceBundle bundle) {
+		this.bundle = bundle;
 	}
 
 	public AnchorPane getMainAnchorPane() {

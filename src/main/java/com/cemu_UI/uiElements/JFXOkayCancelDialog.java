@@ -22,13 +22,14 @@
 
 package com.cemu_UI.uiElements;
 
+import java.util.ResourceBundle;
+
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXDialog;
 import com.jfoenix.controls.JFXDialogLayout;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -39,8 +40,8 @@ public class JFXOkayCancelDialog {
 	private String headingText;
 	private String bodyText;
 	private String dialogBtnStyle;
-	private String okayText = "okay";
-	private String cancelText = "cancel";
+	private String okayText;
+	private String cancelText;
 	private int dialogWidth;
 	private int dialogHeight;
 	private EventHandler<ActionEvent> okayAction;
@@ -59,7 +60,8 @@ public class JFXOkayCancelDialog {
 	 * @param pane pane to which the dialog belongs
 	 */
 	public JFXOkayCancelDialog(String headingText, String bodyText, String dialogBtnStyle, int dialogWidth,
-			int dialogHeight, EventHandler<ActionEvent> okayAction, EventHandler<ActionEvent> cancelAction, Pane pane) {
+			int dialogHeight, EventHandler<ActionEvent> okayAction, EventHandler<ActionEvent> cancelAction, Pane pane,
+			ResourceBundle bundle) {
 		this.headingText = headingText;
 		this.bodyText = bodyText;
 		this.dialogBtnStyle = dialogBtnStyle;
@@ -68,9 +70,12 @@ public class JFXOkayCancelDialog {
 		this.okayAction = okayAction;
 		this.cancelAction = cancelAction;
 		this.pane = pane;
+		okayText = bundle.getString("okayBtnText");
+		cancelText = bundle.getString("cancelBtnText");
 	}
 	
 	public void show() {
+		
 		JFXDialogLayout content = new JFXDialogLayout();
     	content.setHeading(new Text(headingText));
     	content.setBody(new Text(bodyText));
@@ -93,9 +98,7 @@ public class JFXOkayCancelDialog {
     	cancelBtn.setButtonType(com.jfoenix.controls.JFXButton.ButtonType.RAISED);
     	cancelBtn.setPrefHeight(32);
     	cancelBtn.setStyle(dialogBtnStyle);
-    	Label placeholder = new Label();
-    	placeholder.setPrefSize(15, 10);
-    	content.setActions(cancelBtn, placeholder, okayBtn);
+    	content.setActions(cancelBtn, okayBtn);
     	content.setPrefSize(dialogWidth, dialogHeight);
     	pane.getChildren().add(stackPane);
     	AnchorPane.setTopAnchor(stackPane, (pane.getHeight()-content.getPrefHeight())/2);

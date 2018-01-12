@@ -47,10 +47,10 @@ import org.xml.sax.SAXException;
 
 import com.cemu_UI.application.MainWindowController;
 
-public class dbController {
+public class DBController {
 	
-	public dbController(MainWindowController m) {
-		mainWindowController = m;
+	public DBController(MainWindowController mwc) {
+		mainWindowController = mwc;
 	}
 	
 	private MainWindowController mainWindowController;
@@ -59,9 +59,14 @@ public class dbController {
 	private String DB_PATH_games;
 	private Connection connection = null;
 	private Connection connectionGames = null;
-	private static final Logger LOGGER = LogManager.getLogger(dbController.class.getName());
+	private static final Logger LOGGER = LogManager.getLogger(DBController.class.getName());
 	
-	public void main(){
+	/**
+	 * initialize the sqlite database controller
+	 * load ROM and games database
+	 * load all games
+	 */
+	public void init(){
 		LOGGER.info("<==========starting loading sql==========>");
 		loadRomDatabase();
 		loadGamesDatabase();
@@ -97,13 +102,13 @@ public class dbController {
 	 * set the path to the localRoms.db file and initialize the connection
 	 * 
 	 * games.dbcontains a reverence list to for the automatic detection mode
-	 * TODO this should be called ReferenceGameList the games table should be called reference_games
+	 * TODO rework paths
 	 */
 	private void loadGamesDatabase() {
 		if (System.getProperty("os.name").equals("Linux")) {
-			DB_PATH_games = System.getProperty("user.home") + "/cemu_UI/games.db";
+			DB_PATH_games = System.getProperty("user.home") + "/cemu_UI/reference_games.db";
 		} else {
-			DB_PATH_games = System.getProperty("user.home") + "\\Documents\\cemu_UI" + "\\" + "games.db";
+			DB_PATH_games = System.getProperty("user.home") + "\\Documents\\cemu_UI" + "\\" + "reference_games.db";
 		}
 		try {
 			// create a database connection
@@ -221,37 +226,30 @@ public class dbController {
 			LOGGER.info("Getting all .rpx files in " + dir.getCanonicalPath()+" including those in subdirectories");
 			// for all files in dir get the app.xml
 			for (File file : files) {
-				if(System.getProperty("os.name").equals("Linux")){
-					appFile = new File(file.getParent()+"/app.xml");
-				} else {
-					appFile = new File(file.getParent()+"\\app.xml");
-				}
+				appFile = new File(file.getParent() + "/app.xml");
 				DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
 				DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 				Document document = documentBuilder.parse(appFile);
-				String title_ID = document.getElementsByTagName("title_id").item(0).getTextContent(); //get titile_ID from app.xml
+				String title_ID = document.getElementsByTagName("title_id").item(0).getTextContent(); // get titile_ID from app.xml
 				title_ID = title_ID.substring(0, 8) + "-" + title_ID.substring(8, title_ID.length());
-				LOGGER.info("Name: "+file.getName()+"; Title ID: "+title_ID);
-				ResultSet rs = stmt.executeQuery("SELECT * FROM games WHERE TitleID = '"+title_ID+"';");
+				LOGGER.info("Name: " + file.getName() + "; Title ID: " + title_ID);
+				ResultSet rs = stmt.executeQuery("SELECT * FROM games WHERE TitleID = '" + title_ID + "';");
+				
 				// for all elements in the games table check if it's already present, else add it
 				while (rs.next()) {
 					if (checkEntry(rs.getString(2))) {
 						LOGGER.info(rs.getString(2) + ": game already in database");
-					}else{
+					} else {
 						LOGGER.info("adding cover to cache ...");
-						BufferedImage originalImage = ImageIO.read(new URL(rs.getString(6)));//change path to where file is located
-					    int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
-					    BufferedImage resizeImagePNG = resizeImage(originalImage, type, 400, 600);
-					    if(System.getProperty("os.name").equals("Linux")) {
-						    ImageIO.write(resizeImagePNG, "png", new File(pictureCache+"/"+rs.getString(3)+".png")); //change path where you want it saved
-						    coverPath = pictureCache+"/"+rs.getString(3)+".png";
-					    } else {
-						    ImageIO.write(resizeImagePNG, "png", new File(pictureCache+"\\"+rs.getString(3)+".png")); //change path where you want it saved
-						    coverPath = pictureCache+"\\"+rs.getString(3)+".png";
-					    }
-					    
+						BufferedImage originalImage = ImageIO.read(new URL(rs.getString(6)));// change path to where file is located
+						int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
+						BufferedImage resizeImagePNG = resizeImage(originalImage, type, 400, 600);
+
+						ImageIO.write(resizeImagePNG, "png", new File(pictureCache + "/" + rs.getString(3) + ".png"));
+						coverPath = pictureCache + "/" + rs.getString(3) + ".png";
 						LOGGER.info(rs.getString(2) + ": adding ROM");
-						addGame(rs.getString(2), coverPath, file.getCanonicalPath(), rs.getString(1), rs.getString(3), rs.getString(5),"","0");
+						addGame(rs.getString(2), coverPath, file.getCanonicalPath(), rs.getString(1), rs.getString(3),
+								rs.getString(5), "", "0");
 					}
 				}
 			}
