@@ -26,8 +26,6 @@ If you want to use the cloud sync function read the [wiki](https://github.com/Se
 ## [planed Features](https://github.com/Seil0/cemu_UI/projects/1) (no ETA)
 
 * Controller support
-* more UI improvements
-* support more rom file formats in automatic detection
 
 ### If you have another idea, make a "new issue" with the ![#f03c15](https://placehold.it/15/fbca04/000000?text=+)`idea` lable
 
