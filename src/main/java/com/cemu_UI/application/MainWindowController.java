@@ -157,6 +157,9 @@ public class MainWindowController {
 	
 	@FXML
 	private JFXTextField courseSearchTextFiled;
+	
+	@FXML
+	private JFXTextField executeCommandTextFiled;
 
 	@FXML
 	private TextFlow smmdbTextFlow;
@@ -279,8 +282,9 @@ public class MainWindowController {
 	private boolean cloudSync;
 	private String cloudService = ""; // set cloud provider (at the moment only GoogleDrive, Dropbox is planed)
 	private String cemuPath;
-	private String romPath;
+	private String romDirectoryPath;
 	private String gameExecutePath;
+	private String executeCommand;
 	private String color;
 	private String dialogBtnStyle;
 	private String selectedGameTitleID;
@@ -399,7 +403,8 @@ public class MainWindowController {
 		}
 		
 		cemuTextField.setText(cemuPath);
-		romTextField.setText(romPath);
+		romTextField.setText(romDirectoryPath);
+		executeCommandTextFiled.setText(getExecuteCommand());
 		colorPicker.setValue(Color.valueOf(getColor()));
 		fullscreenToggleBtn.setSelected(isFullscreen());
 		cloudSyncToggleBtn.setSelected(isCloudSync());
@@ -800,6 +805,30 @@ public class MainWindowController {
 		        }
 		    }
 		});
+        
+        cemuTextField.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				setCemuPath(cemuTextField.getText());
+	    		saveSettings();
+			}
+		});
+        
+        romTextField.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				setRomDirectoryPath(romTextField.getText());
+	    		saveSettings();
+			}
+		});
+        
+        executeCommandTextFiled.textProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				setExecuteCommand(executeCommandTextFiled.getText());
+	    		saveSettings();
+			}
+		});
 
 		LOGGER.info("initializing Actions done!");
 	}
@@ -846,7 +875,7 @@ public class MainWindowController {
     	Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				dbController.loadRomDirectory(getRomPath()); // reload the rom directory
+				dbController.loadRomDirectory(getRomDirectoryPath()); // reload the rom directory
 				
 				Platform.runLater(() -> {
 					refreshUIData(); // refresh the list of games displayed on screen
@@ -938,7 +967,7 @@ public class MainWindowController {
 		if (romDirectory == null) {
 			LOGGER.info("No Directory selected");
 		} else {
-			setRomPath(romDirectory.getAbsolutePath());
+			setRomDirectoryPath(romDirectory.getAbsolutePath());
 			saveSettings();
 			cemuTextField.setText(getCemuPath());
 			try {
@@ -1042,23 +1071,15 @@ public class MainWindowController {
     }
     
 	@FXML
-	void cemuTextFieldAction(ActionEvent event) {
-		setCemuPath(cemuTextField.getText());
-		saveSettings();
-	}
-    
-	@FXML
-	void romTextFieldAction(ActionEvent event) {
-		setRomPath(romTextField.getText());
-		saveSettings();
-	}
-    
-	@FXML
 	void fullscreenToggleBtnAction(ActionEvent event) {
 		if (fullscreen) {
 			fullscreen = false;
+			setExecuteCommand(getExecuteCommand().replace("-f -g", "-g"));
+			executeCommandTextFiled.setText(getExecuteCommand());
 		} else {
 			fullscreen = true;
+			setExecuteCommand(getExecuteCommand().replace("-g", "-f -g"));
+			executeCommandTextFiled.setText(getExecuteCommand());
 		}
 		saveSettings();
 	}
@@ -1638,7 +1659,8 @@ public class MainWindowController {
     	OutputStream outputStream;	//new output-stream
     	try {
     		props.setProperty("cemuPath", getCemuPath());
-			props.setProperty("romPath", getRomPath());
+			props.setProperty("romPath", getRomDirectoryPath());
+			props.setProperty("executeCommand", getExecuteCommand());
 			props.setProperty("color", getColor());
 			props.setProperty("language", getLanguage());
 			props.setProperty("fullscreen", String.valueOf(isFullscreen()));
@@ -1690,10 +1712,17 @@ public class MainWindowController {
 			}
 			
 			try {
-				setRomPath(props.getProperty("romPath"));
+				setRomDirectoryPath(props.getProperty("romPath"));
 			} catch (Exception e) {
 				LOGGER.error("could not load romPath", e);
-				setRomPath("");
+				setRomDirectoryPath("");
+			}
+			
+			if (props.getProperty("executeCommand") == null) {
+				LOGGER.error("could not load executeCommand, setting default instead!");
+				setExecuteCommand(getCemuPath() + "\\Cemu.exe -g ");
+			} else {
+				setExecuteCommand(props.getProperty("executeCommand"));
 			}
 			
 			try {
@@ -1862,14 +1891,22 @@ public class MainWindowController {
 		this.cemuPath = cemuPath;
 	}
 	
-	public String getRomPath() {
-		return romPath;
+	public String getRomDirectoryPath() {
+		return romDirectoryPath;
 	}
 
-	public void setRomPath(String romPath) {
-		this.romPath = romPath;
+	public void setRomDirectoryPath(String romDirectoryPath) {
+		this.romDirectoryPath = romDirectoryPath;
 	}
 	
+	public String getExecuteCommand() {
+		return executeCommand;
+	}
+
+	public void setExecuteCommand(String executeCommand) {
+		this.executeCommand = executeCommand;
+	}
+
 	public String getColor() {
 		return color;
 	}

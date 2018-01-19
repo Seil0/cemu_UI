@@ -57,19 +57,22 @@ public class playGame extends Thread{
 		});
     	startTime = System.currentTimeMillis();
 		try{
-			if(mainWindowController.isFullscreen()){
-				if(System.getProperty("os.name").equals("Linux")){
-					executeComand = "wine "+mainWindowController.getCemuPath()+"/Cemu.exe -f -g \""+mainWindowController.getGameExecutePath()+"\"";
-				} else {
-					executeComand = mainWindowController.getCemuPath()+"\\Cemu.exe -f -g \""+mainWindowController.getGameExecutePath()+"\"";
-				}
-			}else{
-				if(System.getProperty("os.name").equals("Linux")){
-					executeComand = "wine "+mainWindowController.getCemuPath()+"/Cemu.exe -g \""+mainWindowController.getGameExecutePath()+"\"";
-				} else {
-					executeComand = mainWindowController.getCemuPath()+"\\Cemu.exe -g \""+mainWindowController.getGameExecutePath()+"\"";
-				}
-			}
+			executeComand = mainWindowController.getExecuteCommand() + " \"" + mainWindowController.getGameExecutePath() + "\"";
+			
+//			if(mainWindowController.isFullscreen()){
+//				if(System.getProperty("os.name").equals("Linux")){
+//					executeComand = "wine "+mainWindowController.getCemuPath()+"/Cemu.exe -f -g \""+mainWindowController.getGameExecutePath()+"\"";
+//				} else {
+//					executeComand = mainWindowController.getCemuPath()+"\\Cemu.exe -f -g \""+mainWindowController.getGameExecutePath()+"\"";
+//				}
+//			}else{
+//				if(System.getProperty("os.name").equals("Linux")){
+//					executeComand = "wine "+mainWindowController.getCemuPath()+"/Cemu.exe -g \""+mainWindowController.getGameExecutePath()+"\"";
+//				} else {
+//					executeComand = mainWindowController.getCemuPath() + "\\Cemu.exe -g " + "\"" + mainWindowController.getGameExecutePath() + "\"";
+//				}
+//			}
+			
 			LOGGER.info(executeComand);
 			
 			p = Runtime.getRuntime().exec(executeComand);

@@ -149,7 +149,7 @@ public class DBController {
 			LOGGER.error("error while loading ROMs from ROM database, local_roms table", e);
 		}
 		if (entries.size() == 0) {
-			loadRomDirectory(mainWindowController.getRomPath());
+			loadRomDirectory(mainWindowController.getRomDirectoryPath());
 		}
 	}
 

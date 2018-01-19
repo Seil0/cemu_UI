@@ -141,6 +141,7 @@ public class Main extends Application {
 				mainWindowController.setLanguage("en_US");
 				mainWindowController.setLastLocalSync(0);
 				mainWindowController.setxPosHelper(0);
+				mainWindowController.setExecuteCommand(mainWindowController.getCemuPath() + "/Cemu.exe -g ");
 				mainWindowController.saveSettings();
 				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
 				System.exit(0);	//finishes itself
@@ -212,11 +213,10 @@ public class Main extends Application {
 		Optional<ButtonType> result2 = alert2.showAndWait();
 		if (result2.get() == ButtonType.OK) {
 			DirectoryChooser directoryChooser = new DirectoryChooser();
-            File selectedDirectory = directoryChooser.showDialog(primaryStage);
-                mainWindowController.setRomPath(selectedDirectory.getAbsolutePath());
-            
+			File selectedDirectory = directoryChooser.showDialog(primaryStage);
+			mainWindowController.setRomDirectoryPath(selectedDirectory.getAbsolutePath());
 		} else {
-			mainWindowController.setRomPath(null);
+			mainWindowController.setRomDirectoryPath(null);
 		}
 	}
 	

@@ -18,7 +18,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.TextFlow?>
 
-<AnchorPane fx:id="mainAnchorPane" prefHeight="600.0" prefWidth="904.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cemu_UI.application.MainWindowController">
+<AnchorPane fx:id="mainAnchorPane" prefHeight="600.0" prefWidth="904.0" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cemu_UI.application.MainWindowController">
    <children>
       <ScrollPane fx:id="mainScrollPane" fitToWidth="true" layoutY="38.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0">
          <content>
@@ -91,12 +91,12 @@
                                     <Insets left="-14.0" />
                                  </padding>
                               </VBox>
-                              <VBox spacing="10.0">
+                              <VBox spacing="7.0">
                                  <children>
                                     <Label fx:id="cemuDirectoryLbl" text="Cemu Directory" />
                                     <HBox spacing="10.0">
                                        <children>
-                                          <JFXTextField fx:id="cemuTextField" maxWidth="305.0" minWidth="305.0" onAction="#cemuTextFieldAction" prefHeight="32.0" prefWidth="305.0" promptText="cemu directory" />
+                                          <JFXTextField fx:id="cemuTextField" maxWidth="305.0" minWidth="305.0" prefHeight="32.0" prefWidth="305.0" promptText="cemu directory" />
                                           <JFXButton fx:id="cemuTFBtn" onAction="#cemuTFBtnAction" prefHeight="32.0" text="choose directory" />
                                        </children>
                                     </HBox>
@@ -105,12 +105,12 @@
                                     <Insets right="5.0" />
                                  </padding>
                               </VBox>
-                              <VBox spacing="10.0">
+                              <VBox spacing="7.0">
                                  <children>
                                     <Label fx:id="romDirectoryLbl" text="Rom Directory" />
                                     <HBox spacing="10.0">
                                        <children>
-                                          <JFXTextField fx:id="romTextField" maxWidth="305.0" minWidth="305.0" onAction="#romTextFieldAction" prefHeight="32.0" prefWidth="305.0" promptText="rom directory" />
+                                          <JFXTextField fx:id="romTextField" maxWidth="305.0" minWidth="305.0" prefHeight="32.0" prefWidth="305.0" promptText="rom directory" />
                                           <JFXButton fx:id="romTFBtn" onAction="#romTFBtnAction" prefHeight="32.0" text="choose directory" />
                                        </children>
                                     </HBox>
@@ -170,6 +170,15 @@
                                  <VBox.margin>
                                     <Insets top="-10.0" />
                                  </VBox.margin></JFXToggleButton>
+                              <VBox prefHeight="200.0" prefWidth="100.0" spacing="7.0">
+                                 <children>
+                                    <Label fx:id="cemuDirectoryLbl1" text="execute command" />
+                                    <JFXTextField fx:id="executeCommandTextFiled" maxWidth="430.0" minWidth="430.0" prefHeight="25.0" prefWidth="430.0" promptText="execute command" />
+                                 </children>
+                                 <padding>
+                                    <Insets right="5.0" />
+                                 </padding>
+                              </VBox>
                               <Label fx:id="licensesLbl" text="Licenses" />
                            </children>
                            <padding>
