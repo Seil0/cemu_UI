@@ -177,8 +177,7 @@ public class Main extends Application {
 			if(mainWindowController.isCloudSync()) {
 				cloudController.initializeConnection(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
 				cloudController.sync(mainWindowController.getCloudService(), mainWindowController.getCemuPath(), directory.getPath());
-			}			
-			mainWindowController.addUIData();
+			}
 			
 			scene = new Scene(pane); // create new scene, append pane to scene
 			scene.getStylesheets().add(Main.class.getResource("/css/MainWindows.css").toExternalForm());

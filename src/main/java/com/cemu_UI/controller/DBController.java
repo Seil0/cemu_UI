@@ -67,13 +67,11 @@ public class DBController {
 	 * load all games
 	 */
 	public void init(){
-		LOGGER.info("<==========starting loading sql==========>");
+		LOGGER.info("<========== starting loading sql ==========>");
 		loadRomDatabase();
 		loadGamesDatabase();
 		createRomDatabase();
-		loadAllGames();
-		checkRemoveEntry();
-		LOGGER.info("<==========finished loading sql==========>");
+		LOGGER.info("<========== finished loading sql ==========>");
 	}
 	
 	/**
@@ -149,11 +147,13 @@ public class DBController {
 			LOGGER.error("error while loading ROMs from ROM database, local_roms table", e);
 		}
 		if (entries.size() == 0) {
-			loadRomDirectory(mainWindowController.getRomDirectoryPath());
+			mainWindowController.reloadRoms();
+		} else {
+			loadAllGames();
 		}
 	}
 
-	// add a Ggame to the database
+	// add a game to the database
 	public void addGame(String title, String coverPath, String romPath, String titleID, String productCode, String region, String lastPlayed, String timePlayed) throws SQLException{
 		Statement stmt = connection.createStatement();
 		stmt.executeUpdate("insert into local_roms values ('"+title+"','"+coverPath+"','"+romPath+"','"+titleID+"',"
@@ -163,6 +163,7 @@ public class DBController {
 		LOGGER.info("added \""+title+"\" to ROM database");
 	}
 	
+	// remove a game from the database
 	public void removeGame(String titleID) throws SQLException{
 		Statement stmt = connection.createStatement();
 		stmt.executeUpdate("delete from local_roms where titleID = '"+titleID+"'");
@@ -171,8 +172,8 @@ public class DBController {
 		LOGGER.info("removed \""+titleID+"\" from ROM database");
 	}
 	
-	//load all ROMs on startup to the mainWindowController
-	void loadAllGames(){
+	//load all ROMs to the mainWindowController
+	public void loadAllGames(){
 		LOGGER.info("loading all games on startup into the mainWindowController ...");
 		try { 
 			Statement stmt = connection.createStatement(); 
@@ -187,7 +188,7 @@ public class DBController {
 		}
 	}
 	
-	//load one single ROM after manual adding into the mainWindowController
+	//load a single ROM to the mainWindowController
 	public void loadSingleGame(String titleID){
 		LOGGER.info("loading a single game (ID: "+titleID+") into the mainWindowController ..."); 
 		try { 
@@ -223,6 +224,7 @@ public class DBController {
 		try {
 			Statement stmt = connectionGames.createStatement();
 			List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, true);
+			LOGGER.info("<============================== start loading ROM Directory ==============================>");
 			LOGGER.info("Getting all .rpx files in " + dir.getCanonicalPath()+" including those in subdirectories");
 			// for all files in dir get the app.xml
 			for (File file : files) {
@@ -253,6 +255,7 @@ public class DBController {
 					}
 				}
 			}
+			LOGGER.info("<============================= finished loading ROM Directory ============================>");
 		} catch (IOException | SQLException | ParserConfigurationException | SAXException e) {
 			LOGGER.error("error while loading ROMs from directory", e);
 		}
@@ -268,6 +271,7 @@ public class DBController {
 		return check;
 	}
 	
+	@SuppressWarnings("unused")
 	private void checkRemoveEntry() {
 		/**
 		 *  TODO needs to be implemented!

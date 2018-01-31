@@ -864,26 +864,7 @@ public class MainWindowController {
     
 	@FXML
 	void reloadRomsBtnAction() throws IOException {
-		
-		JFXSpinner spinner = new JFXSpinner();
-		spinner.setPrefSize(30, 30);
-		spinner.setStyle(" -fx-background-color: #f4f4f4;");
-		main.getPane().getChildren().add(spinner);
-		AnchorPane.setTopAnchor(spinner, (main.getPane().getHeight()-spinner.getPrefHeight())/2);
-    	AnchorPane.setLeftAnchor(spinner, (main.getPane().getWidth()-spinner.getPrefWidth())/2);
-    	
-    	Thread thread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				dbController.loadRomDirectory(getRomDirectoryPath()); // reload the rom directory
-				
-				Platform.runLater(() -> {
-					refreshUIData(); // refresh the list of games displayed on screen
-					main.getPane().getChildren().remove(spinner);
-                });
-			}
-		});
-		thread.start();
+		reloadRoms();
 	}
     
 	@FXML
@@ -1312,6 +1293,35 @@ public class MainWindowController {
     	
     	// add uiROMElement to games list
     	games.add(uiROMElement);
+    }
+    
+    public void reloadRoms() {
+    	JFXSpinner spinner = new JFXSpinner();
+		spinner.setPrefSize(30, 30);
+		spinner.setStyle(" -fx-background-color: #f4f4f4;");
+		AnchorPane.setTopAnchor(spinner, (main.getPane().getPrefHeight()-spinner.getPrefHeight())/2);
+    	AnchorPane.setLeftAnchor(spinner, (main.getPane().getPrefWidth()-spinner.getPrefWidth())/2);
+    	
+    	Thread thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Platform.runLater(() -> {
+					//remove all games form gamesAnchorPane
+			    	gamesAnchorPane.getChildren().removeAll(gamesAnchorPane.getChildren());
+					main.getPane().getChildren().add(spinner); // add spinner to pane
+                });
+				
+				dbController.loadRomDirectory(getRomDirectoryPath()); // reload the ROM directory
+				games.removeAll(games); // remove all games from the mwc game list
+				dbController.loadAllGames(); // load all games from the database to the mwc
+				
+				Platform.runLater(() -> {
+					refreshUIData(); // refresh the list of games displayed on screen
+					main.getPane().getChildren().remove(spinner);
+                });
+			}
+		});
+		thread.start();
     }
     
 	// add all games saved in games(ArrayList) to gamesAnchorPane
