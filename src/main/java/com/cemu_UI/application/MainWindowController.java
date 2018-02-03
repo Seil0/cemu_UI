@@ -1317,7 +1317,7 @@ public class MainWindowController {
 	}
     
     //remove all games from gamesAnchorPane and add them afterwards
-    void refreshUIData() {
+    public void refreshUIData() {
     	//remove all games form gamesAnchorPane
     	gamesAnchorPane.getChildren().removeAll(gamesAnchorPane.getChildren());
 

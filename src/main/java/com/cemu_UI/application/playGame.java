@@ -45,7 +45,8 @@ public class playGame extends Thread{
 	@Override
 	public void run(){
 		String selectedGameTitleID = mainWindowController.getSelectedGameTitleID();
-//		String executeComand;
+		String cemuBin = mainWindowController.getCemuPath() + "/Cemu.exe";
+		String gameExec = "\"" + mainWindowController.getGameExecutePath() + "\"";
 		long startTime;
     	long endTime;
     	int timePlayedNow;
@@ -57,30 +58,20 @@ public class playGame extends Thread{
 		});
     	startTime = System.currentTimeMillis();
 		try{
-//			executeComand = mainWindowController.getExecuteCommand() + " \"" + mainWindowController.getGameExecutePath() + "\"";		
-
-			if(mainWindowController.isFullscreen()){
-				if(System.getProperty("os.name").equals("Linux")){
-					p = new ProcessBuilder("wine", mainWindowController.getCemuPath() + "/Cemu.exe", "-f",
-										   "-g \"" + mainWindowController.getGameExecutePath() + "\"").start();
-				} else {
-					p = new ProcessBuilder(mainWindowController.getCemuPath() + "/Cemu.exe", "-f",
-							               "-g \"" + mainWindowController.getGameExecutePath() + "\"").start();
-				}
-			}else{
-				if(System.getProperty("os.name").equals("Linux")){
-					p = new ProcessBuilder("wine", mainWindowController.getCemuPath() + "/Cemu.exe",
-										   "-g \"" + mainWindowController.getGameExecutePath() + "\"").start();
-				} else {
-					p = new ProcessBuilder(mainWindowController.getCemuPath() + "/Cemu.exe",
-							   			   "-g \"" + mainWindowController.getGameExecutePath() + "\"").start();
-				}
-			}
-//			LOGGER.info(p.toString());
 			
-//			p = Runtime.getRuntime().exec(");
-//			p = new ProcessBuilder("wine", "/home/jannik/Downloads/cemu_1.11.3/Cemu.exe", "-g \"" + mainWindowController.getGameExecutePath() + "\"").start();
-			
+			if (System.getProperty("os.name").equals("Linux")) {
+				if(mainWindowController.isFullscreen()){
+					p = new ProcessBuilder("wine", cemuBin, "-f", "-g", gameExec).start();
+				} else {
+					p = new ProcessBuilder("wine", cemuBin, "-g", gameExec).start();
+				}
+			} else {
+				if(mainWindowController.isFullscreen()){
+					p = new ProcessBuilder(cemuBin, "-f", "-g", gameExec).start();
+				} else {
+					p = new ProcessBuilder(cemuBin, "-g", gameExec).start();
+				}
+			}		
 			
 			p.waitFor();
 			endTime = System.currentTimeMillis();

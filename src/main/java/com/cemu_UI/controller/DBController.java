@@ -150,6 +150,7 @@ public class DBController {
 			mainWindowController.reloadRoms();
 		} else {
 			loadAllGames();
+			mainWindowController.refreshUIData();
 		}
 	}
 
