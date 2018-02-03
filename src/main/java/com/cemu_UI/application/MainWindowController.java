@@ -1298,7 +1298,6 @@ public class MainWindowController {
     public void reloadRoms() {
     	JFXSpinner spinner = new JFXSpinner();
 		spinner.setPrefSize(30, 30);
-		spinner.setStyle(" -fx-background-color: #f4f4f4;");
 		AnchorPane.setTopAnchor(spinner, (main.getPane().getPrefHeight()-spinner.getPrefHeight())/2);
     	AnchorPane.setLeftAnchor(spinner, (main.getPane().getPrefWidth()-spinner.getPrefWidth())/2);
     	

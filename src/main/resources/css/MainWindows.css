@@ -81,6 +81,38 @@
     -fx-background-color: -fx-tree-table-color, -fx-box-border, -fx-control-inner-background;
     -fx-background-insets: -1.4, 0, 1;
     -fx-background-radius: 1.4, 0, 0;
-    /*....*/
     -fx-padding: 1; /* 0.083333em; */
 }
+
+/*
+ * ChoiceBox
+ */
+ 
+
+.choice-box {
+	-fx-background-color: transparent;
+	-fx-border-color: #000000;
+	-fx-border-width: 0 0 1 0;
+	-fx-background-radius: 0;
+	-fx-border-radius: 0;
+}
+
+.choice-box:focused {
+	-fx-border-color: #9E9E9E;
+}
+
+.choice-box>.open-button>.arrow {
+	-fx-background-color: #757575;
+}
+
+.menu-item:focused {
+	-fx-background-color: #00A8CC;
+}
+
+/*
+ * Spinner
+ */
+.spinner {
+	-fx-background-color: #f4f4f4;
+}
+
