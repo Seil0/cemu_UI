@@ -35,6 +35,7 @@ public class playGame extends Thread{
 
 	MainWindowController mainWindowController;
 	DBController dbController;
+	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LogManager.getLogger(playGame.class.getName());
 	
 	public playGame(MainWindowController m, com.cemu_UI.controller.DBController db){
