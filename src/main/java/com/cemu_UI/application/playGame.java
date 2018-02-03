@@ -45,7 +45,7 @@ public class playGame extends Thread{
 	@Override
 	public void run(){
 		String selectedGameTitleID = mainWindowController.getSelectedGameTitleID();
-		String executeComand;
+//		String executeComand;
 		long startTime;
     	long endTime;
     	int timePlayedNow;
@@ -57,25 +57,31 @@ public class playGame extends Thread{
 		});
     	startTime = System.currentTimeMillis();
 		try{
-			executeComand = mainWindowController.getExecuteCommand() + " \"" + mainWindowController.getGameExecutePath() + "\"";
+//			executeComand = mainWindowController.getExecuteCommand() + " \"" + mainWindowController.getGameExecutePath() + "\"";		
+
+			if(mainWindowController.isFullscreen()){
+				if(System.getProperty("os.name").equals("Linux")){
+					p = new ProcessBuilder("wine", mainWindowController.getCemuPath() + "/Cemu.exe", "-f",
+										   "-g \"" + mainWindowController.getGameExecutePath() + "\"").start();
+				} else {
+					p = new ProcessBuilder(mainWindowController.getCemuPath() + "/Cemu.exe", "-f",
+							               "-g \"" + mainWindowController.getGameExecutePath() + "\"").start();
+				}
+			}else{
+				if(System.getProperty("os.name").equals("Linux")){
+					p = new ProcessBuilder("wine", mainWindowController.getCemuPath() + "/Cemu.exe",
+										   "-g \"" + mainWindowController.getGameExecutePath() + "\"").start();
+				} else {
+					p = new ProcessBuilder(mainWindowController.getCemuPath() + "/Cemu.exe",
+							   			   "-g \"" + mainWindowController.getGameExecutePath() + "\"").start();
+				}
+			}
+//			LOGGER.info(p.toString());
 			
-//			if(mainWindowController.isFullscreen()){
-//				if(System.getProperty("os.name").equals("Linux")){
-//					executeComand = "wine "+mainWindowController.getCemuPath()+"/Cemu.exe -f -g \""+mainWindowController.getGameExecutePath()+"\"";
-//				} else {
-//					executeComand = mainWindowController.getCemuPath()+"\\Cemu.exe -f -g \""+mainWindowController.getGameExecutePath()+"\"";
-//				}
-//			}else{
-//				if(System.getProperty("os.name").equals("Linux")){
-//					executeComand = "wine "+mainWindowController.getCemuPath()+"/Cemu.exe -g \""+mainWindowController.getGameExecutePath()+"\"";
-//				} else {
-//					executeComand = mainWindowController.getCemuPath() + "\\Cemu.exe -g " + "\"" + mainWindowController.getGameExecutePath() + "\"";
-//				}
-//			}
+//			p = Runtime.getRuntime().exec(");
+//			p = new ProcessBuilder("wine", "/home/jannik/Downloads/cemu_1.11.3/Cemu.exe", "-g \"" + mainWindowController.getGameExecutePath() + "\"").start();
 			
-			LOGGER.info(executeComand);
 			
-			p = Runtime.getRuntime().exec(executeComand);
 			p.waitFor();
 			endTime = System.currentTimeMillis();
     		timePlayedNow = (int)  Math.floor(((endTime - startTime)/1000/60));   			

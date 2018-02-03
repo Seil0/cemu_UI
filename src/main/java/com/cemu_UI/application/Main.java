@@ -141,7 +141,6 @@ public class Main extends Application {
 				mainWindowController.setLanguage("en_US");
 				mainWindowController.setLastLocalSync(0);
 				mainWindowController.setxPosHelper(0);
-				mainWindowController.setExecuteCommand(mainWindowController.getCemuPath() + "/Cemu.exe -g ");
 				mainWindowController.saveSettings();
 				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
 				System.exit(0);	//finishes itself

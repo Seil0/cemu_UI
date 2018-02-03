@@ -170,15 +170,6 @@
                                  <VBox.margin>
                                     <Insets top="-10.0" />
                                  </VBox.margin></JFXToggleButton>
-                              <VBox prefHeight="200.0" prefWidth="100.0" spacing="7.0">
-                                 <children>
-                                    <Label fx:id="cemuDirectoryLbl1" text="execute command" />
-                                    <JFXTextField fx:id="executeCommandTextFiled" maxWidth="430.0" minWidth="430.0" prefHeight="25.0" prefWidth="430.0" promptText="execute command" />
-                                 </children>
-                                 <padding>
-                                    <Insets right="5.0" />
-                                 </padding>
-                              </VBox>
                               <Label fx:id="licensesLbl" text="Licenses" />
                            </children>
                            <padding>

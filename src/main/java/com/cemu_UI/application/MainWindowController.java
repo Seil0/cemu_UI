@@ -284,14 +284,13 @@ public class MainWindowController {
 	private String cemuPath;
 	private String romDirectoryPath;
 	private String gameExecutePath;
-	private String executeCommand;
 	private String color;
 	private String dialogBtnStyle;
 	private String selectedGameTitleID;
 	private String selectedGameTitle;
 	private String id;
 	private String version = "0.3.0";
-	private String buildNumber = "073";
+	private String buildNumber = "075";
 	private String versionName = "Puzzle Plank Galaxy";
 	private int xPos = -200;
 	private int yPos = 17;
@@ -404,7 +403,6 @@ public class MainWindowController {
 		
 		cemuTextField.setText(cemuPath);
 		romTextField.setText(romDirectoryPath);
-		executeCommandTextFiled.setText(getExecuteCommand());
 		colorPicker.setValue(Color.valueOf(getColor()));
 		fullscreenToggleBtn.setSelected(isFullscreen());
 		cloudSyncToggleBtn.setSelected(isCloudSync());
@@ -821,14 +819,6 @@ public class MainWindowController {
 	    		saveSettings();
 			}
 		});
-        
-        executeCommandTextFiled.textProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				setExecuteCommand(executeCommandTextFiled.getText());
-	    		saveSettings();
-			}
-		});
 
 		LOGGER.info("initializing Actions done!");
 	}
@@ -1055,12 +1045,8 @@ public class MainWindowController {
 	void fullscreenToggleBtnAction(ActionEvent event) {
 		if (fullscreen) {
 			fullscreen = false;
-			setExecuteCommand(getExecuteCommand().replace("-f -g", "-g"));
-			executeCommandTextFiled.setText(getExecuteCommand());
 		} else {
 			fullscreen = true;
-			setExecuteCommand(getExecuteCommand().replace("-g", "-f -g"));
-			executeCommandTextFiled.setText(getExecuteCommand());
 		}
 		saveSettings();
 	}
@@ -1669,7 +1655,6 @@ public class MainWindowController {
     	try {
     		props.setProperty("cemuPath", getCemuPath());
 			props.setProperty("romPath", getRomDirectoryPath());
-			props.setProperty("executeCommand", getExecuteCommand());
 			props.setProperty("color", getColor());
 			props.setProperty("language", getLanguage());
 			props.setProperty("fullscreen", String.valueOf(isFullscreen()));
@@ -1725,13 +1710,6 @@ public class MainWindowController {
 			} catch (Exception e) {
 				LOGGER.error("could not load romPath", e);
 				setRomDirectoryPath("");
-			}
-			
-			if (props.getProperty("executeCommand") == null) {
-				LOGGER.error("could not load executeCommand, setting default instead!");
-				setExecuteCommand(getCemuPath() + "\\Cemu.exe -g ");
-			} else {
-				setExecuteCommand(props.getProperty("executeCommand"));
 			}
 			
 			try {
@@ -1906,14 +1884,6 @@ public class MainWindowController {
 
 	public void setRomDirectoryPath(String romDirectoryPath) {
 		this.romDirectoryPath = romDirectoryPath;
-	}
-	
-	public String getExecuteCommand() {
-		return executeCommand;
-	}
-
-	public void setExecuteCommand(String executeCommand) {
-		this.executeCommand = executeCommand;
 	}
 
 	public String getColor() {
