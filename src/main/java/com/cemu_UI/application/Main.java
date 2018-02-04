@@ -180,6 +180,8 @@ public class Main extends Application {
 			
 			scene = new Scene(pane); // create new scene, append pane to scene
 			scene.getStylesheets().add(Main.class.getResource("/css/MainWindows.css").toExternalForm());
+			primaryStage.setMinWidth(265.00);
+			primaryStage.setMinHeight(425.00);
 			primaryStage.setScene(scene); // append scene to stage
 			primaryStage.show(); // show stage
 			} catch (IOException e) {
@@ -187,7 +189,7 @@ public class Main extends Application {
 			}
 	}
 	
-	private void firstStart(){
+	private void firstStart() {
 		Alert alert = new Alert(AlertType.CONFIRMATION); // new alert with file-chooser
 		alert.setTitle("cemu_UI");
 		alert.setHeaderText("cemu installation");
@@ -293,11 +295,11 @@ public class Main extends Application {
 	
 	public static void main(String[] args) {
 		// delete old log file and create new
-		if(osName.equals("Linux")){
+		if (osName.equals("Linux")) {
 			System.setProperty("logFilename", userHome + "/cemu_UI/app.log");
 			File logFile = new File(userHome + "/cemu_UI/app.log");
 			logFile.delete();
-		}else{
+		} else {
 			System.setProperty("logFilename", userHome + "/Documents/cemu_UI/app.log");
 			File logFile = new File(userHome + "/Documents/cemu_UI/app.log");
 			logFile.delete();

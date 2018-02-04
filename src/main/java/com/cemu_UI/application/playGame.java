@@ -33,18 +33,17 @@ import javafx.application.Platform;
 
 public class playGame extends Thread{
 
-	MainWindowController mainWindowController;
-	DBController dbController;
-	@SuppressWarnings("unused")
+	private MainWindowController mainWindowController;
+	private DBController dbController;
 	private static final Logger LOGGER = LogManager.getLogger(playGame.class.getName());
 	
-	public playGame(MainWindowController m, com.cemu_UI.controller.DBController db){
+	public playGame(MainWindowController m, com.cemu_UI.controller.DBController db) {
 		mainWindowController = m;
 		dbController = db;
 	}
-	
+
 	@Override
-	public void run(){
+	public void run() {
 		String selectedGameTitleID = mainWindowController.getSelectedGameTitleID();
 		String cemuBin = mainWindowController.getCemuPath() + "/Cemu.exe";
 		String gameExec = "\"" + mainWindowController.getGameExecutePath() + "\"";
@@ -58,8 +57,7 @@ public class playGame extends Thread{
 			mainWindowController.main.getPrimaryStage().setIconified(true); // minimize cemu_UI
 		});
     	startTime = System.currentTimeMillis();
-		try{
-			
+		try {
 			if (System.getProperty("os.name").equals("Linux")) {
 				if(mainWindowController.isFullscreen()){
 					p = new ProcessBuilder("wine", cemuBin, "-f", "-g", gameExec).start();
@@ -74,22 +72,22 @@ public class playGame extends Thread{
 				}
 			}		
 			
-			p.waitFor();
+			p.waitFor(); // wait until cemu is closed so we can calculate the played time
 			endTime = System.currentTimeMillis();
     		timePlayedNow = (int)  Math.floor(((endTime - startTime)/1000/60));   			
     		timePlayed = Integer.parseInt(dbController.getTotalPlaytime(selectedGameTitleID))+timePlayedNow;
     		
-    		dbController.setTotalPlaytime(Integer.toString(timePlayed), selectedGameTitleID);
-    		Platform.runLater(() -> {
-    			if(Integer.parseInt(dbController.getTotalPlaytime(selectedGameTitleID)) > 60){
-            		int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTotalPlaytime(selectedGameTitleID))/60);
-            		int minutesPlayed = Integer.parseInt(dbController.getTotalPlaytime(selectedGameTitleID))-60*hoursPlayed;
-            		mainWindowController.totalPlaytimeBtn.setText(hoursPlayed+"h "+minutesPlayed+"min");
-            	}else{
-            		mainWindowController.totalPlaytimeBtn.setText(dbController.getTotalPlaytime(selectedGameTitleID)+ " min");
-            	}
-        		mainWindowController.main.getPrimaryStage().setIconified(false); // maximize cemu_UI
-             });
+			dbController.setTotalPlaytime(Integer.toString(timePlayed), selectedGameTitleID);
+			Platform.runLater(() -> {
+				if (Integer.parseInt(dbController.getTotalPlaytime(selectedGameTitleID)) > 60) {
+					int hoursPlayed = (int) Math.floor(Integer.parseInt(dbController.getTotalPlaytime(selectedGameTitleID)) / 60);
+					int minutesPlayed = Integer.parseInt(dbController.getTotalPlaytime(selectedGameTitleID)) - 60 * hoursPlayed;
+					mainWindowController.totalPlaytimeBtn.setText(hoursPlayed + "h " + minutesPlayed + "min");
+				} else {
+					mainWindowController.totalPlaytimeBtn.setText(dbController.getTotalPlaytime(selectedGameTitleID) + " min");
+				}
+				mainWindowController.main.getPrimaryStage().setIconified(false); // maximize cemu_UI
+			});
     		
     		//sync savegame with cloud service
 			if (mainWindowController.isCloudSync()) {
@@ -98,8 +96,8 @@ public class playGame extends Thread{
 						mainWindowController.getCemuPath(), mainWindowController.main.getDirectory().getPath());
 			}
     		
-		}catch (IOException | InterruptedException e){
-			e.printStackTrace();
+		} catch (IOException | InterruptedException e) {
+			LOGGER.error(e);
 		}
 	}
 

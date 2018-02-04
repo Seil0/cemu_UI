@@ -66,7 +66,7 @@ public class DBController {
 	 * load ROM and games database
 	 * load all games
 	 */
-	public void init(){
+	public void init() {
 		LOGGER.info("<========== starting loading sql ==========>");
 		loadRomDatabase();
 		loadGamesDatabase();
@@ -79,18 +79,18 @@ public class DBController {
 	 * 
 	 * TODO this should be called LocalGames
 	 */
-	private void loadRomDatabase(){
+	private void loadRomDatabase() {
 		if (System.getProperty("os.name").equals("Linux")) {
 			DB_PATH_localRoms = System.getProperty("user.home") + "/cemu_UI/localRoms.db";
-		}else{
+		} else {
 			DB_PATH_localRoms = System.getProperty("user.home") + "\\Documents\\cemu_UI" + "\\" + "localRoms.db";
 		}
 		try {
 			// create a database connection
 			connection = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH_localRoms);
-			connection.setAutoCommit(false);	//AutoCommit to false -> manual commit is active
+			connection.setAutoCommit(false); // AutoCommit to false -> manual commit is active
 		} catch (SQLException e) {
-			// if the error message is "out of memory", it probably means no database file is found
+			// if the error message is "out of memory", probably no database file is found
 			LOGGER.error("error while loading the ROM database", e);
 		}
 		LOGGER.info("ROM database loaded successfull");

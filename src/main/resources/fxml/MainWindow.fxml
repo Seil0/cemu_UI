@@ -18,7 +18,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.TextFlow?>
 
-<AnchorPane fx:id="mainAnchorPane" prefHeight="600.0" prefWidth="904.0" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cemu_UI.application.MainWindowController">
+<AnchorPane fx:id="mainAnchorPane" minHeight="405.0" minWidth="260.0" prefHeight="600.0" prefWidth="904.0" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cemu_UI.application.MainWindowController">
    <children>
       <ScrollPane fx:id="mainScrollPane" fitToWidth="true" layoutY="38.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0">
          <content>

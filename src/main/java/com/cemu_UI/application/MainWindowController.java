@@ -1064,24 +1064,24 @@ public class MainWindowController {
 	    			cloudService = "GoogleDrive";
 	    			
 	    			// start cloud sync in new thread			
-	    			Thread thread = new Thread(new Runnable() {
-		    			@Override
+					Thread thread = new Thread(new Runnable() {
+						@Override
 						public void run() {
-		    				
-		    				if (main.getCloudController().initializeConnection(getCloudService(), getCemuPath())) {
-		    					main.getCloudController().sync(getCloudService(), getCemuPath(), main.getDirectory().getPath());
-			        	        saveSettings();
-			    	    	} else {
-			    	    		cloudSyncToggleBtn.setSelected(false);
 
-			    	    	   	//cloud sync init error dialog
+							if (main.getCloudController().initializeConnection(getCloudService(), getCemuPath())) {
+								main.getCloudController().sync(getCloudService(), getCemuPath(), main.getDirectory().getPath());
+								saveSettings();
+							} else {
+								cloudSyncToggleBtn.setSelected(false);
+
+								// cloud sync init error dialog
 								JFXInfoDialog cloudSyncErrorDialog = new JFXInfoDialog(cloudSyncErrorHeadingText,
 										cloudSyncErrorBodyText, dialogBtnStyle, 450, 170, main.getPane());
 								cloudSyncErrorDialog.show();
-			    	    	}
-		    				
-		    			}
-		    		});
+							}
+
+						}
+					});
 		    		thread.start();	
 	    		 }
 	    	};
