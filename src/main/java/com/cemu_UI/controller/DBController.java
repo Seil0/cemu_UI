@@ -45,14 +45,17 @@ import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.cemu_UI.application.Main;
 import com.cemu_UI.application.MainWindowController;
 
 public class DBController {
 	
-	public DBController(MainWindowController mwc) {
-		mainWindowController = mwc;
+	public DBController(Main main, MainWindowController mainWindowController) {
+		this.main = main;
+		this.mainWindowController = mainWindowController;
 	}
 	
+	private Main main;
 	private MainWindowController mainWindowController;
 	private ArrayList<String> entries = new ArrayList<>();
 	private String DB_PATH_localRoms;
@@ -98,16 +101,10 @@ public class DBController {
 	
 	/**
 	 * set the path to the localRoms.db file and initialize the connection
-	 * 
-	 * games.dbcontains a reverence list to for the automatic detection mode
-	 * TODO rework paths
+	 * games.db contains a reverence list to for the automatic detection mode
 	 */
 	private void loadGamesDatabase() {
-		if (System.getProperty("os.name").equals("Linux")) {
-			DB_PATH_games = System.getProperty("user.home") + "/cemu_UI/reference_games.db";
-		} else {
-			DB_PATH_games = System.getProperty("user.home") + "\\Documents\\cemu_UI" + "\\" + "reference_games.db";
-		}
+		DB_PATH_games = main.getReference_gamesFile().getAbsolutePath();
 		try {
 			// create a database connection
 			connectionGames = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH_games);
@@ -213,15 +210,8 @@ public class DBController {
 		File dir = new File(directory);
 		File appFile;
 		String[] extensions = new String[] { "rpx", "jsp" };
-		File pictureCache;
-		String coverPath;
-		
-		if(System.getProperty("os.name").equals("Linux")){
-			pictureCache = mainWindowController.getPictureCacheLinux();
-		}else{
-			pictureCache = mainWindowController.getPictureCacheWin();
-		} 
-		
+		File pictureCache = main.getPictureCache();
+		String coverPath;	
 		try {
 			Statement stmt = connectionGames.createStatement();
 			List<File> files = (List<File>) FileUtils.listFiles(dir, extensions, true);

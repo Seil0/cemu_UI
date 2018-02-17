@@ -26,7 +26,7 @@
     <dependency>
         <groupId>com.jfoenix</groupId>
         <artifactId>jfoenix</artifactId>
-        <version>9.0.1</version>
+        <version>9.0.2</version>
     </dependency>
         
     <dependency>

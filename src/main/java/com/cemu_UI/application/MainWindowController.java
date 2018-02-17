@@ -302,12 +302,6 @@ public class MainWindowController {
 	private double windowWidth;
 	private double windowHeight;
 	private DirectoryChooser directoryChooser = new DirectoryChooser();
-	private File dirWin = new File(System.getProperty("user.home") + "/Documents/cemu_UI");
-	private File dirLinux = new File(System.getProperty("user.home") + "/cemu_UI");
-	private File configFileWin = new File(dirWin + "/config.xml");
-	private File configFileLinux = new File(dirLinux + "/config.xml");
-	private File pictureCacheWin = new File(dirWin + "/picture_cache");
-	private File pictureCacheLinux = new File(dirLinux + "/picture_cache");
 	private ObservableList<String> branches = FXCollections.observableArrayList("stable", "beta");
 	private ObservableList<String> languages = FXCollections.observableArrayList("English (en_US)", "Deutsch (de_DE)");
 	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2", "44fc5929"); // TODO add more IDs
@@ -376,7 +370,7 @@ public class MainWindowController {
 	
 	public void setMain(Main m) {
 		this.main = m;
-		dbController = new DBController(this);
+		dbController = new DBController(main, this);
 		smmdbAPIController = new SmmdbAPIController();
 	}
 	
@@ -911,7 +905,7 @@ public class MainWindowController {
 
 	@FXML
 	void lastTimePlayedBtnAction(ActionEvent event) {
-
+		System.out.println(lastTimePlayedBtn.getWidth());
 	}
     
 	@FXML
@@ -1134,15 +1128,9 @@ public class MainWindowController {
 			errorDialog.show();
 
 		} else {	
-	    	File pictureCache;
+	    	File pictureCache = main.getPictureCache();
 			String coverName = new File(coverPath).getName();
 			try	{
-				if (System.getProperty("os.name").equals("Linux")) {
-					pictureCache = getPictureCacheLinux();
-				} else {
-					pictureCache = getPictureCacheWin();
-				}
-				
 			    BufferedImage originalImage = ImageIO.read(new File(coverPath)); //load cover
 			    int type = originalImage.getType() == 0 ? BufferedImage.TYPE_INT_ARGB : originalImage.getType();
 			    BufferedImage resizeImagePNG = resizeImage(originalImage, type, 400, 600);
@@ -1651,7 +1639,7 @@ public class MainWindowController {
 		
     public void saveSettings(){
     	LOGGER.info("saving Settings ...");
-    	OutputStream outputStream;	//new output-stream
+    	
     	try {
     		props.setProperty("cemuPath", getCemuPath());
 			props.setProperty("romPath", getRomDirectoryPath());
@@ -1670,11 +1658,7 @@ public class MainWindowController {
 			props.setProperty("lastLocalSync", String.valueOf(getLastLocalSync()));
 			props.setProperty("windowWidth", String.valueOf(mainAnchorPane.getWidth()));
 			props.setProperty("windowHeight", String.valueOf(mainAnchorPane.getHeight()));
-    		if(System.getProperty("os.name").equals("Linux")){
-    			outputStream = new FileOutputStream(configFileLinux);
-    		}else{
-    			outputStream = new FileOutputStream(configFileWin);
-    		}
+			OutputStream outputStream = new FileOutputStream(main.getConfigFile());	//new output-stream
     		props.storeToXML(outputStream, "cemu_UI settings");	//write new .xml
     		outputStream.close();
     		LOGGER.info("saving Settings done!");
@@ -1689,13 +1673,8 @@ public class MainWindowController {
      */
     private void loadSettings(){
     	LOGGER.info("loading settings ...");
-		InputStream inputStream;
 		try {
-			if(System.getProperty("os.name").equals("Linux")){
-				inputStream = new FileInputStream(configFileLinux);
-			}else{
-				inputStream = new FileInputStream(configFileWin);
-			}
+			InputStream inputStream = new FileInputStream(main.getConfigFile());
 			props.loadFromXML(inputStream);	//new input-stream from .xml
 			
 			try {
@@ -1892,22 +1871,6 @@ public class MainWindowController {
 
 	public void setColor(String color) {
 		this.color = color;
-	}
-
-	public File getPictureCacheLinux() {
-		return pictureCacheLinux;
-	}
-
-	public void setPictureCacheLinux(File pictureCacheLinux) {
-		this.pictureCacheLinux = pictureCacheLinux;
-	}
-
-	public File getPictureCacheWin() {
-		return pictureCacheWin;
-	}
-
-	public void setPictureCacheWin(File pictureCacheWin) {
-		this.pictureCacheWin = pictureCacheWin;
 	}
 
 	public int getxPos() {

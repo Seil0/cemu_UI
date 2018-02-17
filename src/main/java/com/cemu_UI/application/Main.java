@@ -116,7 +116,7 @@ public class Main extends Application {
 			}
 			
 			// startup checks
-			// check if client_secret.jason is present
+			// check if client_secret.json is present
 			if (Main.class.getResourceAsStream("/client_secret.json") == null) {
 				LOGGER.error("client_secret is missing!!!!!");
 				
@@ -142,11 +142,11 @@ public class Main extends Application {
 				mainWindowController.setLastLocalSync(0);
 				mainWindowController.setxPosHelper(0);
 				mainWindowController.saveSettings();
-				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
+				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//TODO check if this really is needed start again (preventing Bugs)
 				System.exit(0);	//finishes itself
 			}
 			
-			if (pictureCache.exists() != true) {
+			if (!pictureCache.exists()) {
 				pictureCache.mkdir();
 			}
 			
@@ -341,7 +341,19 @@ public class Main extends Application {
 		return directory;
 	}
 
-	public void setDirectory(File directory) {
-		this.directory = directory;
+	public File getConfigFile() {
+		return configFile;
+	}
+
+	public File getGamesDBFile() {
+		return gamesDBFile;
+	}
+
+	public File getReference_gamesFile() {
+		return reference_gamesFile;
+	}
+
+	public File getPictureCache() {
+		return pictureCache;
 	}
 }
