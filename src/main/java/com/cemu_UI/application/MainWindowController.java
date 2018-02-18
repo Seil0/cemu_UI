@@ -811,6 +811,15 @@ public class MainWindowController {
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				setRomDirectoryPath(romTextField.getText());
 	    		saveSettings();
+
+				if (new File(romTextField.getText()).exists()) {
+					reloadRoms();
+				} else {
+					String bodyText = "No such file or directory";
+					JFXInfoDialog fileErrorDialog = new JFXInfoDialog("Waring!", bodyText, dialogBtnStyle, 190, 150, main.getPane());
+					fileErrorDialog.show();
+					LOGGER.warn("Directory does not exist");			
+				}
 			}
 		});
 
@@ -905,14 +914,14 @@ public class MainWindowController {
 
 	@FXML
 	void lastTimePlayedBtnAction(ActionEvent event) {
-		System.out.println(lastTimePlayedBtn.getWidth());
+		
 	}
     
 	@FXML
 	void cemuTFBtnAction(ActionEvent event) {
 		File cemuDirectory = directoryChooser.showDialog(main.getPrimaryStage());
 		if (cemuDirectory == null) {
-			LOGGER.info("No Directory selected");
+			LOGGER.warn("No Directory selected");
 		} else {
 			setCemuPath(cemuDirectory.getAbsolutePath());
 			saveSettings();
@@ -929,18 +938,17 @@ public class MainWindowController {
 	@FXML
 	void romTFBtnAction(ActionEvent event) {
 		File romDirectory = directoryChooser.showDialog(main.getPrimaryStage());
-		if (romDirectory == null) {
-			LOGGER.info("No Directory selected");
+		setRomDirectoryPath(romDirectory.getAbsolutePath());
+		saveSettings();
+		romTextField.setText(getRomDirectoryPath());
+		
+		if (romDirectory.exists()) {
+			reloadRoms();
 		} else {
-			setRomDirectoryPath(romDirectory.getAbsolutePath());
-			saveSettings();
-			cemuTextField.setText(getCemuPath());
-			try {
-				Runtime.getRuntime().exec("java -jar cemu_UI.jar"); // start again
-				System.exit(0); // finishes itself
-			} catch (IOException e) {
-				LOGGER.error("an error occurred", e);
-			}
+			String bodyText = "No such file or directory";
+			JFXInfoDialog fileErrorDialog = new JFXInfoDialog("Waring!", bodyText, dialogBtnStyle, 190, 150, main.getPane());
+			fileErrorDialog.show();
+			LOGGER.warn("Directory does not exist");			
 		}
 	}
     
@@ -1269,6 +1277,9 @@ public class MainWindowController {
     	games.add(uiROMElement);
     }
     
+    /**
+     * reload all ROMs from the ROM directory
+     */
     public void reloadRoms() {
     	JFXSpinner spinner = new JFXSpinner();
 		spinner.setPrefSize(30, 30);
@@ -1323,6 +1334,7 @@ public class MainWindowController {
 		}
     }
     
+    // set the selected local strings to all needed elements
     void setUILanguage(){
 		switch(getLanguage()){
 		case "en_US":	
@@ -1405,6 +1417,7 @@ public class MainWindowController {
 		smmdbDownloadBtnDownload = bundle.getString("smmdbDownloadBtnDownload");
 	}
 
+    // if AutoUpdate, then check for updates
 	private void checkAutoUpdate() {
 
 		if (isAutoUpdate()) {
@@ -1574,6 +1587,7 @@ public class MainWindowController {
 //    	System.out.println("xPos: " + xPos);
     }
     
+    // change the color of all needed GUI elements
     private void applyColor() {
 		String boxStyle = "-fx-background-color: #"+getColor()+";";
 		String btnStyleBlack = "-fx-button-type: RAISED; -fx-background-color: #"+getColor()+"; -fx-text-fill: BLACK;";
@@ -1636,7 +1650,10 @@ public class MainWindowController {
 			games.get(i).getButton().setRipplerFill(Paint.valueOf(getColor()));
 		}
 	}
-		
+    
+    /**
+     * save settings to the config.xml file
+     */
     public void saveSettings(){
     	LOGGER.info("saving Settings ...");
     	
@@ -1658,6 +1675,7 @@ public class MainWindowController {
 			props.setProperty("lastLocalSync", String.valueOf(getLastLocalSync()));
 			props.setProperty("windowWidth", String.valueOf(mainAnchorPane.getWidth()));
 			props.setProperty("windowHeight", String.valueOf(mainAnchorPane.getHeight()));
+			
 			OutputStream outputStream = new FileOutputStream(main.getConfigFile());	//new output-stream
     		props.storeToXML(outputStream, "cemu_UI settings");	//write new .xml
     		outputStream.close();

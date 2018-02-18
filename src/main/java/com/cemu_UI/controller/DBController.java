@@ -230,7 +230,7 @@ public class DBController {
 				
 				// for all elements in the games table check if it's already present, else add it
 				while (rs.next()) {
-					if (checkEntry(rs.getString(2))) {
+					if (checkAddEntry(rs.getString(2))) {
 						LOGGER.info(rs.getString(2) + ": game already in database");
 					} else {
 						LOGGER.info("adding cover to cache ...");
@@ -252,7 +252,13 @@ public class DBController {
 		}
 	}
 	
-	private boolean checkEntry(String title) throws SQLException{
+	/**
+	 * check if there is a game with the given name already in the database
+	 * @param title game title
+	 * @return true if the game exists, false if not
+	 * @throws SQLException
+	 */
+	private boolean checkAddEntry(String title) throws SQLException{
 		Statement stmt = connection.createStatement();
 		boolean check = false;
 		ResultSet rs = stmt.executeQuery("SELECT * FROM local_roms WHERE title = '"+title+"';");
