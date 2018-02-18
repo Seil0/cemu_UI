@@ -57,7 +57,7 @@ public class playGame extends Thread{
 			mainWindowController.main.getPrimaryStage().setIconified(true); // minimize cemu_UI
 		});
     	startTime = System.currentTimeMillis();
-		try {
+    	try {
 			if (System.getProperty("os.name").equals("Linux")) {
 				if(mainWindowController.isFullscreen()){
 					p = new ProcessBuilder("wine", cemuBin, "-f", "-g", gameExec).start();

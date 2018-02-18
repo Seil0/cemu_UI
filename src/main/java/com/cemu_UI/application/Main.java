@@ -241,7 +241,7 @@ public class Main extends Application {
 
 				saveTask = new TimerTask() {
 					@Override
-				    public void run() { 
+				    public void run() {
 						mainWindowController.saveSettings();
 					}
 				};
@@ -262,7 +262,7 @@ public class Main extends Application {
 				
 				saveTask = new TimerTask() {
 					@Override
-				    public void run() { 
+				    public void run() {
 						mainWindowController.saveSettings();
 					}
 				};

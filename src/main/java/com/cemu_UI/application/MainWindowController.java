@@ -54,9 +54,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.cemu_UI.controller.DBController;
 import com.cemu_UI.controller.SmmdbAPIController;
 import com.cemu_UI.controller.UpdateController;
-import com.cemu_UI.controller.DBController;
 import com.cemu_UI.datatypes.CourseTableDataType;
 import com.cemu_UI.datatypes.SmmdbApiDataType;
 import com.cemu_UI.datatypes.UIROMDataType;
@@ -801,24 +801,30 @@ public class MainWindowController {
         cemuTextField.textProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				setCemuPath(cemuTextField.getText());
-	    		saveSettings();
+				if (new File(newValue).exists()) {
+					setCemuPath(newValue);
+					saveSettings();
+				} else {
+					String bodyText = newValue + ": No such file or directory";
+					JFXInfoDialog fileErrorDialog = new JFXInfoDialog("Waring!", bodyText, dialogBtnStyle, 190, 150, main.getPane());
+					fileErrorDialog.show();
+					LOGGER.warn(newValue + ": No such file or directory");
+				}
 			}
 		});
         
         romTextField.textProperty().addListener(new ChangeListener<String>() {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				setRomDirectoryPath(romTextField.getText());
-	    		saveSettings();
-
-				if (new File(romTextField.getText()).exists()) {
+				if (new File(newValue).exists()) {
+					setRomDirectoryPath(newValue);
+		    		saveSettings();
 					reloadRoms();
 				} else {
-					String bodyText = "No such file or directory";
+					String bodyText = newValue + ": No such file or directory";
 					JFXInfoDialog fileErrorDialog = new JFXInfoDialog("Waring!", bodyText, dialogBtnStyle, 190, 150, main.getPane());
 					fileErrorDialog.show();
-					LOGGER.warn("Directory does not exist");			
+					LOGGER.warn(newValue + ": No such file or directory");			
 				}
 			}
 		});
@@ -827,7 +833,7 @@ public class MainWindowController {
 	}
     
 	@FXML
-	void detailsSlideoutBtnAction(ActionEvent event) {
+	void detailsSlideoutBtnAction() {
 		playBtnSlideOut();
 	}
     
@@ -840,7 +846,7 @@ public class MainWindowController {
     }
 
 	@FXML
-	void settingsBtnAction(ActionEvent event) {
+	void settingsBtnAction() {
 		if (smmdbTrue) {
 			smmdbAnchorPane.setVisible(false);
 			smmdbTrue = false;
@@ -900,7 +906,7 @@ public class MainWindowController {
 	}
     	
 	@FXML
-	void playBtnAction(ActionEvent event) throws InterruptedException, IOException {
+	void playBtnAction() throws InterruptedException, IOException {
 		dbController.setLastPlayed(selectedGameTitleID);
 		playGame = new playGame(this, dbController);
 
@@ -908,52 +914,33 @@ public class MainWindowController {
 	}
 
 	@FXML
-	void totalPlaytimeBtnAction(ActionEvent event) {
-
+	void totalPlaytimeBtnAction() {
+		
 	}
 
 	@FXML
-	void lastTimePlayedBtnAction(ActionEvent event) {
+	void lastTimePlayedBtnAction() {
 		
 	}
     
 	@FXML
-	void cemuTFBtnAction(ActionEvent event) {
+	void cemuTFBtnAction() {
 		File cemuDirectory = directoryChooser.showDialog(main.getPrimaryStage());
-		if (cemuDirectory == null) {
-			LOGGER.warn("No Directory selected");
-		} else {
-			setCemuPath(cemuDirectory.getAbsolutePath());
-			saveSettings();
-			cemuTextField.setText(getCemuPath());
-			try {
-				Runtime.getRuntime().exec("java -jar cemu_UI.jar"); // start again
-				System.exit(0); // finishes itself
-			} catch (IOException e) {
-				LOGGER.error("an error occurred", e);
-			}
+		if (cemuDirectory != null) {
+			cemuTextField.setText(cemuDirectory.getAbsolutePath());
 		}
 	}
     
 	@FXML
-	void romTFBtnAction(ActionEvent event) {
+	void romTFBtnAction() {
 		File romDirectory = directoryChooser.showDialog(main.getPrimaryStage());
-		setRomDirectoryPath(romDirectory.getAbsolutePath());
-		saveSettings();
-		romTextField.setText(getRomDirectoryPath());
-		
-		if (romDirectory.exists()) {
-			reloadRoms();
-		} else {
-			String bodyText = "No such file or directory";
-			JFXInfoDialog fileErrorDialog = new JFXInfoDialog("Waring!", bodyText, dialogBtnStyle, 190, 150, main.getPane());
-			fileErrorDialog.show();
-			LOGGER.warn("Directory does not exist");			
+		if (romDirectory != null) {
+			romTextField.setText(romDirectory.getAbsolutePath());
 		}
 	}
     
 	@FXML
-	void updateBtnAction(ActionEvent event) {
+	void updateBtnAction() {
 		updateController = new UpdateController(this, buildNumber, useBeta);
 		Thread updateThread = new Thread(updateController);
 		updateThread.setName("Updater");
@@ -961,7 +948,7 @@ public class MainWindowController {
 	}
     
 	@FXML
-	void autoUpdateToggleBtnAction(ActionEvent event) {
+	void autoUpdateToggleBtnAction() {
 		if (isAutoUpdate()) {
 			setAutoUpdate(false);
 		} else {
@@ -971,12 +958,12 @@ public class MainWindowController {
 	}
 	
 	@FXML
-	void courseSearchTextFiledAction(ActionEvent event) {
+	void courseSearchTextFiledAction() {
 		// not in use
 	}
     
     @FXML
-    void smmdbDownloadBtnAction(ActionEvent event) {
+    void smmdbDownloadBtnAction() {
     	String downloadUrl = "http://smmdb.ddns.net/api/downloadcourse?id=" + id + "&type=zip";
     	String downloadFileURL = getCemuPath() + "/" + id + ".zip";	// getCemuPath() + "/" + smmID + "/" + id + ".rar"
     	String outputFile = getCemuPath() + "/";
@@ -1044,7 +1031,7 @@ public class MainWindowController {
     }
     
 	@FXML
-	void fullscreenToggleBtnAction(ActionEvent event) {
+	void fullscreenToggleBtnAction() {
 		if (fullscreen) {
 			fullscreen = false;
 		} else {
@@ -1054,7 +1041,7 @@ public class MainWindowController {
 	}
     
     @FXML
-    void cloudSyncToggleBtnAction(ActionEvent event) {
+    void cloudSyncToggleBtnAction() {
     	if(cloudSync) {
     		cloudSync = false;
     	} else {
@@ -1103,13 +1090,13 @@ public class MainWindowController {
     }
     
 	@FXML
-	void colorPickerAction(ActionEvent event) {
+	void colorPickerAction() {
 		editColor(colorPicker.getValue().toString());
 		applyColor();
 	}
     
 	@FXML
-	void addBtnAction(ActionEvent event) {
+	void addBtnAction() {
 		String headingText = addGameBtnHeadingText;
 		String bodyText = addGameBtnBodyText;
 		JFXEditGameDialog addGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 450, 300, 0,
@@ -1308,15 +1295,9 @@ public class MainWindowController {
 		thread.start();
     }
     
-	// add all games saved in games(ArrayList) to gamesAnchorPane
-	void addUIData() {
-		for (int i = 0; i < games.size(); i++) {
-			gamesAnchorPane.getChildren().add(games.get(i).getVBox());
-		}
-	}
-    
     //remove all games from gamesAnchorPane and add them afterwards
     public void refreshUIData() {
+    	System.out.println("refresh");
     	//remove all games form gamesAnchorPane
     	gamesAnchorPane.getChildren().removeAll(gamesAnchorPane.getChildren());
 
@@ -1654,11 +1635,11 @@ public class MainWindowController {
     /**
      * save settings to the config.xml file
      */
-    public void saveSettings(){
-    	LOGGER.info("saving Settings ...");
-    	
-    	try {
-    		props.setProperty("cemuPath", getCemuPath());
+	public void saveSettings() {
+		LOGGER.info("saving Settings ...");
+
+		try {
+			props.setProperty("cemuPath", getCemuPath());
 			props.setProperty("romPath", getRomDirectoryPath());
 			props.setProperty("color", getColor());
 			props.setProperty("language", getLanguage());
@@ -1675,89 +1656,89 @@ public class MainWindowController {
 			props.setProperty("lastLocalSync", String.valueOf(getLastLocalSync()));
 			props.setProperty("windowWidth", String.valueOf(mainAnchorPane.getWidth()));
 			props.setProperty("windowHeight", String.valueOf(mainAnchorPane.getHeight()));
-			
-			OutputStream outputStream = new FileOutputStream(main.getConfigFile());	//new output-stream
-    		props.storeToXML(outputStream, "cemu_UI settings");	//write new .xml
-    		outputStream.close();
-    		LOGGER.info("saving Settings done!");
-    	} catch (IOException e) {
-    		LOGGER.error("an error occured", e);
-    	}
-    }
+
+			OutputStream outputStream = new FileOutputStream(main.getConfigFile()); // new output-stream
+			props.storeToXML(outputStream, "cemu_UI settings"); // write new .xml
+			outputStream.close();
+			LOGGER.info("saving Settings done!");
+		} catch (IOException e) {
+			LOGGER.error("an error occured", e);
+		}
+	}
     
     /**
      * loading saved settings from the config.xml file
      * if a value is not present, default is used instead
      */
-    private void loadSettings(){
-    	LOGGER.info("loading settings ...");
+	private void loadSettings() {
+		LOGGER.info("loading settings ...");
 		try {
 			InputStream inputStream = new FileInputStream(main.getConfigFile());
-			props.loadFromXML(inputStream);	//new input-stream from .xml
-			
+			props.loadFromXML(inputStream); // new input-stream from .xml
+
 			try {
 				setCemuPath(props.getProperty("cemuPath"));
 			} catch (Exception e) {
 				LOGGER.error("cloud not load cemuPath", e);
 				setCemuPath("");
 			}
-			
+
 			try {
 				setRomDirectoryPath(props.getProperty("romPath"));
 			} catch (Exception e) {
 				LOGGER.error("could not load romPath", e);
 				setRomDirectoryPath("");
 			}
-			
+
 			try {
 				setColor(props.getProperty("color"));
 			} catch (Exception e) {
 				LOGGER.error("could not load color value, setting default instead", e);
 				setColor("00a8cc");
 			}
-			
+
 			if (props.getProperty("language") == null) {
 				LOGGER.error("cloud not load language, setting default instead");
 				setLanguage("en_US");
 			} else {
 				setLanguage(props.getProperty("language"));
 			}
-			
+
 			try {
 				setFullscreen(Boolean.parseBoolean(props.getProperty("fullscreen")));
 			} catch (Exception e) {
 				LOGGER.error("could not load fullscreen, setting default instead", e);
 				setFullscreen(false);
 			}
-			
+
 			try {
 				setCloudSync(Boolean.parseBoolean(props.getProperty("cloudSync")));
 			} catch (Exception e) {
 				LOGGER.error("could not load cloudSync, setting default instead", e);
 				setCloudSync(false);
 			}
-			
+
 			try {
 				setAutoUpdate(Boolean.parseBoolean(props.getProperty("autoUpdate")));
 			} catch (Exception e) {
 				LOGGER.error("cloud not load autoUpdate", e);
 				setAutoUpdate(false);
 			}
-			
+
 			try {
 				setUseBeta(Boolean.parseBoolean(props.getProperty("useBeta")));
 			} catch (Exception e) {
 				LOGGER.error("cloud not load autoUpdate", e);
 				setUseBeta(false);
 			}
-			
+
 			try {
 				setCloudService(props.getProperty("cloudService"));
 			} catch (Exception e) {
 				LOGGER.error("could not load cloudSync", e);
 				setCloudService("");
 			}
-			
+
 			try {
 				main.getCloudController().setFolderID(props.getProperty("folderID"), getCloudService());
 			} catch (Exception e) {
@@ -1771,27 +1752,27 @@ public class MainWindowController {
 				LOGGER.error("could not load lastSuccessSync, setting default instead", e);
 				setLastLocalSync(0);
 			}
-			
+
 			try {
 				setWindowWidth(Double.parseDouble(props.getProperty("windowWidth")));
 			} catch (Exception e) {
 				LOGGER.error("could not load windowWidth, setting default instead", e);
 				setWindowWidth(904);
 			}
-			
+
 			try {
 				setWindowHeight(Double.parseDouble(props.getProperty("windowHeight")));
 			} catch (Exception e) {
 				LOGGER.error("could not load windowHeight, setting default instead", e);
 				setWindowHeight(600);
 			}
-			
+
 			inputStream.close();
-	    	LOGGER.info("loading settings done!");
+			LOGGER.info("loading settings done!");
 		} catch (IOException e) {
 			LOGGER.error("an error occured", e);
 		}
-    }
+	}
     
     private void sideMenuSlideIn(){
 		sideMenuVBox.setVisible(true);
