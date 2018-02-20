@@ -290,7 +290,7 @@ public class MainWindowController {
 	private String selectedGameTitle;
 	private String id;
 	private String version = "0.3.0";
-	private String buildNumber = "075";
+	private String buildNumber = "077";
 	private String versionName = "Puzzle Plank Galaxy";
 	private int xPos = -200;
 	private int yPos = 17;
@@ -719,7 +719,7 @@ public class MainWindowController {
 							try {
 								Desktop.getDesktop().browse(new URI("https://github.com/Seil0/cemu_UI/issues/3"));
 							} catch (IOException | URISyntaxException e) {
-								e.printStackTrace();
+								LOGGER.error("An error ocoured while trying to open a Website.", e);
 							}
 						}
 					});
@@ -1297,7 +1297,6 @@ public class MainWindowController {
     
     //remove all games from gamesAnchorPane and add them afterwards
     public void refreshUIData() {
-    	System.out.println("refresh");
     	//remove all games form gamesAnchorPane
     	gamesAnchorPane.getChildren().removeAll(gamesAnchorPane.getChildren());
 
@@ -1544,6 +1543,8 @@ public class MainWindowController {
     	
     	/**FIXME somehow the window width is set to 8, if we can find a way to get always the real window with
     	*(at the beginning we have to use prefWidth after resizing Width) we can remove this
+    	*This is caused by the time the game objects are generates,
+    	*it's before the window is opened so it's size is > 10
     	*/
     	if (mainAnchorPane.getWidth() < 10) {
     		xPosHelperMax = (int) Math.floor((mainAnchorPane.getPrefWidth() - 36) / 217);

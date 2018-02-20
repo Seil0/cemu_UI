@@ -142,8 +142,6 @@ public class Main extends Application {
 				mainWindowController.setLastLocalSync(0);
 				mainWindowController.setxPosHelper(0);
 				mainWindowController.saveSettings();
-				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//TODO check if this really is needed start again (preventing Bugs)
-				System.exit(0);	//finishes itself
 			}
 			
 			if (!pictureCache.exists()) {
