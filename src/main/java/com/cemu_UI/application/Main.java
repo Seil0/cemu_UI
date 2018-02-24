@@ -166,7 +166,15 @@ public class Main extends Application {
 				}
 			}
 			
-			// loading settings and initialize UI, dbController.main() loads all databases
+			// generate window
+			scene = new Scene(pane); // create new scene, append pane to scene
+			scene.getStylesheets().add(Main.class.getResource("/css/MainWindows.css").toExternalForm());
+			primaryStage.setMinWidth(265.00);
+			primaryStage.setMinHeight(425.00);
+			primaryStage.setScene(scene); // append scene to stage
+			primaryStage.show(); // show stage
+			
+			// init here as it loads the games to the mwc and the gui, therefore the window must exist
 			mainWindowController.init();
 			mainWindowController.dbController.init();
 			
@@ -176,12 +184,6 @@ public class Main extends Application {
 				cloudController.sync(mainWindowController.getCloudService(), mainWindowController.getCemuPath(), directory.getPath());
 			}
 			
-			scene = new Scene(pane); // create new scene, append pane to scene
-			scene.getStylesheets().add(Main.class.getResource("/css/MainWindows.css").toExternalForm());
-			primaryStage.setMinWidth(265.00);
-			primaryStage.setMinHeight(425.00);
-			primaryStage.setScene(scene); // append scene to stage
-			primaryStage.show(); // show stage
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -304,7 +304,7 @@ public class MainWindowController {
 	private DirectoryChooser directoryChooser = new DirectoryChooser();
 	private ObservableList<String> branches = FXCollections.observableArrayList("stable", "beta");
 	private ObservableList<String> languages = FXCollections.observableArrayList("English (en_US)", "Deutsch (de_DE)");
-	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2", "44fc5929"); // TODO add more IDs
+	private ObservableList<String> smmIDs = FXCollections.observableArrayList("fe31b7f2", "44fc5929");
 	private ObservableList<UIROMDataType> games = FXCollections.observableArrayList();
 	ObservableList<SmmdbApiDataType> courses = FXCollections.observableArrayList();
 	ObservableList<SmmdbApiDataType> filteredCourses = FXCollections.observableArrayList();
@@ -1539,18 +1539,7 @@ public class MainWindowController {
      * calculates how many games can be displayed in one row
      */
     private void generatePosition() {
-    	int xPosHelperMax;
-    	
-    	/**FIXME somehow the window width is set to 8, if we can find a way to get always the real window with
-    	*(at the beginning we have to use prefWidth after resizing Width) we can remove this
-    	*This is caused by the time the game objects are generates,
-    	*it's before the window is opened so it's size is > 10
-    	*/
-    	if (mainAnchorPane.getWidth() < 10) {
-    		xPosHelperMax = (int) Math.floor((mainAnchorPane.getPrefWidth() - 36) / 217);
-    	} else {
-    		xPosHelperMax = (int) Math.floor((mainAnchorPane.getWidth() - 36) / 217);
-    	}
+    	int xPosHelperMax = (int) Math.floor((mainAnchorPane.getWidth() - 36) / 217);
     	
     	if(xPosHelper == xPosHelperMax){
     		oldXPosHelper = xPosHelper;
@@ -1561,12 +1550,6 @@ public class MainWindowController {
     		xPos = xPos + 217;
     		xPosHelper++;
     	}
-    	
-//    	System.out.println("Breit: " + main.pane.getWidth());
-//    	System.out.println("Breit2: " + mainAnchorPane.getWidth());
-//    	System.out.println("xPosHelper: " + xPosHelper);
-//    	System.out.println("yPos: " + yPos);
-//    	System.out.println("xPos: " + xPos);
     }
     
     // change the color of all needed GUI elements
