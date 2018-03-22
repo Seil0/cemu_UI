@@ -1,8 +1,5 @@
 package com.cemu_UI.test;
 
-import java.io.File;
-
-import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
