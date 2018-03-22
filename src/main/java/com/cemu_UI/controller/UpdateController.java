@@ -59,8 +59,7 @@ public class UpdateController implements Runnable {
 	private static final Logger LOGGER = LogManager.getLogger(UpdateController.class.getName());
 
 	/**
-	 * updater for cemu_UI based on Project HomeFlix checks for Updates and download
-	 * it in case there is one
+	 * updater for cemu_UI, checks for Updates and download it
 	 */
 	public UpdateController(MainWindowController mwc, String buildNumber, boolean useBeta) {
 		mainWindowController = mwc;
