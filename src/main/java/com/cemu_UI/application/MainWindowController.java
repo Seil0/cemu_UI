@@ -265,11 +265,15 @@ public class MainWindowController {
 
 	@FXML
 	private JFXTreeTableColumn<CourseTableDataType, Integer> timeColumn = new JFXTreeTableColumn<>("time");
+	
+	private enum CloudService {
+		GoogleDrive, Dropbox
+	}
 
-	Main main;
-	DBController dbController;
-	SmmdbAPIController smmdbAPIController;
-	playGame playGame;
+	private Main main;
+	private DBController dbController;
+	private SmmdbAPIController smmdbAPIController;
+	private playGame playGame;
 	private static MainWindowController MWC;
 	private UpdateController updateController;
 	private boolean menuTrue = false;
@@ -1050,6 +1054,7 @@ public class MainWindowController {
 	        	 public void handle(ActionEvent event){
 	    			cloudSync = true;
 	    			//TODO rework for other cloud services
+//	    			CloudService service = CloudService.GoogleDrive;
 	    			cloudService = "GoogleDrive";
 	    			
 	    			// start cloud sync in new thread			
@@ -1830,6 +1835,18 @@ public class MainWindowController {
 	    g.dispose();
 
 	    return resizedImage;
+	}
+
+	public Main getMain() {
+		return main;
+	}
+
+	public DBController getDbController() {
+		return dbController;
+	}
+
+	public void setMainAnchorPane(AnchorPane mainAnchorPane) {
+		this.mainAnchorPane = mainAnchorPane;
 	}
 
 	public String getCemuPath() {

@@ -176,7 +176,7 @@ public class Main extends Application {
 			
 			// init here as it loads the games to the mwc and the gui, therefore the window must exist
 			mainWindowController.init();
-			mainWindowController.dbController.init();
+			mainWindowController.getDbController().init();
 			
 			// if cloud sync is activated start sync
 			if(mainWindowController.isCloudSync()) {

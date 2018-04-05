@@ -54,7 +54,7 @@ public class playGame extends Thread{
 		Process p;
 		
 		Platform.runLater(() -> {
-			mainWindowController.main.getPrimaryStage().setIconified(true); // minimize cemu_UI
+			mainWindowController.getMain().getPrimaryStage().setIconified(true); // minimize cemu_UI
 		});
     	startTime = System.currentTimeMillis();
     	try {
@@ -86,14 +86,14 @@ public class playGame extends Thread{
 				} else {
 					mainWindowController.totalPlaytimeBtn.setText(dbController.getTotalPlaytime(selectedGameTitleID) + " min");
 				}
-				mainWindowController.main.getPrimaryStage().setIconified(false); // maximize cemu_UI
+				mainWindowController.getMain().getPrimaryStage().setIconified(false); // maximize cemu_UI
 			});
     		
     		//sync savegame with cloud service
 			if (mainWindowController.isCloudSync()) {
 				mainWindowController.setLastLocalSync(Instant.now().getEpochSecond());
-				mainWindowController.main.getCloudController().sync(mainWindowController.getCloudService(),
-						mainWindowController.getCemuPath(), mainWindowController.main.getDirectory().getPath());
+				mainWindowController.getMain().getCloudController().sync(mainWindowController.getCloudService(),
+						mainWindowController.getCemuPath(), mainWindowController.getMain().getDirectory().getPath());
 			}
     		
 		} catch (IOException | InterruptedException e) {
