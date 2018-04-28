@@ -1,7 +1,7 @@
 /**
  * cemu_UI
  * 
- * Copyright 2017  <@Seil0>
+ * Copyright 2017-2018  <@Seil0>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
  */
-
 package com.cemu_UI.application;
 	
 import java.io.File;
@@ -116,7 +115,7 @@ public class Main extends Application {
 			}
 			
 			// startup checks
-			// check if client_secret.jason is present
+			// check if client_secret.json is present
 			if (Main.class.getResourceAsStream("/client_secret.json") == null) {
 				LOGGER.error("client_secret is missing!!!!!");
 				
@@ -142,11 +141,9 @@ public class Main extends Application {
 				mainWindowController.setLastLocalSync(0);
 				mainWindowController.setxPosHelper(0);
 				mainWindowController.saveSettings();
-				Runtime.getRuntime().exec("java -jar cemu_UI.jar");	//start again (preventing Bugs)
-				System.exit(0);	//finishes itself
 			}
 			
-			if (pictureCache.exists() != true) {
+			if (!pictureCache.exists()) {
 				pictureCache.mkdir();
 			}
 			
@@ -168,27 +165,30 @@ public class Main extends Application {
 				}
 			}
 			
-			// loading settings and initialize UI, dbController.main() loads all databases
+			// generate window
+			scene = new Scene(pane); // create new scene, append pane to scene
+			scene.getStylesheets().add(Main.class.getResource("/css/MainWindows.css").toExternalForm());
+			primaryStage.setMinWidth(265.00);
+			primaryStage.setMinHeight(425.00);
+			primaryStage.setScene(scene); // append scene to stage
+			primaryStage.show(); // show stage
+			
+			// init here as it loads the games to the mwc and the gui, therefore the window must exist
 			mainWindowController.init();
-			mainWindowController.dbController.init();
+			mainWindowController.getDbController().init();
 			
 			// if cloud sync is activated start sync
 			if(mainWindowController.isCloudSync()) {
 				cloudController.initializeConnection(mainWindowController.getCloudService(), mainWindowController.getCemuPath());
 				cloudController.sync(mainWindowController.getCloudService(), mainWindowController.getCemuPath(), directory.getPath());
-			}			
-			mainWindowController.addUIData();
+			}
 			
-			scene = new Scene(pane); // create new scene, append pane to scene
-			scene.getStylesheets().add(Main.class.getResource("/css/MainWindows.css").toExternalForm());
-			primaryStage.setScene(scene); // append scene to stage
-			primaryStage.show(); // show stage
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 	}
 	
-	private void firstStart(){
+	private void firstStart() {
 		Alert alert = new Alert(AlertType.CONFIRMATION); // new alert with file-chooser
 		alert.setTitle("cemu_UI");
 		alert.setHeaderText("cemu installation");
@@ -212,11 +212,10 @@ public class Main extends Application {
 		Optional<ButtonType> result2 = alert2.showAndWait();
 		if (result2.get() == ButtonType.OK) {
 			DirectoryChooser directoryChooser = new DirectoryChooser();
-            File selectedDirectory = directoryChooser.showDialog(primaryStage);
-                mainWindowController.setRomPath(selectedDirectory.getAbsolutePath());
-            
+			File selectedDirectory = directoryChooser.showDialog(primaryStage);
+			mainWindowController.setRomDirectoryPath(selectedDirectory.getAbsolutePath());
 		} else {
-			mainWindowController.setRomPath(null);
+			mainWindowController.setRomDirectoryPath(null);
 		}
 	}
 	
@@ -241,7 +240,7 @@ public class Main extends Application {
 
 				saveTask = new TimerTask() {
 					@Override
-				    public void run() { 
+				    public void run() {
 						mainWindowController.saveSettings();
 					}
 				};
@@ -262,7 +261,7 @@ public class Main extends Application {
 				
 				saveTask = new TimerTask() {
 					@Override
-				    public void run() { 
+				    public void run() {
 						mainWindowController.saveSettings();
 					}
 				};
@@ -295,11 +294,11 @@ public class Main extends Application {
 	
 	public static void main(String[] args) {
 		// delete old log file and create new
-		if(osName.equals("Linux")){
+		if (osName.equals("Linux")) {
 			System.setProperty("logFilename", userHome + "/cemu_UI/app.log");
 			File logFile = new File(userHome + "/cemu_UI/app.log");
 			logFile.delete();
-		}else{
+		} else {
 			System.setProperty("logFilename", userHome + "/Documents/cemu_UI/app.log");
 			File logFile = new File(userHome + "/Documents/cemu_UI/app.log");
 			logFile.delete();
@@ -341,7 +340,19 @@ public class Main extends Application {
 		return directory;
 	}
 
-	public void setDirectory(File directory) {
-		this.directory = directory;
+	public File getConfigFile() {
+		return configFile;
+	}
+
+	public File getGamesDBFile() {
+		return gamesDBFile;
+	}
+
+	public File getReference_gamesFile() {
+		return reference_gamesFile;
+	}
+
+	public File getPictureCache() {
+		return pictureCache;
 	}
 }

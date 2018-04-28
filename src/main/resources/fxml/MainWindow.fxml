@@ -18,7 +18,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.TextFlow?>
 
-<AnchorPane fx:id="mainAnchorPane" prefHeight="600.0" prefWidth="904.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cemu_UI.application.MainWindowController">
+<AnchorPane fx:id="mainAnchorPane" minHeight="405.0" minWidth="260.0" prefHeight="600.0" prefWidth="904.0" xmlns="http://javafx.com/javafx/9" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cemu_UI.application.MainWindowController">
    <children>
       <ScrollPane fx:id="mainScrollPane" fitToWidth="true" layoutY="38.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="38.0">
          <content>
@@ -91,12 +91,12 @@
                                     <Insets left="-14.0" />
                                  </padding>
                               </VBox>
-                              <VBox spacing="10.0">
+                              <VBox spacing="7.0">
                                  <children>
                                     <Label fx:id="cemuDirectoryLbl" text="Cemu Directory" />
                                     <HBox spacing="10.0">
                                        <children>
-                                          <JFXTextField fx:id="cemuTextField" maxWidth="305.0" minWidth="305.0" onAction="#cemuTextFieldAction" prefHeight="32.0" prefWidth="305.0" promptText="cemu directory" />
+                                          <JFXTextField fx:id="cemuTextField" maxWidth="305.0" minWidth="305.0" prefHeight="32.0" prefWidth="305.0" promptText="cemu directory" />
                                           <JFXButton fx:id="cemuTFBtn" onAction="#cemuTFBtnAction" prefHeight="32.0" text="choose directory" />
                                        </children>
                                     </HBox>
@@ -105,12 +105,12 @@
                                     <Insets right="5.0" />
                                  </padding>
                               </VBox>
-                              <VBox spacing="10.0">
+                              <VBox spacing="7.0">
                                  <children>
                                     <Label fx:id="romDirectoryLbl" text="Rom Directory" />
                                     <HBox spacing="10.0">
                                        <children>
-                                          <JFXTextField fx:id="romTextField" maxWidth="305.0" minWidth="305.0" onAction="#romTextFieldAction" prefHeight="32.0" prefWidth="305.0" promptText="rom directory" />
+                                          <JFXTextField fx:id="romTextField" maxWidth="305.0" minWidth="305.0" prefHeight="32.0" prefWidth="305.0" promptText="rom directory" />
                                           <JFXButton fx:id="romTFBtn" onAction="#romTFBtnAction" prefHeight="32.0" text="choose directory" />
                                        </children>
                                     </HBox>
@@ -213,14 +213,14 @@
       </AnchorPane>
       <HBox fx:id="bottomHBox" alignment="CENTER" layoutX="326.0" layoutY="602.0" prefHeight="48.0" prefWidth="200.0" spacing="10.0" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <children>
-            <JFXButton fx:id="totalPlaytimeBtn" buttonType="RAISED" maxHeight="32.0" maxWidth="150.0" minWidth="125.0" onAction="#totalPlaytimeBtnAction" prefHeight="32.0" style="-fx-background-color: #ffffff; -fx-button-type: RAISED; -fx-text-fill: BLACK;" text="0 h     0 min">
+            <JFXButton fx:id="totalPlaytimeBtn" buttonType="RAISED" maxHeight="32.0" maxWidth="156.0" minHeight="32.0" minWidth="156.0" onAction="#totalPlaytimeBtnAction" style="-fx-background-color: #ffffff; -fx-button-type: RAISED; -fx-text-fill: BLACK;" text="0 h     0 min">
       </JFXButton>
             <JFXButton fx:id="playBtn" buttonType="RAISED" maxHeight="28.0" minWidth="100.0" onAction="#playBtnAction" ripplerFill="#00aacc" text="play" textAlignment="CENTER">
                <font>
                   <Font name="System Bold" size="14.0" />
                </font>
             </JFXButton>
-            <JFXButton fx:id="lastTimePlayedBtn" buttonType="RAISED" maxHeight="32.0" maxWidth="150.0" minWidth="125.0" onAction="#lastTimePlayedBtnAction" prefHeight="32.0" style="-fx-background-color: #ffffff; -fx-button-type: RAISED; -fx-text-fill: BLACK;" text="Last played, never" />
+            <JFXButton fx:id="lastTimePlayedBtn" buttonType="RAISED" maxHeight="32.0" maxWidth="156.0" minHeight="32.0" minWidth="156.0" onAction="#lastTimePlayedBtnAction" style="-fx-background-color: #ffffff; -fx-button-type: RAISED; -fx-text-fill: BLACK;" text="Last played, never" />
          </children>
       </HBox>
    </children>

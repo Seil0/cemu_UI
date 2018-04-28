@@ -1,7 +1,7 @@
 /**
  * cemu_UI
  * 
- * Copyright 2017  <@Seil0>
+ * Copyright 2017-2018  <@Seil0>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
  */
-
 package com.cemu_UI.controller;
 
 import java.io.BufferedReader;
@@ -59,8 +58,7 @@ public class UpdateController implements Runnable {
 	private static final Logger LOGGER = LogManager.getLogger(UpdateController.class.getName());
 
 	/**
-	 * updater for cemu_UI based on Project HomeFlix checks for Updates and download
-	 * it in case there is one
+	 * updater for cemu_UI, checks for Updates and download it
 	 */
 	public UpdateController(MainWindowController mwc, String buildNumber, boolean useBeta) {
 		mainWindowController = mwc;
@@ -149,7 +147,7 @@ public class UpdateController implements Runnable {
 				FileUtils.copyInputStreamToFile(pmis, new File("cemu_UI_update.jar")); // download update
 				org.apache.commons.io.FileUtils.copyFile(new File("cemu_UI_update.jar"), new File("cemu_UI.jar"));
 				org.apache.commons.io.FileUtils.deleteQuietly(new File("cemu_UI_update.jar")); // delete update
-				Runtime.getRuntime().exec("java -jar cemu_UI.jar"); // start again
+				Runtime.getRuntime().exec("java -jar cemu_UI.jar"); // start again TODO consider ProcessBuilder to execute
 				System.exit(0); // finishes itself
 			} catch (IOException e) {
 				Platform.runLater(() -> {

@@ -4,16 +4,14 @@
 
   <groupId>com</groupId>
   <artifactId>cemu_UI</artifactId>
-  <version>0.2.3-SNAPSHOT</version>
+  <version>0.3.0-SNAPSHOT</version>
   <packaging>jar</packaging>
-
   <name>cemu_UI</name>
+  <description>cemu_UI is a simple, material design graphical frontend for cemu, a Wii U emulator</description>
   <url>http://www.kellerkinder.xyz</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
 
   <dependencies>
@@ -21,20 +19,20 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>3.8.1</version>
+      <version>4.11</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
         <groupId>com.jfoenix</groupId>
         <artifactId>jfoenix</artifactId>
-        <version>1.11.1</version>
+        <version>9.0.3</version>
     </dependency>
         
     <dependency>
         <groupId>com.eclipsesource.minimal-json</groupId>
         <artifactId>minimal-json</artifactId>
-        <version>0.9.4</version>
+        <version>0.9.5</version>
     </dependency>
         
     <dependency>
@@ -43,22 +41,22 @@
         <version>3.21.0.1</version>
     </dependency>
 	
-	<dependency>
-		<groupId>org.apache.logging.log4j</groupId>
-		<artifactId>log4j-api</artifactId>
-		<version>2.9.1</version>
-	</dependency>
-	
-	<dependency>
-		<groupId>org.apache.logging.log4j</groupId>
-		<artifactId>log4j-core</artifactId>
-		<version>2.9.1</version>
-	</dependency>
+    <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-api</artifactId>
+        <version>2.11.0</version>
+    </dependency>
+    
+    <dependency>
+        <groupId>org.apache.logging.log4j</groupId>
+        <artifactId>log4j-core</artifactId>
+        <version>2.11.0</version>
+    </dependency>
     
     <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.5</version>
+        <version>2.6</version>
     </dependency>
     
     <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-vfs2 -->
@@ -109,7 +107,7 @@
     <dependency>
         <groupId>com.google.apis</groupId>
         <artifactId>google-api-services-drive</artifactId>
-        <version>v3-rev87-1.23.0</version>
+        <version>v3-rev99-1.23.0</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/com.google.http-client/google-http-client -->
@@ -152,14 +150,14 @@
     <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
-        <version>2.9.2</version>
+        <version>2.9.4</version>
     </dependency>
 
     <!-- https://mvnrepository.com/artifact/javax.servlet/javax.servlet-api -->
     <dependency>
         <groupId>javax.servlet</groupId>
         <artifactId>javax.servlet-api</artifactId>
-        <version>4.0.0-b01</version>
+        <version>4.0.0</version>
         <scope>provided</scope>
     </dependency>
 
@@ -180,13 +178,24 @@
   </dependencies>
   
   <build>
-      
     <plugins>
-             
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.1.0</version>
+        
+        <plugin> 
+            <groupId>org.apache.maven.plugins</groupId> 
+            <artifactId>maven-compiler-plugin</artifactId> 
+            <version>3.7.0</version> 
+            <configuration> 
+                <source>9</source> 
+                <target>9</target> 
+                <showWarnings>true</showWarnings> 
+                <showDeprecation>true</showDeprecation> 
+            </configuration> 
+        </plugin>
+        
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>3.1.0</version>
                 <executions>
                     <execution>
                     <phase>package</phase>
@@ -194,18 +203,18 @@
                         <goal>shade</goal>
                     </goals>
                     <configuration>
+                        <finalName>cemu_UI</finalName>
                         <shadedArtifactAttached>true</shadedArtifactAttached>
                         <transformers>
-                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                            <mainClass>com.cemu_UI.application.Main</mainClass>
-                        </transformer>
+                            <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                <mainClass>com.cemu_UI.application.Main</mainClass>
+                            </transformer>
                         </transformers>
                     </configuration>
                     </execution>
                 </executions>
             </plugin>
-        
         </plugins>
     </build>
-  
+    
 </project>

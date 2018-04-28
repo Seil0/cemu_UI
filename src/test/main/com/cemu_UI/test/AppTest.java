@@ -1,8 +1,5 @@
 package com.cemu_UI.test;
 
-import java.io.File;
-
-import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -24,8 +21,7 @@ public class AppTest extends TestCase {
 
 	@SuppressWarnings("unused")
 	private void testClientsSecret() {
-		File client_secret = new File("/client_secret.json");
-		Assert.assertTrue(client_secret.exists());
+
 	}
 
 	/**
