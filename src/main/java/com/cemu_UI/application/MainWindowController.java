@@ -1,7 +1,7 @@
 /**
  * cemu_UI
  * 
- * Copyright 2017  <@Seil0>
+ * Copyright 2017-2018  <@Seil0>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
  * MA 02110-1301, USA.
  */
-
 package com.cemu_UI.application;
 
 import java.awt.Desktop;
@@ -266,6 +265,7 @@ public class MainWindowController {
 	@FXML
 	private JFXTreeTableColumn<CourseTableDataType, Integer> timeColumn = new JFXTreeTableColumn<>("time");
 	
+	@SuppressWarnings("unused")
 	private enum CloudService {
 		GoogleDrive, Dropbox
 	}
@@ -295,7 +295,7 @@ public class MainWindowController {
 	private String id;
 	private String version = "0.3.0";
 	private String buildNumber = "077";
-	private String versionName = "Puzzle Plank Galaxy";
+	private String versionName = "Purple Comet";
 	private int xPos = -200;
 	private int yPos = 17;
 	private int xPosHelper;
