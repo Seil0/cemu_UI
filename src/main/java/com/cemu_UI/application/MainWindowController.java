@@ -1590,7 +1590,8 @@ public class MainWindowController {
 			addBtn.setGraphic(add_circle_white);
 			reloadRomsBtn.setGraphic(cached_white);
 			smmdbBtn.setGraphic(smmdb_white);
-
+			
+			menuHam.getStyleClass().clear();
 			menuHam.getStyleClass().add("jfx-hamburgerW");
 		} else {
 			dialogBtnStyle = btnStyleBlack;
@@ -1612,7 +1613,8 @@ public class MainWindowController {
 			addBtn.setGraphic(add_circle_black);
 			reloadRomsBtn.setGraphic(cached_black);
 			smmdbBtn.setGraphic(smmdb_black);
-
+			
+			menuHam.getStyleClass().clear();
 			menuHam.getStyleClass().add("jfx-hamburgerB");
 		}
 
