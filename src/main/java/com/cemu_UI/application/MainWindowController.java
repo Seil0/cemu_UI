@@ -111,37 +111,26 @@ public class MainWindowController {
 
 	@FXML
 	private JFXButton aboutBtn;
-
 	@FXML
 	private JFXButton settingsBtn;
-
 	@FXML
 	private JFXButton addBtn;
-
 	@FXML
 	private JFXButton reloadRomsBtn;
-
 	@FXML
 	private JFXButton smmdbBtn;
-
 	@FXML
 	private JFXButton cemuTFBtn;
-
 	@FXML
 	private JFXButton romTFBtn;
-
 	@FXML
 	private JFXButton updateBtn;
-
 	@FXML
 	private JFXButton smmdbDownloadBtn;
-
 	@FXML
 	private JFXButton playBtn;
-
 	@FXML
 	private JFXButton lastTimePlayedBtn;
-
 	@FXML
 	JFXButton totalPlaytimeBtn;
 
@@ -150,58 +139,46 @@ public class MainWindowController {
 
 	@FXML
 	private JFXTextField cemuTextField;
-
 	@FXML
 	private JFXTextField romTextField;
-	
 	@FXML
 	private JFXTextField courseSearchTextFiled;
-	
 	@FXML
 	private JFXTextField executeCommandTextFiled;
-
+	
 	@FXML
 	private TextFlow smmdbTextFlow;
-
+	
 	@FXML
 	private JFXColorPicker colorPicker;
-
+	
 	@FXML
 	private JFXToggleButton cloudSyncToggleBtn;
-
 	@FXML
 	private JFXToggleButton autoUpdateToggleBtn;
-
 	@FXML
 	private JFXToggleButton fullscreenToggleBtn;
 	
 	@FXML
 	private ChoiceBox<String> languageChoisBox;
-
 	@FXML
 	private ChoiceBox<String> branchChoisBox;
 
 	@FXML
 	private AnchorPane mainAnchorPane;
-
 	@FXML
 	private AnchorPane gamesAnchorPane;
-
 	@FXML
 	private AnchorPane settingsAnchorPane;
-
 	@FXML
 	private AnchorPane smmdbAnchorPane;
 
 	@FXML
 	private ScrollPane mainScrollPane;
-
 	@FXML
 	private ScrollPane settingsScrollPane;
-
 	@FXML
 	private ScrollPane smmdbScrollPane;
-	
 	@FXML
 	private ScrollPane smmdbImageViewScrollPane;
 
@@ -210,7 +187,6 @@ public class MainWindowController {
 
 	@FXML
 	private HBox topHBox;
-	
 	@FXML
 	private HBox bottomHBox;
 
@@ -219,31 +195,22 @@ public class MainWindowController {
 
 	@FXML
 	private Label helpLbl;
-
 	@FXML
 	private Label cemu_UISettingsLbl;
-
 	@FXML
 	private Label cemuDirectoryLbl;
-
 	@FXML
 	private Label romDirectoryLbl;
-
 	@FXML
 	private Label mainColorLbl;
-	
 	@FXML
 	private Label languageLbl;
-
 	@FXML
 	private Label updateLbl;
-
 	@FXML
 	private Label branchLbl;
-
 	@FXML
 	private Label cemuSettingsLbl;
-
 	@FXML
 	private Label licensesLbl;
 
@@ -251,17 +218,14 @@ public class MainWindowController {
 	private JFXTreeTableView<CourseTableDataType> courseTreeTable = new JFXTreeTableView<CourseTableDataType>();
 
 	@FXML
-	TreeItem<CourseTableDataType> root = new TreeItem<>(new CourseTableDataType("", "", 0, 0));
+	private TreeItem<CourseTableDataType> root = new TreeItem<>(new CourseTableDataType("", "", 0, 0));
 
 	@FXML
 	private JFXTreeTableColumn<CourseTableDataType, String> titleColumn = new JFXTreeTableColumn<>("title");
-
 	@FXML
 	private JFXTreeTableColumn<CourseTableDataType, String> idColumn = new JFXTreeTableColumn<>("id");
-
 	@FXML
 	private JFXTreeTableColumn<CourseTableDataType, Integer> starsColumn = new JFXTreeTableColumn<>("stars");
-
 	@FXML
 	private JFXTreeTableColumn<CourseTableDataType, Integer> timeColumn = new JFXTreeTableColumn<>("time");
 	
@@ -294,7 +258,7 @@ public class MainWindowController {
 	private String selectedGameTitle;
 	private String id;
 	private String version = "0.3.0";
-	private String buildNumber = "077";
+	private String buildNumber = "079";
 	private String versionName = "Purple Comet";
 	private int xPos = -200;
 	private int yPos = 17;
@@ -372,8 +336,8 @@ public class MainWindowController {
 	private String smmdbDownloadBtnLoading;
 	private String smmdbDownloadBtnDownload;
 	
-	public void setMain(Main m) {
-		this.main = m;
+	public MainWindowController(Main main) {
+		this.main = main;
 		dbController = new DBController(main, this);
 		smmdbAPIController = new SmmdbAPIController();
 	}
@@ -382,7 +346,7 @@ public class MainWindowController {
 	 * initialize the MainWindowController
 	 * loadSettings, checkAutoUpdate, initUI and initActions
 	 */
-	void init() {
+	public void init() {
 		loadSettings();
 		checkAutoUpdate();
 		initUI();
@@ -837,7 +801,7 @@ public class MainWindowController {
 	}
     
 	@FXML
-	void detailsSlideoutBtnAction() {
+	private void detailsSlideoutBtnAction() {
 		playBtnSlideOut();
 	}
     
@@ -851,7 +815,7 @@ public class MainWindowController {
     }
 
 	@FXML
-	void settingsBtnAction() {
+	private void settingsBtnAction() {
 		if (smmdbTrue) {
 			smmdbAnchorPane.setVisible(false);
 			smmdbTrue = false;
@@ -867,12 +831,12 @@ public class MainWindowController {
 	}
     
 	@FXML
-	void reloadRomsBtnAction() throws IOException {
+	private void reloadRomsBtnAction() throws IOException {
 		reloadRoms();
 	}
     
 	@FXML
-	void smmdbBtnAction() {
+	private void smmdbBtnAction() {
 		// show smmdbAnchorPane
 		if (smmdbTrue) {
 			smmdbAnchorPane.setVisible(false);
@@ -911,7 +875,7 @@ public class MainWindowController {
 	}
     	
 	@FXML
-	void playBtnAction() throws InterruptedException, IOException {
+	private void playBtnAction() throws InterruptedException, IOException {
 		dbController.setLastPlayed(selectedGameTitleID);
 		playGame = new playGame(this, dbController);
 
@@ -919,17 +883,17 @@ public class MainWindowController {
 	}
 
 	@FXML
-	void totalPlaytimeBtnAction() {
+	private void totalPlaytimeBtnAction() {
 		
 	}
 
 	@FXML
-	void lastTimePlayedBtnAction() {
+	private void lastTimePlayedBtnAction() {
 		
 	}
     
 	@FXML
-	void cemuTFBtnAction() {
+	private void cemuTFBtnAction() {
 		File cemuDirectory = directoryChooser.showDialog(main.getPrimaryStage());
 		if (cemuDirectory != null) {
 			cemuTextField.setText(cemuDirectory.getAbsolutePath());
@@ -937,7 +901,7 @@ public class MainWindowController {
 	}
     
 	@FXML
-	void romTFBtnAction() {
+	private void romTFBtnAction() {
 		File romDirectory = directoryChooser.showDialog(main.getPrimaryStage());
 		if (romDirectory != null) {
 			romTextField.setText(romDirectory.getAbsolutePath());
@@ -945,7 +909,7 @@ public class MainWindowController {
 	}
     
 	@FXML
-	void updateBtnAction() {
+	private void updateBtnAction() {
 		updateController = new UpdateController(this, buildNumber, useBeta);
 		Thread updateThread = new Thread(updateController);
 		updateThread.setName("Updater");
@@ -953,7 +917,7 @@ public class MainWindowController {
 	}
     
 	@FXML
-	void autoUpdateToggleBtnAction() {
+	private void autoUpdateToggleBtnAction() {
 		if (isAutoUpdate()) {
 			setAutoUpdate(false);
 		} else {
@@ -963,12 +927,12 @@ public class MainWindowController {
 	}
 	
 	@FXML
-	void courseSearchTextFiledAction() {
+	private void courseSearchTextFiledAction() {
 		// not in use
 	}
     
     @FXML
-    void smmdbDownloadBtnAction() {
+    private void smmdbDownloadBtnAction() {
     	String downloadUrl = "http://smmdb.ddns.net/api/downloadcourse?id=" + id + "&type=zip";
     	String downloadFileURL = getCemuPath() + "/" + id + ".zip";	// getCemuPath() + "/" + smmID + "/" + id + ".rar"
     	String outputFile = getCemuPath() + "/";
@@ -1036,7 +1000,7 @@ public class MainWindowController {
     }
     
 	@FXML
-	void fullscreenToggleBtnAction() {
+	private void fullscreenToggleBtnAction() {
 		if (fullscreen) {
 			fullscreen = false;
 		} else {
@@ -1046,7 +1010,7 @@ public class MainWindowController {
 	}
     
     @FXML
-    void cloudSyncToggleBtnAction() {
+    private void cloudSyncToggleBtnAction() {
     	if(cloudSync) {
     		cloudSync = false;
     	} else {
@@ -1096,13 +1060,13 @@ public class MainWindowController {
     }
     
 	@FXML
-	void colorPickerAction() {
+	private void colorPickerAction() {
 		editColor(colorPicker.getValue().toString());
 		applyColor();
 	}
     
 	@FXML
-	void addBtnAction() {
+	private void addBtnAction() {
 		String headingText = addGameBtnHeadingText;
 		String bodyText = addGameBtnBodyText;
 		JFXEditGameDialog addGameDialog = new JFXEditGameDialog(headingText, bodyText, dialogBtnStyle, 450, 300, 0,

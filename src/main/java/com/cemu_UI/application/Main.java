@@ -47,7 +47,6 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.AnchorPane;
 
-
 public class Main extends Application {
 	
 	private Stage primaryStage;
@@ -63,13 +62,12 @@ public class Main extends Application {
 	private static String javaVers = System.getProperty("java.version");
 	private static String javaVend= System.getProperty("java.vendor");
 	private String gamesDBdownloadURL = "https://github.com/Seil0/cemu_UI/raw/master/downloadContent/games.db";
-	public String dirWin = userHome + "/Documents/cemu_UI";	// Windows: C:/Users/"User"/Documents/cemu_UI
-	public String dirLinux = userHome + "/cemu_UI";	// Linux: /home/"User"/cemu_UI
-	private File directory;
-	private File configFile;
-	private File gamesDBFile;
-	private File reference_gamesFile;
-	private File pictureCache;
+	private static String dirCemuUI;
+	private static File directory;
+	private static File configFile;
+	private static File gamesDBFile;
+	private static File reference_gamesFile;
+	private static File pictureCache;
     private static Logger LOGGER;
 	
 	@Override
@@ -78,7 +76,10 @@ public class Main extends Application {
 			LOGGER.info("OS: " + osName + " " + osVers + " " + osArch);
 			LOGGER.info("Java: " + javaVend + " " + javaVers);
 			LOGGER.info("User: " + userName + " " + userHome);
+			
 			this.primaryStage = primaryStage;
+			mainWindowController = new MainWindowController(this);
+			
 			mainWindow();
 			initActions();
 		} catch (Exception e) {
@@ -91,28 +92,21 @@ public class Main extends Application {
 		try {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(ClassLoader.getSystemResource("fxml/MainWindow.fxml"));
+			loader.setController(mainWindowController);
 			pane = (AnchorPane) loader.load();
+			primaryStage.setMinWidth(265.00);
+			primaryStage.setMinHeight(425.00);
 			primaryStage.setTitle("cemu_UI");
-//			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/resources/Homeflix_Icon_64x64.png"))); //adds application icon
-
-			mainWindowController = loader.getController(); // Link of FXMLController and controller class
-			mainWindowController.setMain(this);	// call setMain
-			cloudController = new CloudController(mainWindowController); // call cloudController constructor
+//			primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream(""))); //adds application icon
+			primaryStage.setOnCloseRequest(event -> System.exit(1));
 			
-			// get OS and the specific paths
-			if (osName.equals("Linux")) {
-				directory = new File(dirLinux);
-				configFile = new File(dirLinux + "/config.xml");
-				gamesDBFile = new File(dirLinux + "/games.db");
-				reference_gamesFile = new File(dirLinux + "/reference_games.db");
-				pictureCache= new File(dirLinux+"/picture_cache");
-			} else {
-				directory = new File(dirWin);
-				configFile = new File(dirWin + "/config.xml");
-				gamesDBFile = new File(dirWin + "/games.db");
-				reference_gamesFile = new File(dirWin + "/reference_games.db");
-				pictureCache= new File(dirWin+"/picture_cache");
-			}
+			// generate window
+			scene = new Scene(pane); // create new scene, append pane to scene
+			scene.getStylesheets().add(Main.class.getResource("/css/MainWindows.css").toExternalForm());
+			primaryStage.setScene(scene); // append scene to stage
+			primaryStage.show(); // show stage
+			
+			cloudController = new CloudController(mainWindowController); // call cloudController constructor
 			
 			// startup checks
 			// check if client_secret.json is present
@@ -165,14 +159,6 @@ public class Main extends Application {
 				}
 			}
 			
-			// generate window
-			scene = new Scene(pane); // create new scene, append pane to scene
-			scene.getStylesheets().add(Main.class.getResource("/css/MainWindows.css").toExternalForm());
-			primaryStage.setMinWidth(265.00);
-			primaryStage.setMinHeight(425.00);
-			primaryStage.setScene(scene); // append scene to stage
-			primaryStage.show(); // show stage
-			
 			// init here as it loads the games to the mwc and the gui, therefore the window must exist
 			mainWindowController.init();
 			mainWindowController.getDbController().init();
@@ -183,9 +169,31 @@ public class Main extends Application {
 				cloudController.sync(mainWindowController.getCloudService(), mainWindowController.getCemuPath(), directory.getPath());
 			}
 			
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static void main(String[] args) {
+		
+		if (osName.contains("Windows")) {
+			dirCemuUI = userHome + "/Documents/cemu_UI";
+		} else {
+			dirCemuUI = userHome + "/cemu_UI";
+		}
+		
+		directory = new File(dirCemuUI);
+		configFile = new File(dirCemuUI + "/config.xml");
+		gamesDBFile = new File(dirCemuUI + "/games.db");
+		reference_gamesFile = new File(dirCemuUI + "/reference_games.db");
+		pictureCache= new File(dirCemuUI+"/picture_cache");
+		
+		// delete old log file and create new
+		System.setProperty("logFilename", dirCemuUI + "/app.log");
+		File logFile = new File(dirCemuUI + "/app.log");
+		logFile.delete();
+		LOGGER = LogManager.getLogger(Main.class.getName());
+		launch(args);
 	}
 	
 	private void firstStart() {
@@ -290,26 +298,6 @@ public class Main extends Application {
 		primaryStage.widthProperty().addListener(widthListener);
 		primaryStage.heightProperty().addListener(heightListener);
 		primaryStage.maximizedProperty().addListener(maximizeListener);
-	}
-	
-	public static void main(String[] args) {
-		// delete old log file and create new
-		if (osName.equals("Linux")) {
-			System.setProperty("logFilename", userHome + "/cemu_UI/app.log");
-			File logFile = new File(userHome + "/cemu_UI/app.log");
-			logFile.delete();
-		} else {
-			System.setProperty("logFilename", userHome + "/Documents/cemu_UI/app.log");
-			File logFile = new File(userHome + "/Documents/cemu_UI/app.log");
-			logFile.delete();
-		}
-		LOGGER = LogManager.getLogger(Main.class.getName());
-		launch(args);
-	}
-	
-	@Override
-	public void stop() {
-	    System.exit(0);
 	}
 
 	public Stage getPrimaryStage() {
