@@ -147,7 +147,7 @@ public class UpdateController implements Runnable {
 				FileUtils.copyInputStreamToFile(pmis, new File("cemu_UI_update.jar")); // download update
 				org.apache.commons.io.FileUtils.copyFile(new File("cemu_UI_update.jar"), new File("cemu_UI.jar"));
 				org.apache.commons.io.FileUtils.deleteQuietly(new File("cemu_UI_update.jar")); // delete update
-				Runtime.getRuntime().exec("java -jar cemu_UI.jar"); // start again TODO consider ProcessBuilder to execute
+				new ProcessBuilder("java", "-jar", "cemu_UI.jar").start(); // start the new application
 				System.exit(0); // finishes itself
 			} catch (IOException e) {
 				Platform.runLater(() -> {

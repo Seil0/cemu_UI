@@ -117,8 +117,8 @@ public class JFXEditGameDialog {
 					// addGame error dialog
 					String headingTextError = mwc.getBundle().getString("editGameDialogHeadingTextError");
 					String bodyTextError = mwc.getBundle().getString("editGameDialogBodyTextError");
-					JFXInfoDialog errorDialog = new JFXInfoDialog(headingTextError, bodyTextError, dialogBtnStyle, 350,170, pane);
-					errorDialog.show();
+					JFXInfoAlert errorDialog = new JFXInfoAlert(headingTextError, bodyTextError, dialogBtnStyle, stage);
+					errorDialog.showAndWait();
 				} else {
 					switch (mode) {
 					case 0:

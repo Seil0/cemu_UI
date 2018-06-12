@@ -60,7 +60,7 @@ import com.cemu_UI.datatypes.CourseTableDataType;
 import com.cemu_UI.datatypes.SmmdbApiDataType;
 import com.cemu_UI.datatypes.UIROMDataType;
 import com.cemu_UI.uiElements.JFXEditGameDialog;
-import com.cemu_UI.uiElements.JFXInfoDialog;
+import com.cemu_UI.uiElements.JFXInfoAlert;
 import com.cemu_UI.uiElements.JFXOkayCancelDialog;
 import com.cemu_UI.uiElements.JFXTextAreaInfoDialog;
 import com.jfoenix.controls.JFXButton;
@@ -810,8 +810,8 @@ public class MainWindowController {
 					saveSettings();
 				} else {
 					String bodyText = newValue + ": No such file or directory";
-					JFXInfoDialog fileErrorDialog = new JFXInfoDialog("Waring!", bodyText, dialogBtnStyle, 190, 150, main.getPane());
-					fileErrorDialog.show();
+					JFXInfoAlert fileErrorDialog = new JFXInfoAlert("Waring!", bodyText, dialogBtnStyle, main.getPrimaryStage());
+					fileErrorDialog.showAndWait();
 					LOGGER.warn(newValue + ": No such file or directory");
 				}
 			}
@@ -826,8 +826,8 @@ public class MainWindowController {
 					reloadRoms();
 				} else {
 					String bodyText = newValue + ": No such file or directory";
-					JFXInfoDialog fileErrorDialog = new JFXInfoDialog("Waring!", bodyText, dialogBtnStyle, 190, 150, main.getPane());
-					fileErrorDialog.show();
+					JFXInfoAlert fileErrorDialog = new JFXInfoAlert("Waring!", bodyText, dialogBtnStyle, main.getPrimaryStage());
+					fileErrorDialog.showAndWait();
 					LOGGER.warn(newValue + ": No such file or directory");			
 				}
 			}
@@ -842,11 +842,12 @@ public class MainWindowController {
 	}
     
     @FXML
-    void aboutBtnAction() {
+    private void aboutBtnAction() {
     	String bodyText = "cemu_UI by @Seil0 \nVersion: " + version + " (" + buildNumber + ")  \"" + versionName + "\" \n"
     					+ aboutBtnBodyText;
-    	JFXInfoDialog aboutDialog = new JFXInfoDialog(aboutBtnHeadingText, bodyText, dialogBtnStyle, 350, 200, main.getPane());
-    	aboutDialog.show();
+    	
+    	JFXInfoAlert infoAlert = new JFXInfoAlert(aboutBtnHeadingText, bodyText, dialogBtnStyle, main.getPrimaryStage());
+		infoAlert.showAndWait();
     }
 
 	@FXML
@@ -1069,9 +1070,9 @@ public class MainWindowController {
 								cloudSyncToggleBtn.setSelected(false);
 
 								// cloud sync init error dialog
-								JFXInfoDialog cloudSyncErrorDialog = new JFXInfoDialog(cloudSyncErrorHeadingText,
-										cloudSyncErrorBodyText, dialogBtnStyle, 450, 170, main.getPane());
-								cloudSyncErrorDialog.show();
+								JFXInfoAlert cloudSyncErrorDialog = new JFXInfoAlert(cloudSyncErrorHeadingText,
+										cloudSyncErrorBodyText, dialogBtnStyle, main.getPrimaryStage());
+								cloudSyncErrorDialog.showAndWait();
 							}
 
 						}
@@ -1123,9 +1124,9 @@ public class MainWindowController {
 			LOGGER.info("No parameter set!");
 			
 			//addGame error dialog
-			JFXInfoDialog errorDialog = new JFXInfoDialog(addBtnReturnErrorHeadingText, addBtnReturnErrorBodyText,
-					dialogBtnStyle, 350, 170, main.getPane());
-			errorDialog.show();
+			JFXInfoAlert errorDialog = new JFXInfoAlert(addBtnReturnErrorHeadingText, addBtnReturnErrorBodyText,
+					dialogBtnStyle, main.getPrimaryStage());
+			errorDialog.showAndWait();
 
 		} else {	
 	    	File pictureCache = main.getPictureCache();
