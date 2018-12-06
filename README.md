@@ -31,8 +31,6 @@ If you want to use the cloud sync function read the [wiki](https://git.mosad.xyz
 
 * Controller support
 
-### If you have another idea, make a new issue!
-
 ### [building from source](https://git.mosad.xyz/Seil0/cemu_UI/wiki/Documentation)
   
 ## Screenshots
