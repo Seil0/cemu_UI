@@ -1,9 +1,7 @@
 # cemu_UI
 
 ![Total Downloads](https://img.shields.io/github/downloads/Seil0/cemu_UI/total.svg?style=flat-square)
-[![Build](https://img.shields.io/travis/Seil0/cemu_UI/master.svg?style=flat-square)](https://travis-ci.org/Seil0/cemu_UI)
 [![Latest](https://img.shields.io/github/release/Seil0/cemu_UI/all.svg?style=flat-square)](https://github.com/Seil0/cemu_UI/releases)
-[![HitCount](http://hits.dwyl.io/Seil0/cemu_UI.svg)](http://hits.dwyl.io/Seil0/cemu_UI)
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg?style=flat-square)](https://www.gnu.org/licenses/gpl-3.0)
 
 cemu_UI is a simple, material design graphical frontend for [cemu](http://cemu.info/), a Wii U emulator. Downloads can be found [here](https://git.mosad.xyz/Seil0/cemu_UI/releases).
@@ -35,8 +33,8 @@ If you want to use the cloud sync function read the [wiki](https://git.mosad.xyz
 
 ### If you have another idea, make a new issue!
 
-### [building from source](https://git.mosad.xyz/Seil0/cemu_UI/wiki/Documantation)
+### [building from source](https://git.mosad.xyz/Seil0/cemu_UI/wiki/Documentation)
   
 ## Screenshots
 
-![Screenshot](https://git.mosad.xyz/Seil0/cemu_UI/raw/branch/master/downloadContent/cemu_UI4.png)
+![Screenshot](https://www.mosad.xyz/images/cemu_UI_MainWindow.png)
