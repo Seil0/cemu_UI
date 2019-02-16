@@ -16,23 +16,5 @@ If you want to use the cloud sync function read the [wiki](https://git.mosad.xyz
 
 ### [FAQ](https://git.mosad.xyz/Seil0/cemu_UI/wiki#faq)
 
-## Features
-
-* launch Games
-* Time played in total
-* last time played
-* add updates and dlcs easier (only adding not downloading!)
-* automatic rom detection (only .rpx files with a app.xml)
-* customisable UI
-* [sync savegames via google drive](https://git.mosad.xyz/Seil0/cemu_UI/wiki)
-* [smmdb api](https://github.com/Tarnadas/smmdb) integration
-
-## [planed Features](https://git.mosad.xyz/Seil0/cemu_UI/milestones)
-
-* Controller support
-
-### [building from source](https://git.mosad.xyz/Seil0/cemu_UI/wiki/Documentation)
-  
 ## Screenshots
-
 ![Screenshot](https://www.mosad.xyz/images/cemu_UI_MainWindow.png)
